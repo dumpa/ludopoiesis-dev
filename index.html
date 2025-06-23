@@ -13,10 +13,22 @@
 <body>
   <h1>Ludopoiesis</h1>
 
+  <div id="instrucciones">
+  <p><strong>1.</strong> Haz una pregunta</p>
+  <p><strong>2.</strong> Escoge tus lentes:</p>
   <div id="lentes-toggle">
-    <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza" onclick="toggleLente('naturaleza')">
-    <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir" onclick="toggleLente('fluir')">
+    
+    <div class="lente">
+      <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza" onclick="toggleLente('naturaleza')">
+      <span>Naturaleza</span>
+    </div>
+    <div class="lente">
+      <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir" onclick="toggleLente('fluir')">
+      <span>Fluir</span>
+    </div>
   </div>
+  <p><strong>3.</strong> Saca tu carta</p>
+</div>
 
   <button onclick="tirarCarta()">Lanzar Carta</button>
   
