@@ -173,9 +173,18 @@ input:checked + .slider:before {
   padding: 20px;
   color: #666;
 }
+
+#instrucciones,
+#instrucciones p,
+.lente span {
+  font-family: 'Dosis', sans-serif;
+  font-size: 16px;
+  color: #333;
+  letter-spacing: 0.3px;
+}
+
 #instrucciones {
   text-align: center;
-  font-family: 'Libre Baskerville', serif;
   color: #444;
   margin: 30px 0;
 }
@@ -194,7 +203,6 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;   /* nombre debajo del ícono */
   align-items: center;
-  font-family: 'Libre Baskerville', serif;
   font-size: 14px;
   color: #333;
   cursor: pointer;
