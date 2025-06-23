@@ -167,4 +167,10 @@ input:checked + .slider:before {
   margin: 10px;
   cursor: pointer;
 }
+.mensaje-divertido {
+  text-align: center;
+  font-style: italic;
+  padding: 20px;
+  color: #666;
+}
 
