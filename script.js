@@ -15,6 +15,23 @@ fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
   .catch(err => console.error("Error al cargar cartas:", err));
 
 function tirarCarta() {
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+
+  if (!cartasFiltradas.length) {
+    mostrarObraDeArteOTexto(); // función alternativa divertida
+    return;
+  }
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+  mostrarCarta(carta);
+}
+
+function tirarCartaBK() {
   if (!cartas.length) {
     alert("Las cartas aún no se han cargado. Intenta de nuevo en unos segundos.");
     return;
@@ -108,6 +125,15 @@ function setIdioma(lengua) {
   if (cartaActual) {
     mostrarCarta(cartaActual);
   }
+}
+function mostrarObraDeArteOTexto() {
+  const container = document.getElementById("carta-container");
+  container.innerHTML = `
+    <div class="mensaje-divertido">
+      <p>No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️</p>
+      <p>O... prueba prender alguno para continuar.</p>
+    </div>
+  `;
 }
 
 
