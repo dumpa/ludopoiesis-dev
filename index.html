@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ludopoiesis - Oráculo Naturaleza</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+  <h1>Ludopoiesis - Naturaleza</h1>
+  <button onclick="tirarCarta()">Tirar Carta</button>
+  
+  <div class="idioma-switch">
+  <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
+  <label class="switch">
+    <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
+    <span class="slider"></span>
+  </label>
+  <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
+</div>
+
+
+  <div id="carta-container"></div>
+  <script src="script.js"></script>
+<!--    <button onclick="descargarImagenCarta()">Compartir</button>-->
+<!-- <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>-->
+
+ <!--  <button onclick="compartirCarta()">Compartir esta carta</button> -->
+  <!-- Footer estilo Dumpa -->
+<footer class="footer-dumpa">
+ <!--  <img src="img/avatar.png" alt="Dumpa avatar" class="avatar"> -->
+  <div><strong>El blog de dumpa</strong></div>
+  <div>Los problemas se arreglan solos</div>
+  <div class="icons">
+  <a href="https://dumpa.co" target="_blank"><i class="fa-solid fa-globe"></i></a>
+  <a href="https://x.com/@dumpita" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+  <a href="https://instagram.com/superdumpa" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+  <a href="https://github.com/dumpa" target="_blank"><i class="fa-brands fa-github"></i></a>
+  <a href="https://facebook.com/dumpablog" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+  </div>
+
+<!--  <div style="margin-top: 0.7rem;">
+    <a href="https://dumpa.substack.com" target="_blank" style="padding: 0.5rem 1rem; background: #007272; color: white; border-radius: 999px;">Suscribirme</a>
+  </div>-->
+</footer>
+
+<style>
+  .footer-dumpa {
+    margin-top: 3rem;
+    padding: 1.5rem 1rem;
+    font-family: 'Dosis', sans-serif;
+    font-size: 0.9rem;
+    color: #444;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+    text-align: center;
+  }
+  .footer-dumpa img.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+  }
+  .footer-dumpa a {
+    color: #007272;
+    text-decoration: none;
+    margin: 0 0.4rem;
+  }
+  .footer-dumpa a:hover {
+    text-decoration: underline;
+  }
+  .footer-dumpa .icons {
+    margin: 0.7rem 0;
+  }
+  .footer-dumpa .icons a {
+    margin: 0 0.3rem;
+    font-size: 1.2rem;
+    display: inline-block;
+  }
+</style>
+</body>
+</html>

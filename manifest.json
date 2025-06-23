@@ -1,0 +1,10 @@
+{
+  "name": "Ludopoiesis - Naturaleza",
+  "short_name": "Ludopoiesis",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f1ee",
+  "description": "Tira cartas del or\u00e1culo de la naturaleza y deja que la sabidur\u00eda hable.",
+  "icons": [],
+  "theme_color": "#f4f1ee"
+}

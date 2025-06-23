@@ -1,1 +1,2 @@
-# ludopoiesis-dev
+# ludopoiesis
+App for ludopoiesis
