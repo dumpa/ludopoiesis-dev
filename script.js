@@ -3,7 +3,7 @@ let idioma = "es"; // idioma actual: "es" o "pt"
 //let imagen = idioma === "es" ? carta.imagen : (carta.imagen_pt || carta.imagen);
 let cartaActual = null;
 
-fetch("cartas_naturaleza_es_pt2.json?v=" + new Date().getTime())
+fetch("cartas_naturaleza_fluir.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
