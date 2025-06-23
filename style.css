@@ -175,9 +175,13 @@ input:checked + .slider:before {
 }
 #instrucciones {
   text-align: center;
-  font-family: 'Georgia', serif;
+  
   color: #444;
   margin: 30px 0;
+}
+
+#instrucciones, .lente span {
+  font-family: 'Libre Baskerville', serif;
 }
 
 
