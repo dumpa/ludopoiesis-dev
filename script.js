@@ -3,6 +3,12 @@ let idioma = "es"; // idioma actual: "es" o "pt"
 //let imagen = idioma === "es" ? carta.imagen : (carta.imagen_pt || carta.imagen);
 let cartaActual = null;
 
+let lentesActivos = {
+  naturaleza: true,
+  fluir: true
+};
+
+
 fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
@@ -46,6 +52,13 @@ function cambiarIdioma() {
   idioma = idioma === "es" ? "pt" : "es";
   document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸 Español" : "🇧🇷 Português";
   if (cartaActual) mostrarCarta(cartaActual);
+}
+function toggleLente(lente) {
+  lentesActivos[lente] = !lentesActivos[lente];
+
+  const btn = document.getElementById(`btn-${lente}`);
+  const estado = lentesActivos[lente] ? "" : "_apagado";
+  btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
 
 function descargarImagenCarta() {
