@@ -16,37 +16,35 @@
 </head>
 <body>
   <h1>Ludopoiesis</h1>
-
+<div class="contenedor-principal">
   <div id="instrucciones">
-  <p><strong>1.</strong> Haz una pregunta</p>
-  <p><strong>2.</strong> Escoge tus lentes:</p>
-  <div id="lentes-toggle">
-    
-    <div class="lente">
-      <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza" onclick="toggleLente('naturaleza')">
-      <span>Naturaleza</span>
+    <p><strong>1.</strong> Haz una pregunta</p>
+    <p><strong>2.</strong> Escoge tus lentes:</p>
+    <div id="lentes-toggle">
+      <div class="lente">
+        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza" onclick="toggleLente('naturaleza')">
+        <span>Naturaleza</span>
+      </div>
+      <div class="lente">
+        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir" onclick="toggleLente('fluir')">
+        <span>Fluir</span>
+      </div>
     </div>
-    <div class="lente">
-      <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir" onclick="toggleLente('fluir')">
-      <span>Fluir</span>
+    <p><strong>3.</strong> Saca tu carta</p>
+    <button onclick="tirarCarta()">Lanzar Carta</button>
+
+    <div class="idioma-switch">
+      <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
+      <label class="switch">
+        <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
+        <span class="slider"></span>
+      </label>
+      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
     </div>
   </div>
-  <p><strong>3.</strong> Saca tu carta</p>
-</div>
-
-  <button onclick="tirarCarta()">Lanzar Carta</button>
-  
-  <div class="idioma-switch">
-  <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
-  <label class="switch">
-    <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
-    <span class="slider"></span>
-  </label>
-  <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
-</div>
-
 
   <div id="carta-container"></div>
+</div>
   <script src="script.js"></script>
 <!--    <button onclick="descargarImagenCarta()">Compartir</button>-->
 <!-- <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>-->
