@@ -197,7 +197,7 @@ function mostrarLentes() {
   fetch('textos.json')
     .then(res => res.json())
     .then(data => {
-      const texto = data.lentes?.[idiomaActual] || data.lentes['es'];
+      const texto = data.lentes?.[idioma] || data.lentes['es'];
       document.getElementById('introShort').style.display = 'none';
       document.getElementById('introLong').innerHTML = texto;
       document.getElementById('introLong').style.display = 'block';
