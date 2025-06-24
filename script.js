@@ -15,6 +15,8 @@ fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
+cargarIntro(); // al iniciar
+
 function tirarCarta() {
   const activos = Object.entries(lentesActivos)
     .filter(([_, activo]) => activo)
