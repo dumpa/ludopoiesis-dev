@@ -181,4 +181,16 @@ function mostrarAutor() {
     })
     .catch(err => console.error('Error cargando autor:', err));
 }
+function mostrarPregunta() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.pregunta?.[idioma] || data.pregunta['es'];
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').innerHTML = texto;
+      document.getElementById('introLong').style.display = 'block';
+      document.getElementById('carta-container').style.display = 'none';
+    })
+    .catch(err => console.error('Error al cargar el texto de pregunta:', err));
+}
 
