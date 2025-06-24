@@ -169,5 +169,16 @@ async function cargarIntro(desplegarLargo = false) {
     console.error('Error cargando textos:', err);
   }
 }
+function mostrarAutor() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('introShort').style.display = 'none';
+      const autorTexto = data.autor[idiomaActual];
+      document.getElementById('introLong').innerHTML = autorTexto;
+      document.getElementById('introLong').style.display = 'block';
+    })
+    .catch(err => console.error('Error cargando autor:', err));
+}
 
 
