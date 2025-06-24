@@ -156,6 +156,10 @@ button:hover {
   color: #333;
 }
 
+.lente-horizontal:active {
+  transform: scale(0.98);
+}
+
 .lente-horizontal img {
   width: 40px;
   height: 40px;
