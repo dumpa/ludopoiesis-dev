@@ -18,31 +18,7 @@
     "pt": "<p><strong>Sobre as perguntas</strong></p><p>Ludopoiesis começa com uma pergunta.</p><p>Achamos que perguntar é buscar uma resposta.<br>Mas as boas perguntas não se respondem:<br>se habitam.<br>Se expandem.<br>Se transformam com o tempo.</p><p>As respostas vêm com perguntas.<br>Mas talvez a resposta que chega não seja a que você esperava.<br>Isso não significa que a pergunta esteja errada.<br>Talvez você não esteja fazendo perguntas suficientes.</p><p>Uma boa pergunta não fecha, abre.<br>Não confirma, provoca.<br>Não acalma, acende.</p><p>Não se trata de fazer uma pergunta e encontrar uma resposta.<br>Trata-se de fazer uma pergunta que te gere muitas outras.<br>E essas novas perguntas, por sua vez, mais outras.</p><p>E à medida que você aprende a perguntar,<br>aprende a ver o mundo com curiosidade,<br>a navegar por ele, a mover-se com ele.<br>A fluir.</p><p>Não se trata de encontrar respostas.<br>Trata-se de fluir.</p><p>Agora faça uma pergunta. Talvez algo que te mantenha acordado, que te deixe curioso.</p>"
   },
   "lentes": {
-    "es": "<p><strong>Perspectivas del juego</strong></p>
-    <div style='display:flex; justify-content:center; gap:1rem; margin:1rem 0;'>
-      <img src='img/iconos/icono_naturaleza.png' alt='Naturaleza' width='48'>
-      <img src='img/iconos/icono_fluir.png' alt='Fluir' width='48'>
-      <img src='img/iconos/icono_tecnologia.png' alt='Tecnología' width='48'>
-    </div>
-    <p>Las cartas están organizadas en 4 perspectivas. Puedes activarlas o desactivarlas con los íconos que ves a continuación. Cada una representa un lente para ver el mundo de forma distinta:</p>
-    <p>🌱 <strong>Naturaleza</strong> — Las leyes, los ciclos, los seres. Yo como universo.<br>
-    💧 <strong>Fluir</strong> — El movimiento, los aprendizajes, la adaptación.<br>
-    🧠 <strong>Tecnología</strong> — Las herramientas, los procesos, lo que diseño y uso.<br>
-    ✨ <strong>Abundancia</strong> — La actitud, el enfoque, los juicios. (en construcción)</p>
-    <p>Activa uno, dos o los tres. Según los lentes que uses, verás un mundo distinto.</p>",
-
-    "pt": "<p><strong>Perspectivas do jogo</strong></p>
-    <div style='display:flex; justify-content:center; gap:1rem; margin:1rem 0;'>
-      <img src='img/iconos/icono_naturaleza.png' alt='Natureza' width='48'>
-      <img src='img/iconos/icono_fluir.png' alt='Fluir' width='48'>
-      <img src='img/iconos/icono_tecnologia.png' alt='Tecnologia' width='48'>
-    </div>
-    <p>As cartas estão organizadas em 4 perspectivas. Você pode ativá-las ou desativá-las com os ícones abaixo. Cada uma é uma lente para ver o mundo de forma diferente:</p>
-    <p>🌱 <strong>Natureza</strong> — As leis, os ciclos, os seres. Eu como universo.<br>
-    💧 <strong>Fluir</strong> — O movimento, os aprendizados, a adaptação.<br>
-    🧠 <strong>Tecnologia</strong> — As ferramentas, os processos, o que crio e uso.<br>
-    ✨ <strong>Abundância</strong> — A atitude, o foco, os julgamentos. (em construção)</p>
-    <p>Ative um, dois ou os três. Conforme os óculos que usar, verá um mundo diferente.</p>"
+    "es": "<p><strong>Perspectivas del juego</strong></p><div style='display:flex; justify-content:center; gap:1rem; margin:1rem 0;'><img src='img/iconos/icono_naturaleza.png' alt='Naturaleza' width='48'><img src='img/iconos/icono_fluir.png' alt='Fluir' width='48'><img src='img/iconos/icono_tecnologia.png' alt='Tecnología' width='48'></div><p>Las cartas están organizadas en 4 perspectivas. Puedes activarlas o desactivarlas con los íconos que ves a continuación. Cada una representa un lente para ver el mundo de forma distinta:</p><p>🌱 <strong>Naturaleza</strong> — Las leyes, los ciclos, los seres. Yo como universo.<br>💧 <strong>Fluir</strong> — El movimiento, los aprendizajes, la adaptación.<br>🧠 <strong>Tecnología</strong> — Las herramientas, los procesos, lo que diseño y uso.<br>✨ <strong>Abundancia</strong> — La actitud, el enfoque, los juicios. (en construcción)</p><p>Activa uno, dos o los tres. Según los lentes que uses, verás un mundo distinto.</p>",
+    "pt": "<p><strong>Perspectivas do jogo</strong></p><div style='display:flex; justify-content:center; gap:1rem; margin:1rem 0;'><img src='img/iconos/icono_naturaleza.png' alt='Natureza' width='48'><img src='img/iconos/icono_fluir.png' alt='Fluir' width='48'><img src='img/iconos/icono_tecnologia.png' alt='Tecnologia' width='48'></div><p>As cartas estão organizadas em 4 perspectivas. Você pode ativá-las ou desativá-las com os ícones abaixo. Cada uma é uma lente para ver o mundo de forma diferente:</p><p>🌱 <strong>Natureza</strong> — As leis, os ciclos, os seres. Eu como universo.<br>💧 <strong>Fluir</strong> — O movimento, os aprendizados, a adaptação.<br>🧠 <strong>Tecnologia</strong> — As ferramentas, os processos, o que crio e uso.<br>✨ <strong>Abundância</strong> — A atitude, o foco, os julgamentos. (em construção)</p><p>Ative um, dois ou os três. Conforme os óculos que usar, verá um mundo diferente.</p>"
   }
-
 }
