@@ -23,20 +23,20 @@
 
     <p><strong>2.</strong> <span onclick="mostrarLentes()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Escoge tus lentes</span></p>
    <div id="lentes-toggle">
-     <div class="lente-horizontal">
-      <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza" onclick="toggleLente('naturaleza')">
-      <span>Naturaleza</span>
-    </div>
-    <div class="lente-horizontal">
-      <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir" onclick="toggleLente('fluir')">
-      <span>Fluir</span>
-    </div>
-    <div class="lente-horizontal">
-      <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología" onclick="toggleLente('tecnologia')">
-      <span>Tecnología</span>
-    </div>
-  
-    </div>
+  <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
+    <img src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+    <span>Naturaleza</span>
+  </div>
+  <div class="lente-horizontal" onclick="toggleLente('fluir')">
+    <img src="img/iconos/icono_fluir.png" alt="Fluir">
+    <span>Fluir</span>
+  </div>
+  <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
+    <img src="img/iconos/icono_tecnologia.png" alt="Tecnología">
+    <span>Tecnología</span>
+  </div>
+</div>
+
     <p><strong>3.</strong> Saca tu carta</p>
     <button onclick="tirarCarta()">Lanzar Carta</button>
 
