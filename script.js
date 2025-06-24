@@ -26,6 +26,27 @@ function tirarCarta() {
 
   document.getElementById('introShort').style.display = 'none';
   document.getElementById('introLong').style.display = 'none';
+  document.getElementById('dinamica').style.display = 'none';
+  document.getElementById('carta-container').style.display = 'block';
+
+  if (!cartasFiltradas.length) {
+    mostrarObraDeArteOTexto();
+    return;
+  }
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+  mostrarCarta(carta);
+}
+/*function tirarCarta() {
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+
+  document.getElementById('introShort').style.display = 'none';
+  document.getElementById('introLong').style.display = 'none';
   document.getElementById('carta-container').style.display = 'block';
 
   if (!cartasFiltradas.length) {
@@ -37,7 +58,7 @@ function tirarCarta() {
   cartaActual = carta;
   mostrarCarta(carta);
 }
-
+*/
 function tirarCartaBK() {
   if (!cartas.length) {
     alert("Las cartas aún no se han cargado. Intenta de nuevo en unos segundos.");
