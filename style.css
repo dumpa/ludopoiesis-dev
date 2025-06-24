@@ -111,7 +111,8 @@ button:hover {
   color: #333;
   letter-spacing: 0.3px;
 }
-}#lentes-toggle {
+
+#lentes-toggle {
   display: flex;
   flex-direction: row;
   justify-content: center;
