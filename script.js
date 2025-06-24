@@ -5,7 +5,8 @@ let cartaActual = null;
 
 let lentesActivos = {
   naturaleza: true,
-  fluir: true
+  fluir: true,
+  tecnología: true
 };
 
 
