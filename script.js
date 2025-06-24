@@ -206,3 +206,17 @@ function mostrarLentes() {
     .catch(err => console.error('Error al cargar el texto de lentes:', err));
 }
 
+function mostrarDinamica() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const idioma = getIdiomaActual();
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').style.display = 'none';
+      const texto = data.dinamica[idioma];
+      const contenedor = document.getElementById('dinamica');
+      contenedor.innerHTML = texto;
+      contenedor.style.display = 'block';
+    });
+}
+
