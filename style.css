@@ -209,14 +209,15 @@ input:checked + .slider:before {
   padding: 20px;
   color: #666;
 }
-
 @media (min-width: 768px) {
   .contenedor-principal {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 2rem;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
   }
 
   #instrucciones {
@@ -228,6 +229,6 @@ input:checked + .slider:before {
     width: 60%;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 }
-
