@@ -24,6 +24,10 @@ function tirarCarta() {
 
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
 
+  document.getElementById('introShort').style.display = 'none';
+  document.getElementById('introLong').style.display = 'none';
+  document.getElementById('carta-container').style.display = 'block';
+
   if (!cartasFiltradas.length) {
     mostrarObraDeArteOTexto(); // función alternativa divertida
     return;
