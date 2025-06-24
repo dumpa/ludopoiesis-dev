@@ -209,3 +209,25 @@ input:checked + .slider:before {
   padding: 20px;
   color: #666;
 }
+
+@media (min-width: 768px) {
+  .contenedor-principal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  #instrucciones {
+    width: 40%;
+    text-align: left;
+  }
+
+  #carta-container {
+    width: 60%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
