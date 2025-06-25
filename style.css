@@ -35,8 +35,9 @@ button:hover {
   max-height: 80vh;
   overflow-y: auto;
   padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
-
 
 .card {
   width: 340px;
@@ -45,7 +46,7 @@ button:hover {
   transform-style: preserve-3d;
   transition: transform 0.8s;
   cursor: pointer;
-  margin: auto;
+  margin: 0.5rem;
 }
 
 .card-inner {
@@ -233,9 +234,9 @@ input:checked + .slider:before {
     text-align: left;
   }
 
+  /* ⛔ Se eliminó display/flex aquí para no romper el layout */
   #carta-container {
     width: 60%;
- 
   }
 }
 
@@ -291,6 +292,7 @@ input:checked + .slider:before {
     z-index: 2;
   }
 }
+
 .card.ampliada {
   position: fixed;
   top: 50%;
@@ -303,4 +305,3 @@ input:checked + .slider:before {
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
 }
-
