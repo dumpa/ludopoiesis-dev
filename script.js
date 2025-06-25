@@ -114,6 +114,23 @@ card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
   container.style.display = "flex";
   container.style.flexDirection = "row";
   container.style.flexWrap = "nowrap";
+
+  // Fijar posición absoluta de cartas anteriores para que no se muevan
+const cartasPrevias = container.querySelectorAll(".card");
+cartasPrevias.forEach(carta => {
+  const rect = carta.getBoundingClientRect();
+  const parentRect = container.getBoundingClientRect();
+
+  const left = rect.left - parentRect.left + container.scrollLeft;
+  const top = rect.top - parentRect.top + container.scrollTop;
+
+  carta.style.position = "absolute";
+  carta.style.left = `${left}px`;
+  carta.style.top = `${top}px`;
+  carta.style.margin = "0";
+});
+
+  
   container.appendChild(card);
 }
 function lanzarCartaConEstilo(posicion = 'horizontal') {
