@@ -64,25 +64,23 @@ function lanzarCartaSuperpuesta() {
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
 
-card.onclick = () => {
+  
+  card.onclick = () => {
   const todas = document.querySelectorAll(".card");
+
   const yaFlipped = card.classList.contains("flipped");
 
-  // Quitar flip y ampliación de todas
   todas.forEach(c => {
-    c.classList.remove("flipped", "ampliada");
-    //c.style.transform = c.dataset.originalTransform || "";
+    if (c !== card) {
+      c.classList.remove("flipped", "ampliada");
+    }
   });
 
-  // Si no estaba flipped antes, agregarlo de nuevo
   if (!yaFlipped) {
-  card.classList.add("flipped");
-  if (todas.length > 1) {
-    card.classList.add("ampliada");
-    const anguloOriginal = card.dataset.angulo || "0";
-    card.style.transform = `scale(1) rotate(${anguloOriginal}deg)`;
+    card.classList.add("flipped", "ampliada");
+  } else {
+    card.classList.remove("flipped", "ampliada");
   }
-}
 };
 
   const angulo = (Math.random() * 10 - 5).toFixed(2);
