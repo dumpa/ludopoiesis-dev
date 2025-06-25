@@ -325,13 +325,14 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   container.appendChild(wrapper);
 
   const wrappers = container.querySelectorAll(".carta-wrapper");
+  
   const total = wrappers.length;
 
-  wrappers.forEach((wrapper, index) => {
-    const scale = Math.max(0.6, 1 - index * 0.07); // más cartas, más pequeñas
-    wrapper.style.transform = `scale(${scale})`;
-  });
-
+wrappers.forEach((wrapper, index) => {
+  const i = total - 1 - index; // invertir el orden
+  const scale = Math.max(0.6, 1 - i * 0.07);
+  wrapper.style.transform = `scale(${scale})`;
+});
 }
 
 function lanzarCartaConEstilo2(posicion = 'horizontal') {
