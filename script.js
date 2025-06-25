@@ -71,23 +71,27 @@ card.onclick = () => {
   // Quitar flip y ampliación de todas
   todas.forEach(c => {
     c.classList.remove("flipped", "ampliada");
-    c.style.transform = c.dataset.originalTransform || "";
+    //c.style.transform = c.dataset.originalTransform || "";
   });
 
   // Si no estaba flipped antes, agregarlo de nuevo
   if (!yaFlipped) {
-    card.classList.add("flipped");
-    if (todas.length > 1) {
-      card.classList.add("ampliada");
-      card.style.transform = "scale(1) rotate(0deg)";
-    }
+  card.classList.add("flipped");
+  if (todas.length > 1) {
+    card.classList.add("ampliada");
+    const anguloOriginal = card.dataset.angulo || "0";
+    card.style.transform = `scale(1) rotate(${anguloOriginal}deg)`;
   }
+}
 };
 
-
   const angulo = (Math.random() * 10 - 5).toFixed(2);
-  card.style.transform = `rotate(${angulo}deg)`;
+  card.style.transform = `rotate(${angulo}deg) scale(0.9)`;  // o el valor que estés usando
+  card.dataset.angulo = angulo;
+  card.dataset.originalTransform = card.style.transform;
 
+
+  
 const totalCartas = container.querySelectorAll(".card").length;
 card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
 
