@@ -310,11 +310,13 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   const wrapper = document.createElement("div");
   wrapper.classList.add("carta-wrapper");
   wrapper.style.display = "flex";
-  wrapper.style.flexDirection = "column";
+ 
   wrapper.style.alignItems = "center";
   wrapper.style.justifyContent = "center";
-  wrapper.style.margin = "0.5rem";
+  //wrapper.style.margin = "0.5rem";
+  wrapper.classList.add("carta-wrapper", posicion); // posicion = 'horizontal' o 'vertical'
 
+  
   // Rotación decorativa
   const angulo = (Math.random() * 10 - 5).toFixed(2);
   wrapper.style.transform = `rotate(${angulo}deg)`;
