@@ -272,7 +272,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   // Asegurar visibilidad del contenedor
   container.style.display = "flex";
-  container.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
+  container.style.flexDirection = posicion === 'vertical' ? 'row' : 'column' ;
 
   // Filtrar cartas activas
   const activos = Object.entries(lentesActivos)
@@ -291,7 +291,8 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
-  card.onclick = () => toggleAmpliada(card);
+  card.onclick = () => card.classList.toggle("flipped");
+
 
   // Rotación y leve desplazamiento
   const angulo = (Math.random() * 10 - 5).toFixed(2); // entre -5° y 5°
