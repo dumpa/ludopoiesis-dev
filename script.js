@@ -76,21 +76,29 @@ function mostrarCarta(carta) {
   const texto = idioma === "es" ? carta.texto : carta.texto_pt;
   const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
 
-  const estabaVolteada = document.querySelector(".card")?.classList.contains("flipped");
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.onclick = () => card.classList.toggle("flipped");
 
-
-  container.innerHTML = `
-    <div class="card" onclick="this.classList.toggle('flipped')">
-      <div class="card-inner">
-        <div class="card-front">
-          <img src="${imagen}" alt="${titulo}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
-        </div>
-        <div class="card-back">
-          <h2>${titulo}</h2>
-          <p>${texto.replace(/\\n/g, "<br>")}</p>
-        </div>
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
       </div>
-    </div>`;
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(card);
+
+  // Controlar escala si hay muchas cartas
+  const totalCartas = container.querySelectorAll(".card").length;
+  if (totalCartas >= 4) {
+    container.classList.add("muchas-cartas");
+  }
 }
 
 function cambiarIdioma() {
@@ -105,6 +113,14 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
+
+function reiniciarCartas() {
+  const container = document.getElementById("carta-container");
+  container.innerHTML = "";
+  container.classList.remove("muchas-cartas");
+  cartaActual = null;
+}
+
 
 function descargarImagenCarta() {
   const carta = document.querySelector(".card");
