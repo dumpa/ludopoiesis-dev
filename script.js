@@ -65,6 +65,23 @@ function lanzarCartaSuperpuesta() {
   card.classList.add("card", "card-animada");
   card.dataset.id = carta.id;
 
+  card.onclick = () => {
+  const todas = document.querySelectorAll(".card");
+  const yaFlipped = card.classList.contains("flipped");
+
+  todas.forEach(c => {
+    c.classList.remove("flipped", "ampliada");
+    const angulo = c.dataset.angulo || "0";
+    const escala = c.dataset.originalScale || "0.9";
+    c.style.transform = `rotate(${angulo}deg) scale(${escala})`;
+  });
+
+  if (!yaFlipped) {
+    card.classList.add("flipped", "ampliada");
+    card.style.transform = "scale(1) rotate(0deg)";
+  }
+};
+
 
   card.onclick = () => {
   const todas = document.querySelectorAll(".card");
