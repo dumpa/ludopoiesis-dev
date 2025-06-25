@@ -293,6 +293,9 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
       </div>
     </div>`;
 
+  container.style.display = "flex";
+container.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
+
   container.appendChild(card);
 
 // ya tienes 'container', solo actualizamos clases
@@ -315,3 +318,4 @@ function toggleAmpliada(card) {
   }
   card.classList.toggle("ampliada");
 }
+window.lanzarCartaConEstilo = lanzarCartaConEstilo;
