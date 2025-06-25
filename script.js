@@ -6,7 +6,7 @@ let cartasLanzadas = [];
 let lentesActivos = {
   naturaleza: true,
   fluir: true,
-  tecnología: true
+  tecnologia: true
 };
 
 fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
