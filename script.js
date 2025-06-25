@@ -254,3 +254,56 @@ function mostrarDinamica() {
     })
     .catch(err => console.error('Error al cargar el texto de dinamica:', err));
 }
+function lanzarCartaConEstilo(posicion = 'horizontal') {
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+
+  const container = document.getElementById("carta-container");
+  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.onclick = () => toggleAmpliada(card); // para agrandar al hacer click
+
+  // rotación aleatoria y posición flotante leve
+  const angulo = (Math.random() * 10 - 5).toFixed(2); // -5° a 5°
+  const offsetX = (Math.random() * 20 - 10).toFixed(2);
+  const offsetY = (Math.random() * 20 - 10).toFixed(2);
+  card.style.transform += ` rotate(${angulo}deg)`;
+  card.style.marginLeft = `${offsetX}px`;
+  card.style.marginTop = `${offsetY}px`;
+
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}">
+      </div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\\n/g, "<br>")}</p>
+      </div>
+    </div>`;
+
+  container.appendChild(card);
+
+  // Escala si hay muchas
+  if (container.querySelectorAll('.card').length >= 4) {
+    container.classList.add("muchas-cartas");
+  }
+}
+function toggleAmpliada(card) {
+  const yaAmpliada = document.querySelector(".card.ampliada");
+  if (yaAmpliada && yaAmpliada !== card) {
+    yaAmpliada.classList.remove("ampliada");
+  }
+  card.classList.toggle("ampliada");
+}
