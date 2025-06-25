@@ -265,36 +265,53 @@ function toggleIdioma() {
 function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
-  // Actualizar introducción visible si aplica
-  cargarIntro();
+  // Actualiza la bandera si tienes algún botón visual
+  // document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸" : "🇧🇷";
 
-  // Reactualizar posibles secciones cargadas
-  mostrarLentes();
-  mostrarPregunta();
-  mostrarDinamica();
-
-  // Actualizar cartas ya lanzadas
+  // Si se están mostrando cartas, actualizarlas
   const cartasEnPantalla = document.querySelectorAll(".card");
-  cartasEnPantalla.forEach(card => {
-    const id = card.dataset.id;
-    const cartaData = cartas.find(c => c.id == id);
-    if (!cartaData) return;
+  if (cartasEnPantalla.length > 0) {
+    cartasEnPantalla.forEach(card => {
+      const id = card.dataset.id;
+      const cartaData = cartas.find(c => c.id == id);
+      if (!cartaData) return;
 
-    const titulo = idioma === "es" ? cartaData.titulo : cartaData.titulo_pt;
-    const texto = idioma === "es" ? cartaData.texto : cartaData.texto_pt;
-    const imagen = idioma === "es" ? cartaData.imagen : cartaData.imagen_pt;
+      const titulo = idioma === "es" ? cartaData.titulo : cartaData.titulo_pt;
+      const texto = idioma === "es" ? cartaData.texto : cartaData.texto_pt;
+      const imagen = idioma === "es" ? cartaData.imagen : cartaData.imagen_pt;
 
-    const front = card.querySelector(".card-front img");
-    const backH2 = card.querySelector(".card-back h2");
-    const backP = card.querySelector(".card-back p");
+      const front = card.querySelector(".card-front img");
+      const backH2 = card.querySelector(".card-back h2");
+      const backP = card.querySelector(".card-back p");
 
-    if (front) {
-      front.src = imagen;
-      front.alt = titulo;
-    }
-    if (backH2) backH2.textContent = titulo;
-    if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
-  });
+      if (front) {
+        front.src = imagen;
+        front.alt = titulo;
+      }
+      if (backH2) backH2.textContent = titulo;
+      if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
+    });
+    return;
+  }
+
+  // Si no hay cartas en pantalla, verifica qué texto está visible
+  const longVisible = document.getElementById("introLong").style.display === "block";
+  const shortVisible = document.getElementById("introShort").style.display === "block";
+
+  if (longVisible || shortVisible) {
+    cargarIntro(longVisible);
+    return;
+  }
+
+  // Si se estaba mostrando alguna sección adicional
+  const longEl = document.getElementById("introLong");
+  if (longEl.innerHTML.includes("pregunta")) {
+    mostrarPregunta();
+  } else if (longEl.innerHTML.includes("lentes")) {
+    mostrarLentes();
+  } else if (longEl.innerHTML.includes("dinámica")) {
+    mostrarDinamica();
+  }
 }
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
