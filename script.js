@@ -338,7 +338,7 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
-/*function toggleIdioma() {
+function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
   document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸 Español" : "🇧🇷 Português";
 
@@ -352,7 +352,7 @@ function toggleLente(lente) {
 
   // También podrías actualizar el texto de instrucciones si lo deseas
   cargarIntro();
-}*/
+}
 /*function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
