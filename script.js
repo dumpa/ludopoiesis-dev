@@ -385,14 +385,14 @@ function toggleIdioma() {
       const front = card.querySelector(".card-front img");
       const backH2 = card.querySelector(".card-back h2");
       const backP = card.querySelector(".card-back p");
+if (front) {
+  front.src = imagen;
+  front.alt = titulo;
+}
+if (backH2) backH2.textContent = titulo;
+if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
 
-      if (front) {
-        front.src = imagen;
-        front.alt = titulo;
-      }
-      if (backH2) backH2.textContent = titulo;
-      if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
-      card.style.transform = card.dataset.originalTransform || "";
+card.dataset.originalTransform = card.style.transform;
 
     });
     
