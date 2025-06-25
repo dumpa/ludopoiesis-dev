@@ -392,7 +392,10 @@ function toggleIdioma() {
       }
       if (backH2) backH2.textContent = titulo;
       if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
+      card.style.transform = card.dataset.originalTransform || "";
+
     });
+    
     return;
   }
 
