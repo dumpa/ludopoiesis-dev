@@ -235,9 +235,7 @@ input:checked + .slider:before {
 
   #carta-container {
     width: 60%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+ 
   }
 }
 
