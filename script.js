@@ -226,3 +226,15 @@ function mostrarLentes() {
     })
     .catch(err => console.error('Error al cargar el texto de lentes:', err));
 }
+function mostrarDinamica() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.dinamica?.[idioma] || data.dinamica['es'];
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').innerHTML = texto;
+      document.getElementById('introLong').style.display = 'block';
+      document.getElementById('carta-container').style.display = 'none';
+    })
+    .catch(err => console.error('Error al cargar el texto de dinamica:', err));
+}
