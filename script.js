@@ -70,35 +70,24 @@ function lanzarCartaSuperpuesta() {
   const yaFlipped = card.classList.contains("flipped");
 
   todas.forEach(c => {
-    c.classList.remove("flipped", "ampliada");
-    const angulo = c.dataset.angulo || "0";
-    const escala = c.dataset.originalScale || "0.9";
-    c.style.transform = `rotate(${angulo}deg) scale(${escala})`;
-  });
-
-  if (!yaFlipped) {
-    card.classList.add("flipped", "ampliada");
-    card.style.transform = "scale(1) rotate(0deg)";
-  }
-};
-
-
-  card.onclick = () => {
-  const todas = document.querySelectorAll(".card");
-
-  const yaFlipped = card.classList.contains("flipped");
-
-  todas.forEach(c => {
     if (c !== card) {
       c.classList.remove("flipped", "ampliada");
-      // Restaurar solo la carta no seleccionada
       c.style.transform = c.dataset.originalTransform || "";
     }
   });
 
   if (!yaFlipped) {
-    card.classList.add("flipped", "ampliada");
-    card.style.transform = "scale(1) rotate(0deg)";
+    card.classList.add("flipped");
+
+    const totalCartas = document.querySelectorAll(".card").length;
+
+    if (totalCartas > 1) {
+      card.classList.add("ampliada");
+      card.style.transform = "scale(1) rotate(0deg)";
+    } else {
+      card.classList.remove("ampliada"); // no usar ampliada si es la única
+      card.style.transform = "scale(1) rotate(0deg)";
+    }
   } else {
     card.classList.remove("flipped", "ampliada");
     card.style.transform = card.dataset.originalTransform || "";
