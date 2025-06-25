@@ -45,7 +45,7 @@ button:hover {
   transform-style: preserve-3d;
   transition: transform 0.8s;
   cursor: pointer;
-  margin: auto;
+  margin: 0;
 }
 
 .card-inner {
