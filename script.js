@@ -255,6 +255,7 @@ function mostrarDinamica() {
     .catch(err => console.error('Error al cargar el texto de dinamica:', err));
 }
 function lanzarCartaConEstilo(posicion = 'horizontal') {
+  console.log('🎯 Lanzar carta con estilo activado:', posicion);
   const activos = Object.entries(lentesActivos)
     .filter(([_, activo]) => activo)
     .map(([lente]) => lente);
