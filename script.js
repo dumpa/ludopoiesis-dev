@@ -254,7 +254,80 @@ function mostrarDinamica() {
     })
     .catch(err => console.error('Error al cargar el texto de dinamica:', err));
 }
+function lanzarCartaConEstilo(posicion = 'horizontal') {
+  console.log('🎯 Lanzar carta con estilo activado:', posicion);
 
+  // Ocultar textos introductorios
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  const container = document.getElementById("carta-container");
+
+  // Eliminar mensaje poético si existe
+  const mensaje = container.querySelector(".mensaje-divertido");
+  if (mensaje) mensaje.remove();
+
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap"; // permitir múltiples filas
+  container.style.alignItems = "flex-start";
+
+  // Filtrar cartas activas
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+
+  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+  // Crear carta
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.onclick = () => card.classList.toggle("flipped");
+
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}">
+      </div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+
+  // Crear wrapper individual
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("carta-wrapper");
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = (posicion === 'horizontal') ? 'row' : 'column';
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "center";
+  wrapper.style.margin = "0.5rem";
+
+  wrapper.appendChild(card);
+  container.appendChild(wrapper);
+
+  // Aplicar escalado a todas las cartas visibles
+  const todas = container.querySelectorAll(".card");
+  const total = todas.length;
+  const scale = Math.max(0.6, 1 - total * 0.08);
+
+  todas.forEach(c => {
+    const angulo = (Math.random() * 10 - 5).toFixed(2);
+    c.style.transform = `rotate(${angulo}deg) scale(${scale})`;
+  });
+}
+/*
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   console.log('🎯 Lanzar carta con estilo activado:', posicion);
 
