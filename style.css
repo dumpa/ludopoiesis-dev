@@ -327,24 +327,7 @@ input:checked + .slider:before {
 #carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
 
 
-
-
-
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap');
-
-/* ... contenido original anterior omitido para brevedad ... */
-
-/* Ajustes para eliminar bordes blancos entre cartas */
-#carta-container {
-  gap: 0 !important;
-  padding: 0 !important;
-}
-
-.carta-wrapper {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
+/* Ajustes para eliminar bordes blancos y sombras de las cartas */
 .card, .card-inner, .card-front img {
   border: none !important;
   box-shadow: none !important;
