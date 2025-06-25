@@ -324,14 +324,14 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   wrapper.appendChild(card);
   container.appendChild(wrapper);
 
-  // 🔁 REESCALAR TODAS
   const wrappers = container.querySelectorAll(".carta-wrapper");
   const total = wrappers.length;
-  const scale = Math.max(0.6, 1 - total * 0.07);
 
-  wrappers.forEach(w => {
-    w.style.transform += ` scale(${scale})`;
+  wrappers.forEach((wrapper, index) => {
+    const scale = Math.max(0.6, 1 - index * 0.07); // más cartas, más pequeñas
+    wrapper.style.transform = `scale(${scale})`;
   });
+
 }
 
 function lanzarCartaConEstilo2(posicion = 'horizontal') {
