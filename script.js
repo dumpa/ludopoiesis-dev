@@ -254,8 +254,27 @@ function mostrarDinamica() {
     })
     .catch(err => console.error('Error al cargar el texto de dinamica:', err));
 }
+
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   console.log('🎯 Lanzar carta con estilo activado:', posicion);
+
+  // Ocultar textos introductorios si están visibles
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  const container = document.getElementById("carta-container");
+
+  // Remover mensaje poético si existe
+  const mensaje = container.querySelector(".mensaje-divertido");
+  if (mensaje) mensaje.remove();
+
+  // Asegurar visibilidad del contenedor
+  container.style.display = "flex";
+  container.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
+
+  // Filtrar cartas activas
   const activos = Object.entries(lentesActivos)
     .filter(([_, activo]) => activo)
     .map(([lente]) => lente);
@@ -266,22 +285,19 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
 
-  const container = document.getElementById("carta-container");
   const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
   const texto = idioma === "es" ? carta.texto : carta.texto_pt;
   const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
 
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
-  card.onclick = () => toggleAmpliada(card); // para agrandar al hacer click
+  card.onclick = () => toggleAmpliada(card);
 
-  // rotación aleatoria y posición flotante leve
-  const angulo = (Math.random() * 10 - 5).toFixed(2); // -5° a 5°
+  // Rotación y leve desplazamiento
+  const angulo = (Math.random() * 10 - 5).toFixed(2); // entre -5° y 5°
   const offsetX = (Math.random() * 20 - 10).toFixed(2);
   const offsetY = (Math.random() * 20 - 10).toFixed(2);
-  card.style.transform += ` rotate(${angulo}deg)`;
-  card.style.marginLeft = `${offsetX}px`;
-  card.style.marginTop = `${offsetY}px`;
+  card.style.transform += ` rotate(${angulo}deg) translate(${offsetX}px, ${offsetY}px)`;
 
   card.innerHTML = `
     <div class="card-inner">
@@ -292,25 +308,21 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
         <h2>${titulo}</h2>
         <p>${texto.replace(/\\n/g, "<br>")}</p>
       </div>
-    </div>`;
-
-  container.style.display = "flex";
-container.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
+    </div>
+  `;
 
   container.appendChild(card);
 
-// ya tienes 'container', solo actualizamos clases
-const totalCartas = container.querySelectorAll(".card").length;
+  // Escalar si hay muchas
+  const totalCartas = container.querySelectorAll(".card").length;
 
-container.classList.forEach(cls => {
-  if (/^card-\d+$/.test(cls)) {
-    container.classList.remove(cls);
-  }
-});
+  container.classList.forEach(cls => {
+    if (/^card-\d+$/.test(cls)) {
+      container.classList.remove(cls);
+    }
+  });
 
-container.classList.add(`card-${Math.min(totalCartas, 9)}`);
-
-  
+  container.classList.add(`card-${Math.min(totalCartas, 9)}`);
 }
 function toggleAmpliada(card) {
   const yaAmpliada = document.querySelector(".card.ampliada");
