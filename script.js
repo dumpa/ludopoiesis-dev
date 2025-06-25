@@ -364,7 +364,7 @@ function toggleLente(lente) {
   // También podrías actualizar el texto de instrucciones si lo deseas
   cargarIntro();
 }*/
-function toggleIdioma() {
+/*function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
   // Actualiza la bandera si tienes algún botón visual
@@ -418,7 +418,7 @@ card.dataset.originalTransform = card.style.transform;
     mostrarDinamica();
   }
 }
-
+*/
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
