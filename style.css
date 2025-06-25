@@ -303,6 +303,9 @@ input:checked + .slider:before {
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
 }
+.carta-wrapper {
+  flex-shrink: 0;
+}
 
 /* Escalado progresivo automático */
 #carta-container.card-1 .card { transform: scale(1); }
