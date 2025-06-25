@@ -262,6 +262,35 @@ function toggleIdioma() {
   // También podrías actualizar el texto de instrucciones si lo deseas
   cargarIntro();
 }
+function toggleIdioma() {
+  idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
+
+  // Actualizar los textos introductorios
+  cargarIntro();
+
+  // Actualizar cartas ya lanzadas
+  const cartasEnPantalla = document.querySelectorAll(".card");
+  cartasEnPantalla.forEach(card => {
+    const id = card.dataset.id;
+    const cartaData = cartas.find(c => c.id == id);
+    if (!cartaData) return;
+
+    const titulo = idioma === "es" ? cartaData.titulo : cartaData.titulo_pt;
+    const texto = idioma === "es" ? cartaData.texto : cartaData.texto_pt;
+    const imagen = idioma === "es" ? cartaData.imagen : cartaData.imagen_pt;
+
+    const front = card.querySelector(".card-front img");
+    const backH2 = card.querySelector(".card-back h2");
+    const backP = card.querySelector(".card-back p");
+
+    if (front) {
+      front.src = imagen;
+      front.alt = titulo;
+    }
+    if (backH2) backH2.textContent = titulo;
+    if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
+  });
+}
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
