@@ -314,7 +314,16 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   container.appendChild(card);
 
-  // Escalar si hay muchas
+
+  // Escalar dinámicamente si hay muchas
+const totalCartas = container.querySelectorAll(".card").length;
+if (totalCartas >= 2) {
+  container.querySelectorAll('.card').forEach(c => {
+    const scale = Math.max(0.6, 1 - totalCartas * 0.1);
+    c.style.transform += ` scale(${scale})`;
+  });
+}
+/*  // Escalar si hay muchas
   const totalCartas = container.querySelectorAll(".card").length;
 
   container.classList.forEach(cls => {
@@ -324,7 +333,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   });
 
   container.classList.add(`card-${Math.min(totalCartas, 9)}`);
-}
+}*/
 function toggleAmpliada(card) {
   const yaAmpliada = document.querySelector(".card.ampliada");
   if (yaAmpliada && yaAmpliada !== card) {
