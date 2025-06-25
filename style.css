@@ -305,6 +305,7 @@ input:checked + .slider:before {
   transition: all 0.3s ease;
 }
 .carta-wrapper {
+  transition: transform 0.4s ease;
   flex-shrink: 0;
 }
 
