@@ -39,7 +39,53 @@ function cargarIntro(desplegarLargo = false) {
     })
     .catch(err => console.error('Error cargando textos:', err));
 }
+function lanzarCartaSuperpuesta() {
+  const container = document.getElementById("carta-container");
 
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+
+  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.onclick = () => card.classList.toggle("flipped");
+
+  const angulo = (Math.random() * 10 - 5).toFixed(2);
+  card.style.transform = `rotate(${angulo}deg)`;
+  card.style.marginLeft = "-60px"; // sobreposición leve a la izquierda
+
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}">
+      </div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+
+  container.style.display = "flex";
+  container.style.flexDirection = "row";
+  container.style.flexWrap = "nowrap";
+  container.appendChild(card);
+}
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
     const el = document.getElementById(id);
