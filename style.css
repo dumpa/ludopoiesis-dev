@@ -303,3 +303,15 @@ input:checked + .slider:before {
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
 }
+
+/* Escalado progresivo automático */
+#carta-container.card-1 .card { transform: scale(1); }
+#carta-container.card-2 .card { transform: scale(0.95); }
+#carta-container.card-3 .card { transform: scale(0.9); }
+#carta-container.card-4 .card { transform: scale(0.85); }
+#carta-container.card-5 .card { transform: scale(0.8); }
+#carta-container.card-6 .card { transform: scale(0.75); }
+#carta-container.card-7 .card { transform: scale(0.7); }
+#carta-container.card-8 .card { transform: scale(0.65); }
+#carta-container.card-9 .card { transform: scale(0.6); }
+
