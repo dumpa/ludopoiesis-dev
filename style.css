@@ -292,4 +292,16 @@ input:checked + .slider:before {
     z-index: 2;
   }
 }
+.card.ampliada {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  height: auto;
+  max-height: 90vh;
+  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  z-index: 999;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+}
 
