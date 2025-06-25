@@ -296,9 +296,17 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   container.appendChild(card);
 
   // Escala si hay muchas
-  if (container.querySelectorAll('.card').length >= 4) {
-    container.classList.add("muchas-cartas");
-  }
+  
+const container = document.getElementById("carta-container");
+const totalCartas = container.querySelectorAll(".card").length;
+
+// Limpiar cualquier clase previa tipo "card-1", "card-2", etc.
+container.className = container.className.replace(/card-\d+/g, '').trim();
+
+// Agregar la clase correspondiente (máximo 9 para evitar overflow)
+container.classList.add(`card-${Math.min(totalCartas, 9)}`);
+
+  
 }
 function toggleAmpliada(card) {
   const yaAmpliada = document.querySelector(".card.ampliada");
