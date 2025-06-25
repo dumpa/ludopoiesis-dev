@@ -270,6 +270,77 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   if (mensaje) mensaje.remove();
 
   container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.alignItems = "flex-start";
+
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+
+  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.onclick = () => card.classList.toggle("flipped");
+
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}">
+      </div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+
+  // Crear un wrapper por carta
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("carta-wrapper");
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = (posicion === 'horizontal') ? 'row' : 'column';
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "center";
+  wrapper.style.margin = "0.5rem";
+
+  // Aplicar escala al wrapper (no a la carta)
+  const total = container.querySelectorAll(".carta-wrapper").length + 1;
+  const scale = Math.max(0.6, 1 - total * 0.08);
+  wrapper.style.transform = `scale(${scale})`;
+
+  // Rotación decorativa
+  const angulo = (Math.random() * 10 - 5).toFixed(2);
+  wrapper.style.transform += ` rotate(${angulo}deg)`;
+
+  wrapper.appendChild(card);
+  container.appendChild(wrapper);
+}
+
+function lanzarCartaConEstilo2(posicion = 'horizontal') { //borrar si la otra funciona
+  console.log('🎯 Lanzar carta con estilo activado:', posicion);
+
+  // Ocultar textos introductorios
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  const container = document.getElementById("carta-container");
+
+  // Eliminar mensaje poético si existe
+  const mensaje = container.querySelector(".mensaje-divertido");
+  if (mensaje) mensaje.remove();
+
+  container.style.display = "flex";
   container.style.flexWrap = "wrap"; // permitir múltiples filas
   container.style.alignItems = "flex-start";
 
