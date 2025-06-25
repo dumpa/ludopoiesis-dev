@@ -338,14 +338,16 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
-
 function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
-  // Actualiza la bandera si tienes algún botón visual
-  // document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸" : "🇧🇷";
+  const longEl = document.getElementById("introLong");
+  const shortEl = document.getElementById("introShort");
+  const longVisible = longEl.style.display === "block";
+  const shortVisible = shortEl.style.display === "block";
+  const contenidoActual = longEl.innerHTML.toLowerCase();
 
-  // Si se están mostrando cartas, actualizarlas
+  // Si hay cartas en pantalla, solo actualizar cartas
   const cartasEnPantalla = document.querySelectorAll(".card");
   if (cartasEnPantalla.length > 0) {
     cartasEnPantalla.forEach(card => {
@@ -360,38 +362,34 @@ function toggleIdioma() {
       const front = card.querySelector(".card-front img");
       const backH2 = card.querySelector(".card-back h2");
       const backP = card.querySelector(".card-back p");
-if (front) {
-  front.src = imagen;
-  front.alt = titulo;
-}
-if (backH2) backH2.textContent = titulo;
-if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
 
-card.dataset.originalTransform = card.style.transform;
-
+      if (front) {
+        front.src = imagen;
+        front.alt = titulo;
+      }
+      if (backH2) backH2.textContent = titulo;
+      if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
+      card.dataset.originalTransform = card.style.transform;
     });
-    
     return;
   }
 
-  // Si no hay cartas en pantalla, verifica qué texto está visible
-  const longVisible = document.getElementById("introLong").style.display === "block";
-  const shortVisible = document.getElementById("introShort").style.display === "block";
-
-  if (longVisible || shortVisible) {
-    cargarIntro(longVisible);
+  // Si estaba viendo introducción
+  if (shortVisible || longVisible) {
+    if (contenidoActual.includes("pregunta") || contenidoActual.includes("question")) {
+      mostrarPregunta();
+    } else if (contenidoActual.includes("lentes") || contenidoActual.includes("lens")) {
+      mostrarLentes();
+    } else if (contenidoActual.includes("dinámica") || contenidoActual.includes("dinâmica")) {
+      mostrarDinamica();
+    } else {
+      cargarIntro(longVisible);
+    }
     return;
   }
 
-  // Si se estaba mostrando alguna sección adicional
-  const longEl = document.getElementById("introLong");
-  if (longEl.innerHTML.includes("pregunta")) {
-    mostrarPregunta();
-  } else if (longEl.innerHTML.includes("lentes")) {
-    mostrarLentes();
-  } else if (longEl.innerHTML.includes("dinámica")) {
-    mostrarDinamica();
-  }
+  // Si todo falla, mostrar introducción corta
+  cargarIntro(false);
 }
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
