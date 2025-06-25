@@ -28,6 +28,7 @@ button:hover {
   perspective: 1000px;
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
   justify-content: center;
   align-items: flex-start;
   gap: 1rem;
