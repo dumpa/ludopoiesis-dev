@@ -395,7 +395,7 @@ if (totalCartas >= 2) {
     const scale = Math.max(0.6, 1 - totalCartas * 0.1);
     c.style.transform += ` scale(${scale})`;
   });
-}
+}*/
 /*  // Escalar si hay muchas
   const totalCartas = container.querySelectorAll(".card").length;
 
