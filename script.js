@@ -247,6 +247,21 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
+function toggleIdioma() {
+  idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
+  document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸 Español" : "🇧🇷 Português";
+
+  // Refrescar cartas ya visibles si hay alguna
+  const cartas = document.querySelectorAll(".card");
+  cartas.forEach(card => {
+    const id = card.dataset.id;
+    const carta = cartas.find(c => c.id === id);
+    if (carta) mostrarCarta(carta); // o tu función de actualización de carta
+  });
+
+  // También podrías actualizar el texto de instrucciones si lo deseas
+  cargarIntro();
+}
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
