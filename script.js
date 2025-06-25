@@ -87,7 +87,12 @@ card.onclick = () => {
 
   const angulo = (Math.random() * 10 - 5).toFixed(2);
   card.style.transform = `rotate(${angulo}deg)`;
-  card.style.marginLeft = "-60px"; // sobreposición leve a la izquierda
+
+const totalCartas = container.querySelectorAll(".card").length;
+card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
+
+  
+//  card.style.marginLeft = "-60px"; // sobreposición leve a la izquierda
   card.dataset.originalTransform = card.style.transform; // guardar transform inicial
   card.innerHTML = `
     <div class="card-inner">
