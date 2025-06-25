@@ -63,6 +63,8 @@ function lanzarCartaSuperpuesta() {
 
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
+  card.dataset.id = carta.id;
+
 
   card.onclick = () => {
   const todas = document.querySelectorAll(".card");
