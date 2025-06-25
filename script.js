@@ -265,8 +265,13 @@ function toggleIdioma() {
 function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
-  // Actualizar los textos introductorios
+  // Actualizar introducción visible si aplica
   cargarIntro();
+
+  // Reactualizar posibles secciones cargadas
+  mostrarLentes();
+  mostrarPregunta();
+  mostrarDinamica();
 
   // Actualizar cartas ya lanzadas
   const cartasEnPantalla = document.querySelectorAll(".card");
