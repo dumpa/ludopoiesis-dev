@@ -64,7 +64,6 @@ function lanzarCartaSuperpuesta() {
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
 
-  
   card.onclick = () => {
   const todas = document.querySelectorAll(".card");
 
@@ -73,13 +72,17 @@ function lanzarCartaSuperpuesta() {
   todas.forEach(c => {
     if (c !== card) {
       c.classList.remove("flipped", "ampliada");
+      // Restaurar solo la carta no seleccionada
+      c.style.transform = c.dataset.originalTransform || "";
     }
   });
 
   if (!yaFlipped) {
     card.classList.add("flipped", "ampliada");
+    card.style.transform = "scale(1) rotate(0deg)";
   } else {
     card.classList.remove("flipped", "ampliada");
+    card.style.transform = card.dataset.originalTransform || "";
   }
 };
 
