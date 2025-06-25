@@ -305,18 +305,25 @@ input:checked + .slider:before {
   transition: all 0.3s ease;
 }
 .carta-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
   transition: transform 0.4s ease;
-  flex-shrink: 0;
+  margin: 0;        /* ❗elimina separación entre cartas */
+  padding: 0;       /* ❗sin relleno adicional */
 }
 
 /* Escalado progresivo automático */
-#carta-container.card-1 .card { transform: scale(1); }
-#carta-container.card-2 .card { transform: scale(0.95); }
-#carta-container.card-3 .card { transform: scale(0.9); }
-#carta-container.card-4 .card { transform: scale(0.85); }
-#carta-container.card-5 .card { transform: scale(0.8); }
-#carta-container.card-6 .card { transform: scale(0.75); }
-#carta-container.card-7 .card { transform: scale(0.7); }
-#carta-container.card-8 .card { transform: scale(0.65); }
-#carta-container.card-9 .card { transform: scale(0.6); }
+#carta-container.card-1 .carta-wrapper { transform: scale(1); }
+#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
+#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
+#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
+#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
+#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
+#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
+#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
+#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
+
 
