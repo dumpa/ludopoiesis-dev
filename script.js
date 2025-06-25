@@ -157,6 +157,89 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
     const card = document.createElement("div");
     card.classList.add("card", "card-animada");
+
+    // guardar transform original
+    const originalTransform = `scale(${scale})`;
+    card.style.transform = originalTransform;
+    card.dataset.originalTransform = originalTransform;
+
+    // comportamiento de flip y restaurar tamaño
+    card.onclick = () => {
+      const yaFlipped = card.classList.contains("flipped");
+      const todas = document.querySelectorAll(".card");
+
+      todas.forEach(c => {
+        c.classList.remove("flipped", "ampliada");
+        c.style.transform = c.dataset.originalTransform || "";
+      });
+
+      if (!yaFlipped) {
+        card.classList.add("flipped", "ampliada");
+        card.style.transform = "scale(1) rotate(0deg)";
+      }
+    };
+
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="${img}" alt="${t}">
+        </div>
+        <div class="card-back">
+          <h2>${t}</h2>
+          <p>${txt.replace(/\n/g, "<br>")}</p>
+        </div>
+      </div>
+    `;
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("carta-wrapper");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
+    wrapper.style.alignItems = "center";
+    wrapper.style.justifyContent = "center";
+    wrapper.style.margin = "0.1rem";
+
+    wrapper.appendChild(card);
+    container.appendChild(wrapper);
+  });
+}
+/*
+function lanzarCartaConEstilo(posicion = 'horizontal') {
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  const container = document.getElementById("carta-container");
+  const mensaje = container.querySelector(".mensaje-divertido");
+  if (mensaje) mensaje.remove();
+
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.alignItems = "flex-start";
+  container.innerHTML = "";
+
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const nuevaCarta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = nuevaCarta;
+  cartasLanzadas.push({ ...nuevaCarta, posicion });
+
+  const total = cartasLanzadas.length;
+  const scale = Math.max(0.6, 1 - total * 0.06);
+
+  cartasLanzadas.forEach(({ titulo, texto, imagen, titulo_pt, texto_pt, imagen_pt, posicion }) => {
+    const t = idioma === "es" ? titulo : titulo_pt;
+    const txt = idioma === "es" ? texto : texto_pt;
+    const img = idioma === "es" ? imagen : imagen_pt;
+
+    const card = document.createElement("div");
+    card.classList.add("card", "card-animada");
     card.onclick = () => card.classList.toggle("flipped");
 
     card.innerHTML = `
@@ -185,7 +268,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     container.appendChild(wrapper);
   });
 }
-
+*/
 function mostrarObraDeArteOTexto() {
   const container = document.getElementById("carta-container");
   container.innerHTML = `
@@ -249,7 +332,7 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
-function toggleIdioma() {
+/*function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
   document.getElementById("boton-idioma").innerText = idioma === "es" ? "🇪🇸 Español" : "🇧🇷 Português";
 
@@ -263,7 +346,7 @@ function toggleIdioma() {
 
   // También podrías actualizar el texto de instrucciones si lo deseas
   cargarIntro();
-}
+}*/
 function toggleIdioma() {
   idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
 
