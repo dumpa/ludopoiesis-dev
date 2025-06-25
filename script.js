@@ -295,15 +295,15 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   container.appendChild(card);
 
-  // Escala si hay muchas
-  
-const container = document.getElementById("carta-container");
+// ya tienes 'container', solo actualizamos clases
 const totalCartas = container.querySelectorAll(".card").length;
 
-// Limpiar cualquier clase previa tipo "card-1", "card-2", etc.
-container.className = container.className.replace(/card-\d+/g, '').trim();
+container.classList.forEach(cls => {
+  if (/^card-\d+$/.test(cls)) {
+    container.classList.remove(cls);
+  }
+});
 
-// Agregar la clase correspondiente (máximo 9 para evitar overflow)
 container.classList.add(`card-${Math.min(totalCartas, 9)}`);
 
   
