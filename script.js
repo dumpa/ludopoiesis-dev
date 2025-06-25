@@ -14,6 +14,32 @@ fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
+function cargarIntro(desplegarLargo = false) {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const introCorta = data.intro.short[idioma];
+      const introLarga = data.intro.long[idioma];
+
+      const shortEl = document.getElementById('introShort');
+      const longEl = document.getElementById('introLong');
+      const cartaContainer = document.getElementById('carta-container');
+
+      cartaContainer.style.display = 'none';
+
+      if (desplegarLargo) {
+        longEl.innerHTML = introLarga;
+        shortEl.style.display = 'none';
+        longEl.style.display = 'block';
+      } else {
+        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">➤ Conocer más sobre Ludopoiesis</span>`;
+        shortEl.style.display = 'block';
+        longEl.style.display = 'none';
+      }
+    })
+    .catch(err => console.error('Error cargando textos:', err));
+}
+
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
     const el = document.getElementById(id);
@@ -98,3 +124,4 @@ function reiniciarCartas() {
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
+window.cargarIntro = cargarIntro;
