@@ -32,7 +32,7 @@ function cargarIntro(desplegarLargo = false) {
         shortEl.style.display = 'none';
         longEl.style.display = 'block';
       } else {
-        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">➤ Conocer más sobre Ludopoiesis</span>`;
+        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">➔ Conocer más sobre Ludopoiesis</span>`;
         shortEl.style.display = 'block';
         longEl.style.display = 'none';
       }
@@ -122,6 +122,48 @@ function reiniciarCartas() {
   container.innerHTML = "";
 }
 
+function mostrarPregunta() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.pregunta?.[idioma] || data.pregunta['es'];
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').innerHTML = texto;
+      document.getElementById('introLong').style.display = 'block';
+      document.getElementById('carta-container').style.display = 'none';
+    })
+    .catch(err => console.error('Error al cargar el texto de pregunta:', err));
+}
+
+function mostrarLentes() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.lentes?.[idioma] || data.lentes['es'];
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').innerHTML = texto;
+      document.getElementById('introLong').style.display = 'block';
+      document.getElementById('carta-container').style.display = 'none';
+    })
+    .catch(err => console.error('Error al cargar el texto de lentes:', err));
+}
+
+function mostrarDinamica() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.dinamica?.[idioma] || data.dinamica['es'];
+      document.getElementById('introShort').style.display = 'none';
+      document.getElementById('introLong').innerHTML = texto;
+      document.getElementById('introLong').style.display = 'block';
+      document.getElementById('carta-container').style.display = 'none';
+    })
+    .catch(err => console.error('Error al cargar el texto de dinamica:', err));
+}
+
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
+window.mostrarPregunta = mostrarPregunta;
+window.mostrarLentes = mostrarLentes;
+window.mostrarDinamica = mostrarDinamica;
