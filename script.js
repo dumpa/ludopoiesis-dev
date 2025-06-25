@@ -227,6 +227,14 @@ function mostrarDinamica() {
     .catch(err => console.error('Error al cargar el texto de dinamica:', err));
 }
 
+function toggleLente(lente) {
+  lentesActivos[lente] = !lentesActivos[lente];
+
+  const btn = document.getElementById(`btn-${lente}`);
+  const estado = lentesActivos[lente] ? "" : "_apagado";
+  btn.src = `img/iconos/icono_${lente}${estado}.png`;
+}
+
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
