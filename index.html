@@ -19,8 +19,31 @@
   
   <div class="contenedor-principal">
     <div id="instrucciones">
-  
-      <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis Test</h1>
+  <div id="instrucciones" class="pantalla-inicio">
+  <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
+  <p class="subtitulo">Un oráculo para jugar la vida</p>
+
+  <div class="pasos-iniciales">
+    <p><strong>Haz una buena pregunta.</strong></p>
+    <p><strong>Escoge tus lentes.</strong></p>
+    <p><strong>Lanza tus cartas.</strong></p>
+    <p><strong>Observa con atención.</strong></p>
+    <p><strong>Lee con el corazón.</strong></p>
+    <p><strong>Comparte si resuena.</strong></p>
+  </div>
+
+  <div class="botones-inicio">
+    <button onclick="mostrarDinamica()" class="btn-principal">🎴 Jugar</button>
+    <button onclick="mostrarAutor()" class="btn-secundario">ℹ️ Más info</button>
+  </div>
+
+  <div class="idiomas-footer">
+    <span onclick="setIdioma('es')">🇪🇸</span>
+    <span onclick="setIdioma('pt')">🇧🇷</span>
+  </div>
+</div>
+
+ <!--     <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis Test</h1>
 
     <p><strong>1.</strong> <span onclick="mostrarPregunta()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Haz una pregunta</span></p>
 
@@ -42,10 +65,10 @@
 
     <p><strong>3.</strong> <span onclick="mostrarDinamica()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Saca tus cartas</span></p>
 
-    <button onclick="reiniciarCartas()">Volver a empezar</button>
+    <button onclick="reiniciarCartas()">Volver a empezar</button>-->
   <!--  <button onclick="lanzarCartaConEstilo('horizontal')">Lanzar al lado</button>
     <button onclick="lanzarCartaConEstilo('vertical')">Lanzar debajo</button> -->
-    <button onclick="lanzarCartaSuperpuesta()">Lanzar al lado</button>
+<!--    <button onclick="lanzarCartaSuperpuesta()">Lanzar al lado</button>
 
 
 
