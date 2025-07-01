@@ -318,7 +318,7 @@ function mostrarLentes() {
     .catch(err => console.error('Error al cargar el texto de lentes:', err));
 }
 
-function mostrarDinamica() {
+function mostrarTextoDinamica() {
   fetch('textos.json')
     .then(res => res.json())
     .then(data => {
@@ -390,6 +390,17 @@ function toggleIdioma() {
 
   // Si todo falla, mostrar introducción corta
   cargarIntro(false);
+}
+
+function mostrarDinamica() {
+  ocultarTodo();
+  document.getElementById("dinamica").style.display = "block";
+}
+function ocultarTodo() {
+  document.getElementById("instrucciones").style.display = "none";
+  document.getElementById("dinamica").style.display = "none";
+  document.getElementById("introLong").style.display = "none";
+  document.getElementById("carta-container").style.display = "none";
 }
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
