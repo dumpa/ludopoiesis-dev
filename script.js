@@ -107,13 +107,18 @@ function obtenerLentesActivos() {
 }
 
 function lanzarCartaSuperpuesta() {
-  const container = document.getElementById("carta-container");
-  if (!container) return;
+  
+const container = document.getElementById("carta-container");
+if (!container) {
+  console.warn("Contenedor de cartas no encontrado");
+  return;
+}
+container.style.display = "flex";
+container.style.flexDirection = "row";
+container.style.flexWrap = "nowrap";
+container.style.alignItems = "flex-start";
+container.style.justifyContent = "center";
 
-  container.innerHTML = '';
-  container.style.display = "flex";
-  container.style.flexDirection = "row";
-  container.style.flexWrap = "nowrap";
 
   const activos = obtenerLentesActivos();
 
@@ -204,18 +209,26 @@ function obtenerLentesActivos() {
   return activos;
 }
 
+
 function configurarBurbujasToggle() {
   const ayudas = document.querySelectorAll(".icono-ayuda");
   ayudas.forEach(icon => {
     icon.addEventListener("click", () => {
       const id = icon.dataset.target;
       const ayuda = document.getElementById(id);
+
+      // Si está visible, la ocultamos
       if (ayuda.style.display === "block") {
         ayuda.style.display = "none";
       } else {
+        // Ocultar todas antes de mostrar esta
         document.querySelectorAll(".burbuja-ayuda").forEach(b => b.style.display = "none");
         ayuda.style.display = "block";
       }
+    });
+  });
+}
+
     });
   });
 }
