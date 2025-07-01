@@ -18,9 +18,9 @@ function actualizarPantallaInicialConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.inicio[idioma] || data.inicio["es"];
-      document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
-      document.getElementById("inicio-mensaje").innerText = textos.mensaje;
-      document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
+      if (document.getElementById("inicio-subtitulo")) document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
+      if (document.getElementById("inicio-mensaje")) document.getElementById("inicio-mensaje").innerText = textos.mensaje;
+      if (document.getElementById("inicio-boton-jugar")) document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
     });
 }
 
@@ -58,12 +58,12 @@ function actualizarPantallaJuegoConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.juego[idioma] || data.juego["es"];
-      document.getElementById("juego-titulo").innerText = textos.titulo;
-      document.getElementById("juego-paso1").innerText = textos.paso1;
-      document.getElementById("juego-paso2").innerText = textos.paso2;
-      document.getElementById("juego-paso3").innerText = textos.paso3;
-      if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
-      document.getElementById("juego-boton-volver").innerText = textos.volver;
+      if (document.getElementById("juego-titulo")) document.getElementById("juego-titulo").innerText = textos.titulo;
+      if (document.getElementById("juego-paso1")) document.getElementById("juego-paso1").innerText = textos.paso1;
+      if (document.getElementById("juego-paso2")) document.getElementById("juego-paso2").innerText = textos.paso2;
+      if (document.getElementById("juego-paso3")) document.getElementById("juego-paso3").innerText = textos.paso3;
+      if (document.getElementById("juego-boton-tirar")) if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
+      if (document.getElementById("juego-boton-volver")) document.getElementById("juego-boton-volver").innerText = textos.volver;
     });
 }
 
@@ -90,10 +90,10 @@ function actualizarPantallaTiradaConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.tirada[idioma] || data.tirada["es"];
-      document.getElementById("tirada-titulo").innerText = textos.titulo;
-      document.getElementById("tirada-instruccion").innerText = textos.instruccion;
-      document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
-      document.getElementById("tirada-boton-volver").innerText = textos.volver;
+      if (document.getElementById("tirada-titulo")) document.getElementById("tirada-titulo").innerText = textos.titulo;
+      if (document.getElementById("tirada-instruccion")) document.getElementById("tirada-instruccion").innerText = textos.instruccion;
+      if (document.getElementById("tirada-boton-lanzar")) document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
+      if (document.getElementById("tirada-boton-volver")) document.getElementById("tirada-boton-volver").innerText = textos.volver;
     });
 }
 
