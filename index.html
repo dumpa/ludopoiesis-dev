@@ -9,13 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
 </head>
-<body>
+<body onload="setIdioma(idioma)">
   <div id="pantalla-inicial" class="pantalla">
     <h1 onclick="mostrarPantalla('pantalla-inicial')">Ludopoiesis</h1>
-    <p class="subtitulo">Un oráculo para jugar la vida.</p>
-    <p class="texto">Un espacio para detenerte, hacer una pregunta<br>y mirar el mundo desde otra perspectiva.</p>
-    <button onclick="mostrarPantalla('pantalla-juego')">🎴 Jugar</button>
-    <button onclick="mostrarPantalla('pantalla-info')">ℹ️ Más info</button>
+    <p id="inicio-subtitulo" class="subtitulo"></p>
+    <p id="inicio-mensaje" class="texto"></p>
+    <button id="inicio-boton-jugar" onclick="mostrarPantalla('pantalla-juego')"></button>
+
+    <div class="idioma-switch">
+      <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
+      <label class="switch">
+        <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
+        <span class="slider"></span>
+      </label>
+      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
+    </div>
   </div>
 
   <div id="pantalla-juego" class="pantalla" style="display:none;">
