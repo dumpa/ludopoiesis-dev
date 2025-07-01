@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,58 +10,97 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
-
-
-
 </head>
+
 <body onload="cargarIntro()">
-  
   <div class="contenedor-principal">
-    <div id="instrucciones">
-      
-      <div id="instrucciones" class="pantalla-inicio">
-        
-        <h1 class="titulo">Ludopoiesis</h1>
-        <p class="subtitulo">Un oráculo para jugar la vida.</p>
-        
-        <div class="texto-poetico">
-          <p>Un espacio para detenerte, hacer una pregunta<br/>y mirar el mundo desde otra perspectiva.</p>
-          <p>No busca respuestas definitivas.<br/>
-            Invita a sintonizar, asombrarte,<br/>
-            crear y fluir con el juego.</p>
+
+    <!-- 🟢 Pantalla de inicio -->
+    <div id="instrucciones" class="pantalla-inicio">
+      <h1 class="titulo" onclick="cargarIntro()">Ludopoiesis</h1>
+      <p class="subtitulo">Un oráculo para jugar la vida.</p>
+
+      <div class="texto-poetico">
+        <p>Un espacio para detenerte, hacer una pregunta<br/>y mirar el mundo desde otra perspectiva.</p>
+        <p>No busca respuestas definitivas.<br/>
+          Invita a sintonizar, asombrarte,<br/>
+          crear y fluir con el juego.</p>
+      </div>
+
+      <div class="botones-inicio">
+        <button onclick="mostrarDinamica()" class="btn-jugar">🎴 Jugar</button>
+        <button onclick="mostrarInfoProyecto()" class="btn-info">ℹ️ Más info</button>
+      </div>
+
+      <div class="idiomas-footer">
+        <span onclick="setIdioma('es')">🇪🇸</span>
+        <span onclick="setIdioma('pt')">🇧🇷</span>
+      </div>
+    </div>
+
+    <!-- 🎴 Menú de juego -->
+    <div id="dinamica" class="pantalla-juego" style="display: none;">
+      <h1 onclick="cargarIntro()" style="cursor:pointer;">Ludopoiesis</h1>
+      <p class="subtitulo">Elige cómo quieres jugar</p>
+
+      <div class="bloque">
+        <h3>1. Haz una buena pregunta</h3>
+        <button onclick="mostrarPregunta()">¿Qué es una buena pregunta?</button>
+      </div>
+
+      <div class="bloque">
+        <h3>2. Escoge tus lentes</h3>
+        <div class="lentes-menu">
+          <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
+            <img src="img/iconos/icono_naturaleza.png" alt="Naturaleza" />
+            <span>Naturaleza</span>
+          </div>
+          <div class="lente-horizontal" onclick="toggleLente('fluir')">
+            <img src="img/iconos/icono_fluir.png" alt="Fluir" />
+            <span>Fluir</span>
+          </div>
+          <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
+            <img src="img/iconos/icono_tecnologia.png" alt="Tecnología" />
+            <span>Tecnología</span>
+          </div>
         </div>
+      </div>
 
+      <div class="bloque">
+        <h3>3. Elige tu tirada</h3>
+        <button onclick="lanzarCartaSuperpuesta()">1 carta</button>
+        <button onclick="lanzarCartaConEstilo('horizontal')">3 horizontales</button>
+        <button onclick="lanzarCartaConEstilo('vertical')">3 verticales</button>
+      </div>
 
-        <div class="botones-inicio">
-          <button onclick="mostrarDinamica()" class="btn-jugar">🎴 Jugar</button>
-          <button onclick="mostrarInfoProyecto()" class="btn-info">ℹ️ Más info</button>
+      <div class="bloque">
+        <button onclick="reiniciarCartas()">🔄 Volver a empezar</button>
+      </div>
+
+      <div class="volver-home">
+        <button onclick="cargarIntro()">🏠 Volver al inicio</button>
+      </div>
+    </div>
+
+    <!-- 🧾 Footer estilo Dumpa -->
+    <footer class="footer-dumpa">
+      <div><strong>El blog de dumpa</strong></div>
+      <div>Los problemas se arreglan solos</div>
+      <div class="icons">
+        <a href="https://dumpa.co" target="_blank"><i class="fa-solid fa-globe"></i></a>
+        <a href="https://x.com/@dumpita" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://instagram.com/superdumpa" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://github.com/dumpa" target="_blank"><i class="fa-brands fa-github"></i></a>
+        <a href="https://facebook.com/dumpablog" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+      </div>
+
+      <div style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.6;">
+        Creado por Juan Pablo Calderón — físico, poeta y diseñador de juegos.  
+        <a href="https://dumpa.co" target="_blank">www.dumpa.co</a>
+      </div>
+    </footer>
   </div>
 
-  <div class="idiomas-footer">
-    <span onclick="setIdioma('es')">🇪🇸</span>
-    <span onclick="setIdioma('pt')">🇧🇷</span>
-  </div>
-</div>
-  <!-- Footer estilo Dumpa -->
-  <footer class="footer-dumpa">
-  <div><strong>El blog de dumpa</strong></div>
-  <div>Los problemas se arreglan solos</div>
-  <div class="icons">
-    <a href="https://dumpa.co" target="_blank"><i class="fa-solid fa-globe"></i></a>
-    <a href="https://x.com/@dumpita" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-    <a href="https://instagram.com/superdumpa" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-    <a href="https://github.com/dumpa" target="_blank"><i class="fa-brands fa-github"></i></a>
-    <a href="https://facebook.com/dumpablog" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-  </div>
-
-  <div style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.6;">
-    Creado por Juan Pablo Calderón — físico, poeta y diseñador de juegos.  
-    <a href="https://dumpa.co" target="_blank">www.dumpa.co</a>
-  </div>
-</footer>
-<!--  <div style="margin-top: 0.7rem;">
-    <a href="https://dumpa.substack.com" target="_blank" style="padding: 0.5rem 1rem; background: #007272; color: white; border-radius: 999px;">Suscribirme</a>
-  </div>-->
 
 
 <style>
