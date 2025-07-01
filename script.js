@@ -15,12 +15,12 @@ function toggleIdioma() {
 
 function actualizarPantallaInicialConIdioma() {
   fetch("textos.json")
-    .then(res => res.json())
+    .then(res => res.json()
     .then(data => {
       const textos = data.inicio[idioma] || data.inicio["es"];
-      if (document.getElementById("inicio-subtitulo")) document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
-      if (document.getElementById("inicio-mensaje")) document.getElementById("inicio-mensaje").innerText = textos.mensaje;
-      if (document.getElementById("inicio-boton-jugar")) document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
+      if (document.getElementById("inicio-subtitulo") document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
+      if (document.getElementById("inicio-mensaje") document.getElementById("inicio-mensaje").innerText = textos.mensaje;
+      if (document.getElementById("inicio-boton-jugar") document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
     });
 }
 
@@ -55,15 +55,15 @@ function inicializarApp() {
 
 function actualizarPantallaJuegoConIdioma() {
   fetch("textos.json")
-    .then(res => res.json())
+    .then(res => res.json()
     .then(data => {
       const textos = data.juego[idioma] || data.juego["es"];
-      if (document.getElementById("juego-titulo")) document.getElementById("juego-titulo").innerText = textos.titulo;
-      if (document.getElementById("juego-paso1")) document.getElementById("juego-paso1").innerText = textos.paso1;
-      if (document.getElementById("juego-paso2")) document.getElementById("juego-paso2").innerText = textos.paso2;
-      if (document.getElementById("juego-paso3")) document.getElementById("juego-paso3").innerText = textos.paso3;
-      if (document.getElementById("juego-boton-tirar")) if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
-      if (document.getElementById("juego-boton-volver")) document.getElementById("juego-boton-volver").innerText = textos.volver;
+      if (document.getElementById("juego-titulo") document.getElementById("juego-titulo").innerText = textos.titulo;
+      if (document.getElementById("juego-paso1") document.getElementById("juego-paso1").innerText = textos.paso1;
+      if (document.getElementById("juego-paso2") document.getElementById("juego-paso2").innerText = textos.paso2;
+      if (document.getElementById("juego-paso3") document.getElementById("juego-paso3").innerText = textos.paso3;
+      if (document.getElementById("juego-boton-tirar") if (document.getElementById("juego-boton-tirar") document.getElementById("juego-boton-tirar").innerText = textos.tirar;
+      if (document.getElementById("juego-boton-volver") document.getElementById("juego-boton-volver").innerText = textos.volver;
     });
 }
 
@@ -87,13 +87,13 @@ function mostrarExplicacion(tipo) {
 
 function actualizarPantallaTiradaConIdioma() {
   fetch("textos.json")
-    .then(res => res.json())
+    .then(res => res.json()
     .then(data => {
       const textos = data.tirada[idioma] || data.tirada["es"];
-      if (document.getElementById("tirada-titulo")) document.getElementById("tirada-titulo").innerText = textos.titulo;
-      if (document.getElementById("tirada-instruccion")) document.getElementById("tirada-instruccion").innerText = textos.instruccion;
-      if (document.getElementById("tirada-boton-lanzar")) document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
-      if (document.getElementById("tirada-boton-volver")) document.getElementById("tirada-boton-volver").innerText = textos.volver;
+      if (document.getElementById("tirada-titulo") document.getElementById("tirada-titulo").innerText = textos.titulo;
+      if (document.getElementById("tirada-instruccion") document.getElementById("tirada-instruccion").innerText = textos.instruccion;
+      if (document.getElementById("tirada-boton-lanzar") document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
+      if (document.getElementById("tirada-boton-volver") document.getElementById("tirada-boton-volver").innerText = textos.volver;
     });
 }
 
@@ -123,9 +123,9 @@ container.style.justifyContent = "center";
   const activos = obtenerLentesActivos();
 
   fetch("cartas_ludopoiesis_naturaleza_fluir.json")
-    .then(res => res.json())
+    .then(res => res.json()
     .then(cartas => {
-      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente);
       if (!cartasFiltradas.length) {
         alert("No hay cartas disponibles para los lentes seleccionados.");
         return;
@@ -264,9 +264,9 @@ function lanzarCartaSuperpuesta() {
   const activos = obtenerLentesActivos();
 
   fetch("cartas_ludopoiesis_naturaleza_fluir.json")
-    .then(res => res.json())
+    .then(res => res.json()
     .then(cartas => {
-      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente);
       if (!cartasFiltradas.length) {
         alert("No hay cartas disponibles para los lentes seleccionados.");
         return;
@@ -332,3 +332,9 @@ function lanzarCartaSuperpuesta() {
       mostrarPantalla('pantalla-cartas');
     });
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  configurarBotonesLentes();
+  configurarBurbujasToggle();
+});
