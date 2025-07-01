@@ -62,7 +62,7 @@ function actualizarPantallaJuegoConIdioma() {
       document.getElementById("juego-paso1").innerText = textos.paso1;
       document.getElementById("juego-paso2").innerText = textos.paso2;
       document.getElementById("juego-paso3").innerText = textos.paso3;
-      document.getElementById("juego-boton-tirar").innerText = textos.tirar;
+      if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
       document.getElementById("juego-boton-volver").innerText = textos.volver;
     });
 }
