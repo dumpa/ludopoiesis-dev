@@ -42,7 +42,7 @@ function ocultarTodasPantallas() {
   pantallas.forEach(p => p.style.display = 'none');
 }
 
-function lanzarCartaSuperpuesta() {
+() {
   mostrarPantalla('pantalla-cartas');
   const zona = document.getElementById('zona-cartas');
   zona.innerHTML = '<p>(Aquí aparecerán las cartas...)</p>';
@@ -98,7 +98,7 @@ function actualizarPantallaTiradaConIdioma() {
 }
 
 
-function obtenerLentesActivos() {
+() {
   const activos = [];
   if (document.getElementById("lente-naturaleza").checked) activos.push("naturaleza");
   if (document.getElementById("lente-fluir").checked) activos.push("fluir");
@@ -106,7 +106,7 @@ function obtenerLentesActivos() {
   return activos;
 }
 
-function lanzarCartaSuperpuesta() {
+function () {
   
 const container = document.getElementById("carta-container");
 if (!container) {
@@ -201,7 +201,7 @@ function configurarBotonesLentes() {
   });
 }
 
-function obtenerLentesActivos() {
+function () {
   const activos = [];
   document.querySelectorAll(".lente-boton.lente-activo").forEach(btn => {
     activos.push(btn.dataset.lente);
@@ -237,3 +237,98 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarBotonesLentes();
   configurarBurbujasToggle();
 });
+
+
+
+function obtenerLentesActivos() {
+  const activos = [];
+  document.querySelectorAll(".lente-boton.lente-activo").forEach(btn => {
+    activos.push(btn.dataset.lente);
+  });
+  return activos;
+}
+
+function lanzarCartaSuperpuesta() {
+  const container = document.getElementById("carta-container");
+  if (!container) {
+    console.warn("Contenedor de cartas no encontrado");
+    return;
+  }
+
+  container.style.display = "flex";
+  container.style.flexDirection = "row";
+  container.style.flexWrap = "nowrap";
+  container.style.alignItems = "flex-start";
+  container.style.justifyContent = "center";
+
+  const activos = obtenerLentesActivos();
+
+  fetch("cartas_ludopoiesis_naturaleza_fluir.json")
+    .then(res => res.json())
+    .then(cartas => {
+      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+      if (!cartasFiltradas.length) {
+        alert("No hay cartas disponibles para los lentes seleccionados.");
+        return;
+      }
+
+      const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+      const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+      const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+      const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+      const card = document.createElement("div");
+      card.classList.add("card", "card-animada");
+      card.dataset.id = carta.id;
+
+      card.onclick = () => {
+        const todas = document.querySelectorAll(".card");
+        const yaFlipped = card.classList.contains("flipped");
+
+        todas.forEach(c => {
+          if (c !== card) {
+            c.classList.remove("flipped", "ampliada");
+            c.style.transform = c.dataset.originalTransform || "";
+          }
+        });
+
+        if (!yaFlipped) {
+          card.classList.add("flipped");
+          const totalCartas = document.querySelectorAll(".card").length;
+          if (totalCartas > 1) {
+            card.classList.add("ampliada");
+            card.style.transform = "scale(1) rotate(0deg)";
+          } else {
+            card.classList.remove("ampliada");
+            card.style.transform = "scale(1) rotate(0deg)";
+          }
+        } else {
+          card.classList.remove("flipped", "ampliada");
+          card.style.transform = card.dataset.originalTransform || "";
+        }
+      };
+
+      const angulo = (Math.random() * 10 - 5).toFixed(2);
+      card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
+      card.dataset.angulo = angulo;
+      card.dataset.originalTransform = card.style.transform;
+
+      const totalCartas = container.querySelectorAll(".card").length;
+      card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
+
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">
+            <img src="${imagen}" alt="${titulo}">
+          </div>
+          <div class="card-back">
+            <h2>${titulo}</h2>
+            <p>${texto.replace(/\n/g, "<br>")}</p>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+      mostrarPantalla('pantalla-cartas');
+    });
+}
