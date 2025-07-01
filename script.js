@@ -234,8 +234,11 @@ function configurarBurbujasToggle() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("App iniciada");
   configurarBotonesLentes();
   configurarBurbujasToggle();
+  actualizarPantallaInicialConIdioma();
+  mostrarPantalla('pantalla-inicio');
 });
 
 
@@ -335,8 +338,11 @@ function lanzarCartaSuperpuesta() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("App iniciada");
   configurarBotonesLentes();
   configurarBurbujasToggle();
+  actualizarPantallaInicialConIdioma();
+  mostrarPantalla('pantalla-inicio');
 });
   const pantallas = document.querySelectorAll('.pantalla');
   pantallas.forEach(p => p.style.display = 'none');
@@ -534,8 +540,11 @@ function configurarBurbujasToggle() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("App iniciada");
   configurarBotonesLentes();
   configurarBurbujasToggle();
+  actualizarPantallaInicialConIdioma();
+  mostrarPantalla('pantalla-inicio');
 });
 
 
@@ -635,6 +644,9 @@ function lanzarCartaSuperpuesta() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("App iniciada");
   configurarBotonesLentes();
   configurarBurbujasToggle();
+  actualizarPantallaInicialConIdioma();
+  mostrarPantalla('pantalla-inicio');
 });
