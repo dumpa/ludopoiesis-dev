@@ -13,15 +13,23 @@ function toggleIdioma() {
   setIdioma(nuevo);
 }
 
-function actualizarPantallaInicialConIdioma() {
-  fetch("textos.json")
-    .then(res => res.json()
-    .then(data => {
-      const textos = data.inicio[idioma] || data.inicio["es"];
-      if (document.getElementById("inicio-subtitulo")) document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
-      if (document.getElementById("inicio-mensaje")) document.getElementById("inicio-mensaje").innerText = textos.mensaje;
-      if (document.getElementById("inicio-boton-jugar")) document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
-    });
+
+async function actualizarPantallaInicialConIdioma() {
+  try {
+    const res = await fetch("textos.json");
+    const data = await res.json();
+    const textos = data.inicio[idioma] || data.inicio["es"];
+
+    const subtituloEl = document.getElementById("inicio-subtitulo");
+    const mensajeEl = document.getElementById("inicio-mensaje");
+    const jugarBtn = document.getElementById("inicio-boton-jugar");
+
+    if (subtituloEl) subtituloEl.innerText = textos.subtitulo;
+    if (mensajeEl) mensajeEl.innerText = textos.mensaje;
+    if (jugarBtn) jugarBtn.innerText = textos.jugar;
+  } catch (err) {
+    console.error("Error cargando textos de inicio:", err);
+  }
 }
 
 function mostrarPantalla(id) {
