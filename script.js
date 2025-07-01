@@ -186,3 +186,41 @@ function lanzarCartaSuperpuesta() {
       mostrarPantalla('pantalla-cartas');
     });
 }
+
+function configurarBotonesLentes() {
+  const botones = document.querySelectorAll(".lente-boton");
+  botones.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("lente-activo");
+    });
+  });
+}
+
+function obtenerLentesActivos() {
+  const activos = [];
+  document.querySelectorAll(".lente-boton.lente-activo").forEach(btn => {
+    activos.push(btn.dataset.lente);
+  });
+  return activos;
+}
+
+function configurarBurbujasToggle() {
+  const ayudas = document.querySelectorAll(".icono-ayuda");
+  ayudas.forEach(icon => {
+    icon.addEventListener("click", () => {
+      const id = icon.dataset.target;
+      const ayuda = document.getElementById(id);
+      if (ayuda.style.display === "block") {
+        ayuda.style.display = "none";
+      } else {
+        document.querySelectorAll(".burbuja-ayuda").forEach(b => b.style.display = "none");
+        ayuda.style.display = "block";
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  configurarBotonesLentes();
+  configurarBurbujasToggle();
+});
