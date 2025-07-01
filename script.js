@@ -399,7 +399,7 @@ function mostrarDinamica() {
 function ocultarTodo() {
   document.getElementById("instrucciones").style.display = "none";
   document.getElementById("dinamica").style.display = "none";
-  document.getElementById("introLong").style.display = "none";
+  //document.getElementById("introLong").style.display = "none";
   document.getElementById("carta-container").style.display = "none";
 }
 
