@@ -27,6 +27,25 @@
   </div>
 
   <div id="pantalla-juego" class="pantalla" style="display:none;">
+  <h2 id="juego-titulo"></h2>
+
+  <ol class="juego-pasos">
+    <li>
+      <span id="juego-paso1"></span>
+      <span class="icono-ayuda" onclick="mostrarExplicacion('pregunta')">❓</span>
+    </li>
+    <li>
+      <span id="juego-paso2"></span>
+      <span class="icono-ayuda" onclick="mostrarExplicacion('lentes')">👓</span>
+    </li>
+    <li>
+      <span id="juego-paso3"></span>
+      <span class="icono-ayuda" onclick="mostrarExplicacion('tirada')">🔮</span>
+    </li>
+  </ol>
+
+  <div id="juego-explicacion" class="explicacion-box" style="display:none;"></div>
+
     <h2>Elige cómo quieres jugar</h2>
     <button onclick="lanzarCartaSuperpuesta()">Tirar carta</button>
     <button onclick="mostrarPantalla('pantalla-inicial')">🏠 Volver</button>
@@ -44,6 +63,6 @@
     <button onclick="mostrarPantalla('pantalla-juego')">🎴 Jugar</button>
   </div>
 
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>

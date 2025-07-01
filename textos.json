@@ -10,5 +10,23 @@
       "mensaje": "Um espaço para pausar, fazer uma pergunta e ver o mundo de outra perspectiva.",
       "jugar": "🎴 Jogar"
     }
+  },
+  "juego": {
+    "es": {
+      "titulo": "Ludopoiesis",
+      "paso1": "1. Haz una pregunta",
+      "paso2": "2. Escoge tus lentes",
+      "paso3": "3. Saca tus cartas",
+      "tirar": "Tirar carta",
+      "volver": "🏠 Volver"
+    },
+    "pt": {
+      "titulo": "Ludopoiesis",
+      "paso1": "1. Faça uma pergunta",
+      "paso2": "2. Escolha suas lentes",
+      "paso3": "3. Tire suas cartas",
+      "tirar": "Lançar carta",
+      "volver": "🏠 Voltar"
+    }
   }
 }
