@@ -28,5 +28,19 @@
       "tirar": "Lançar carta",
       "volver": "🏠 Voltar"
     }
+  },
+  "tirada": {
+    "es": {
+      "titulo": "Tirada",
+      "volver": "🔙 Volver",
+      "instruccion": "Escoge tus lentes y presiona el botón para lanzar tus cartas",
+      "boton": "🎴 Lanzar cartas"
+    },
+    "pt": {
+      "titulo": "Tirada",
+      "volver": "🔙 Voltar",
+      "instruccion": "Escolha suas lentes e pressione o botão para lançar suas cartas",
+      "boton": "🎴 Lançar cartas"
+    }
   }
 }

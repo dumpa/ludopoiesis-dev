@@ -66,10 +66,17 @@
   <script src="script.js"></script>
 
 <div id="pantalla-tirada" class="pantalla" style="display:none;">
-  <h2>Tirada</h2>
-  <p>Escoge tus lentes y el tipo de tirada</p>
-  <!-- Aquí irán opciones de lentes y tipo de tirada -->
-  <button onclick="mostrarPantalla('pantalla-juego')">🔙 Volver</button>
+  <h2 id="tirada-titulo"></h2>
+  <p id="tirada-instruccion"></p>
+
+  <div id="lentes-select">
+    <label><input type="checkbox" id="lente-naturaleza" checked> 🌱 Naturaleza</label><br>
+    <label><input type="checkbox" id="lente-fluir" checked> 🌊 Fluir</label><br>
+    <label><input type="checkbox" id="lente-tecnologia" checked> 🤖 Tecnología</label>
+  </div>
+
+  <button id="tirada-boton-lanzar" onclick="lanzarCartaSuperpuesta()"></button>
+  <button id="tirada-boton-volver" onclick="mostrarPantalla('pantalla-juego')"></button>
 </div>
 
 </body>

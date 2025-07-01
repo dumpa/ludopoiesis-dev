@@ -29,6 +29,9 @@ function mostrarPantalla(id) {
     actualizarPantallaInicialConIdioma();
   } else if (id === 'pantalla-juego') {
     actualizarPantallaJuegoConIdioma();
+  } else if (id === 'pantalla-tirada') {
+    actualizarPantallaTiradaConIdioma();
+    actualizarPantallaJuegoConIdioma();
   }
   ocultarTodasPantallas();
   document.getElementById(id).style.display = 'block';
@@ -80,4 +83,16 @@ function mostrarExplicacion(tipo) {
   const box = document.getElementById("juego-explicacion");
   box.innerText = explicaciones[idioma][tipo];
   box.style.display = "block";
+}
+
+function actualizarPantallaTiradaConIdioma() {
+  fetch("textos.json")
+    .then(res => res.json())
+    .then(data => {
+      const textos = data.tirada[idioma] || data.tirada["es"];
+      document.getElementById("tirada-titulo").innerText = textos.titulo;
+      document.getElementById("tirada-instruccion").innerText = textos.instruccion;
+      document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
+      document.getElementById("tirada-boton-volver").innerText = textos.volver;
+    });
 }
