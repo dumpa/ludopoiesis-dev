@@ -25,6 +25,11 @@ function actualizarPantallaInicialConIdioma() {
 }
 
 function mostrarPantalla(id) {
+  if (id === 'pantalla-inicial') {
+    actualizarPantallaInicialConIdioma();
+  } else if (id === 'pantalla-juego') {
+    actualizarPantallaJuegoConIdioma();
+  }
   ocultarTodasPantallas();
   document.getElementById(id).style.display = 'block';
 }
