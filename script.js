@@ -39,3 +39,8 @@ function lanzarCartaSuperpuesta() {
   const zona = document.getElementById('zona-cartas');
   zona.innerHTML = '<p>(Aquí aparecerán las cartas...)</p>';
 }
+
+function inicializarApp() {
+  setIdioma(idioma);
+  mostrarPantalla("pantalla-inicial");
+}
