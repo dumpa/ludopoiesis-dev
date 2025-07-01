@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ludopoiesis</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="pantalla-inicial" class="pantalla">
+    <h1 onclick="mostrarPantalla('pantalla-inicial')">Ludopoiesis</h1>
+    <p class="subtitulo">Un oráculo para jugar la vida.</p>
+    <p class="texto">Un espacio para detenerte, hacer una pregunta<br>y mirar el mundo desde otra perspectiva.</p>
+    <button onclick="mostrarPantalla('pantalla-juego')">🎴 Jugar</button>
+    <button onclick="mostrarPantalla('pantalla-info')">ℹ️ Más info</button>
+  </div>
+
+  <div id="pantalla-juego" class="pantalla" style="display:none;">
+    <h2>Elige cómo quieres jugar</h2>
+    <button onclick="lanzarCartaSuperpuesta()">Tirar carta</button>
+    <button onclick="mostrarPantalla('pantalla-inicial')">🏠 Volver</button>
+  </div>
+
+  <div id="pantalla-cartas" class="pantalla" style="display:none;">
+    <h2>Tus cartas</h2>
+    <div id="zona-cartas"></div>
+    <button onclick="mostrarPantalla('pantalla-juego')">↩️ Volver al menú</button>
+  </div>
+
+  <div id="pantalla-info" class="pantalla" style="display:none;">
+    <h2>¿Qué es Ludopoiesis?</h2>
+    <p>Información del autor, créditos, dónde comprar y newsletter...</p>
+    <button onclick="mostrarPantalla('pantalla-juego')">🎴 Jugar</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
