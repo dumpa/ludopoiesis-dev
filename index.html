@@ -19,22 +19,20 @@
   
   <div class="contenedor-principal">
     <div id="instrucciones">
-  <div id="instrucciones" class="pantalla-inicio">
-  <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
-  <p class="subtitulo">Un oráculo para jugar la vida</p>
+<div id="instrucciones" class="pantalla-inicio">
+  <h1 class="titulo">Ludopoiesis</h1>
+  <p class="subtitulo">Un oráculo para jugar la vida.</p>
 
-  <div class="pasos-iniciales">
-    <p><strong>Haz una buena pregunta.</strong></p>
-    <p><strong>Escoge tus lentes.</strong></p>
-    <p><strong>Lanza tus cartas.</strong></p>
-    <p><strong>Observa con atención.</strong></p>
-    <p><strong>Lee con el corazón.</strong></p>
-    <p><strong>Comparte si resuena.</strong></p>
+  <div class="texto-poetico">
+    <p>Un espacio para detenerte, hacer una pregunta<br/>y mirar el mundo desde otra perspectiva.</p>
+    <p>No busca respuestas definitivas.<br/>
+    Invita a sintonizar, asombrarte,<br/>
+    crear y fluir con el juego.</p>
   </div>
 
   <div class="botones-inicio">
-    <button onclick="mostrarDinamica()" class="btn-principal">🎴 Jugar</button>
-    <button onclick="mostrarAutor()" class="btn-secundario">ℹ️ Más info</button>
+    <button onclick="mostrarDinamica()" class="btn-jugar">🎴 Jugar</button>
+    <button onclick="mostrarAutor()" class="btn-info">ℹ️ Más info</button>
   </div>
 
   <div class="idiomas-footer">
@@ -42,61 +40,6 @@
     <span onclick="setIdioma('pt')">🇧🇷</span>
   </div>
 </div>
-
- <!--     <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis Test</h1>
-
-    <p><strong>1.</strong> <span onclick="mostrarPregunta()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Haz una pregunta</span></p>
-
-    <p><strong>2.</strong> <span onclick="mostrarLentes()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Escoge tus lentes</span></p>
-  <div id="lentes-toggle">
-  <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
-    <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
-    <span style="margin-left: 0.5rem;">Naturaleza</span>
-  </div>
-  <div class="lente-horizontal" onclick="toggleLente('fluir')">
-    <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
-    <span style="margin-left: 0.5rem;">Fluir</span>
-  </div>
-  <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
-    <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
-    <span style="margin-left: 0.5rem;">Tecnología</span>
-  </div>
-</div>
-
-    <p><strong>3.</strong> <span onclick="mostrarDinamica()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Saca tus cartas</span></p>
-
-    <button onclick="reiniciarCartas()">Volver a empezar</button>-->
-  <!--  <button onclick="lanzarCartaConEstilo('horizontal')">Lanzar al lado</button>
-    <button onclick="lanzarCartaConEstilo('vertical')">Lanzar debajo</button> -->
-<!--    <button onclick="lanzarCartaSuperpuesta()">Lanzar al lado</button>
-
-
-
-    <div class="idioma-switch">
-      <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
-      <label class="switch">
-        <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
-        <span class="slider"></span>
-      </label>
-      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
-    </div>
-  </div>
-
-  <div id="carta-container"></div>
-  <div id="introShort" class="intro-texto" style="display: none;"></div>
-  <div id="introLong" class="intro-texto" style="display: none;"> 
-    <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
-  </div>
- <div id="dinamica" class="intro-texto" style="display: none;"></div>
-
-
-
-</div>
-  <script src="script.js"></script>
-<!--    <button onclick="descargarImagenCarta()">Compartir</button>-->
-<!-- <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>-->
-
- <!--  <button onclick="compartirCarta()">Compartir esta carta</button> -->
   <!-- Footer estilo Dumpa -->
   <footer class="footer-dumpa">
   <div><strong>El blog de dumpa</strong></div>
