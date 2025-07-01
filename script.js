@@ -96,3 +96,93 @@ function actualizarPantallaTiradaConIdioma() {
       document.getElementById("tirada-boton-volver").innerText = textos.volver;
     });
 }
+
+
+function obtenerLentesActivos() {
+  const activos = [];
+  if (document.getElementById("lente-naturaleza").checked) activos.push("naturaleza");
+  if (document.getElementById("lente-fluir").checked) activos.push("fluir");
+  if (document.getElementById("lente-tecnologia").checked) activos.push("tecnologia");
+  return activos;
+}
+
+function lanzarCartaSuperpuesta() {
+  const container = document.getElementById("carta-container");
+  if (!container) return;
+
+  container.innerHTML = '';
+  container.style.display = "flex";
+  container.style.flexDirection = "row";
+  container.style.flexWrap = "nowrap";
+
+  const activos = obtenerLentesActivos();
+
+  fetch("cartas_ludopoiesis_naturaleza_fluir.json")
+    .then(res => res.json())
+    .then(cartas => {
+      const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+      if (!cartasFiltradas.length) {
+        alert("No hay cartas disponibles para los lentes seleccionados.");
+        return;
+      }
+
+      const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+      const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+      const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+      const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+      const card = document.createElement("div");
+      card.classList.add("card", "card-animada");
+      card.dataset.id = carta.id;
+
+      card.onclick = () => {
+        const todas = document.querySelectorAll(".card");
+        const yaFlipped = card.classList.contains("flipped");
+
+        todas.forEach(c => {
+          if (c !== card) {
+            c.classList.remove("flipped", "ampliada");
+            c.style.transform = c.dataset.originalTransform || "";
+          }
+        });
+
+        if (!yaFlipped) {
+          card.classList.add("flipped");
+          const totalCartas = document.querySelectorAll(".card").length;
+          if (totalCartas > 1) {
+            card.classList.add("ampliada");
+            card.style.transform = "scale(1) rotate(0deg)";
+          } else {
+            card.classList.remove("ampliada");
+            card.style.transform = "scale(1) rotate(0deg)";
+          }
+        } else {
+          card.classList.remove("flipped", "ampliada");
+          card.style.transform = card.dataset.originalTransform || "";
+        }
+      };
+
+      const angulo = (Math.random() * 10 - 5).toFixed(2);
+      card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
+      card.dataset.angulo = angulo;
+      card.dataset.originalTransform = card.style.transform;
+
+      const totalCartas = container.querySelectorAll(".card").length;
+      card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
+
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">
+            <img src="${imagen}" alt="${titulo}">
+          </div>
+          <div class="card-back">
+            <h2>${titulo}</h2>
+            <p>${texto.replace(/\n/g, "<br>")}</p>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+      mostrarPantalla('pantalla-cartas');
+    });
+}
