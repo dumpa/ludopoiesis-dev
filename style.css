@@ -171,7 +171,7 @@ button {
 .card-back p {
   text-align: left;
   font-size: 0.95rem;
-  line-height: 1.65;
+  line-height: 1.4;
   white-space: pre-line;
 }
 
@@ -199,8 +199,8 @@ button {
 .card-back p,
 .carta-texto {
   font-family: 'Dosis', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.65;
+  font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+  line-height: 1.4;
   text-align: left;
   padding: 0 1.5rem 1rem 1.5rem;
   white-space: normal;
