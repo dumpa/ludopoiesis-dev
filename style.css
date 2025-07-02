@@ -184,3 +184,37 @@ button {
     top: 10vh;
   }
 }
+
+
+/* v0.4 - Diseño inspirado en página 10 del PDF */
+.card-back h2,
+.carta-titulo {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.1rem;
+  text-align: right;
+  text-transform: uppercase;
+  margin: 0.5rem 1rem;
+}
+
+.card-back p,
+.carta-texto {
+  font-family: 'Dosis', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: left;
+  padding: 0 1.5rem 1rem 1.5rem;
+  white-space: pre-wrap;
+}
+
+/* Proporción realista para cartas en escritorio */
+@media (min-width: 769px) {
+  .card.ampliada {
+    width: 320px !important;
+    max-height: 520px !important;
+    left: calc(50% - 160px);
+    top: 10vh;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-radius: 1rem;
+  }
+}
