@@ -274,7 +274,7 @@ input:checked + .slider:before {
   transform: scale(0.85);
 }
 
-/* AnimaciÃƒÂ³n al aparecer carta */
+/* AnimaciÃ³n al aparecer carta */
 .card-animada {
   animation: entrada-carta 0.4s ease;
 }
@@ -298,29 +298,19 @@ input:checked + .slider:before {
   }
 }
 
-/* Ajustes especÃ­ficos para mÃ³viles */
-@media (max-width: 768px) {
-  body {
-    padding: 0;
-    overflow-x: hidden;
-  }
-}
-
-/* Estilo final de carta ampliada â€” centrado absoluto respecto al viewport */
 .card.ampliada {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1.1);
-  width: 90vw;
-  max-width: 340px;
+  width: auto;
+  max-width: 90vw;
   height: auto;
   max-height: 90vh;
-  z-index: 9999;
-  background: white;
+  aspect-ratio: 340 / 520; /* mantiene proporción de carta */
+  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  z-index: 999;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  border-radius: 12px;
-  pointer-events: auto;
+  transition: all 0.3s ease;
 }
 
 
@@ -331,11 +321,11 @@ input:checked + .slider:before {
   justify-content: center;
   transform-origin: center center;
   transition: transform 0.4s ease;
-  margin: 0;        /* Ã¢Ââ€”elimina separaciÃƒÂ³n entre cartas */
-  padding: 0;       /* Ã¢Ââ€”sin relleno adicional */
+  margin: 0;        /* â—elimina separaciÃ³n entre cartas */
+  padding: 0;       /* â—sin relleno adicional */
 }
 
-/* Escalado progresivo automÃƒÂ¡tico */
+/* Escalado progresivo automÃ¡tico */
 #carta-container.card-1 .carta-wrapper { transform: scale(1); }
 #carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
 #carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
@@ -355,4 +345,30 @@ input:checked + .slider:before {
 
 .card-front {
   background: transparent !important;
+}
+
+
+/* Overlay centrado para carta ampliada */
+#overlay-ampliada {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 9999;
+}
+
+#overlay-ampliada .card {
+  width: 90vw;
+  max-width: 340px;
+  height: auto;
+  max-height: 90vh;
+  aspect-ratio: 340 / 520;
+  transform: none !important;
+  margin: 0;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  border-radius: 12px;
+  position: relative;
+  z-index: 9999;
 }
