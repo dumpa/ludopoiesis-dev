@@ -159,3 +159,28 @@ button {
 .card-back {
   overflow-y: auto;
 }
+
+
+/* v0.3 - Ajustes de layout */
+.card-back h2 {
+  text-align: right;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.card-back p {
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* Tamaño moderado en pantallas grandes */
+@media (min-width: 769px) {
+  .card.ampliada {
+    width: 400px !important;
+    height: 600px !important;
+    left: calc(50% - 200px);
+    top: 10vh;
+  }
+}
