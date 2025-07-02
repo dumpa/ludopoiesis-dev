@@ -1,3 +1,10 @@
+// script.js — Versión 1.0.3 — Mejora carta ampliada en móvil
+
+// Devuelve true si el ancho de la pantalla es menor a 768px (móvil)
+function esDispositivoMovil() {
+  return window.innerWidth < 768;
+}
+
 let cartas = [];
 let idioma = "es";
 let cartaActual = null;
@@ -398,3 +405,19 @@ window.cargarIntro = cargarIntro;
 window.mostrarPregunta = mostrarPregunta;
 window.mostrarLentes = mostrarLentes;
 window.mostrarDinamica = mostrarDinamica;
+
+
+// Evento de clic en carta (añadido)
+// Al hacer clic en la carta:
+  carta.addEventListener('click', () => {
+    // Voltea la carta
+    carta.classList.toggle('flipped');
+
+    // Si es móvil, mover la carta al <body> y aplicar clase ampliada
+    if (esDispositivoMovil()) {
+      if (!carta.classList.contains('ampliada')) {
+        document.body.appendChild(carta);
+      }
+      carta.classList.toggle('ampliada');
+    }
+  });
