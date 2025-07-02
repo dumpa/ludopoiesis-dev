@@ -192,7 +192,7 @@ button {
   font-family: 'Dosis', sans-serif;
   font-size: 1.1rem;
   text-align: right;
-  text-transform: uppercase;
+  
   margin: 0.5rem 1rem;
 }
 
@@ -217,4 +217,12 @@ button {
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     border-radius: 1rem;
   }
+}
+
+
+/* v0.5 - Cartas con esquinas redondeadas */
+.card {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
