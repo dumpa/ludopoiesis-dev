@@ -274,7 +274,7 @@ input:checked + .slider:before {
   transform: scale(0.85);
 }
 
-/* AnimaciÃ³n al aparecer carta */
+/* AnimaciÃƒÂ³n al aparecer carta */
 .card-animada {
   animation: entrada-carta 0.4s ease;
 }
@@ -298,19 +298,27 @@ input:checked + .slider:before {
   }
 }
 
+/* Ajustes especÃ­ficos para mÃ³viles */
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Carta ampliada al centro de la pantalla â€” versiÃ³n mÃ³vil optimizada */
 .card.ampliada {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  width: auto;
-  max-width: 90vw;
-  height: auto;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%) scale(1.1);
+  max-width: 100vw;
   max-height: 90vh;
-  aspect-ratio: 340 / 520; /* mantiene proporción de carta */
-  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
-  z-index: 999;
+  aspect-ratio: 340 / 520;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  transition: all 0.3s ease;
+  z-index: 999;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 
@@ -321,11 +329,11 @@ input:checked + .slider:before {
   justify-content: center;
   transform-origin: center center;
   transition: transform 0.4s ease;
-  margin: 0;        /* â—elimina separaciÃ³n entre cartas */
-  padding: 0;       /* â—sin relleno adicional */
+  margin: 0;        /* Ã¢Ââ€”elimina separaciÃƒÂ³n entre cartas */
+  padding: 0;       /* Ã¢Ââ€”sin relleno adicional */
 }
 
-/* Escalado progresivo automÃ¡tico */
+/* Escalado progresivo automÃƒÂ¡tico */
 #carta-container.card-1 .carta-wrapper { transform: scale(1); }
 #carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
 #carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
