@@ -117,15 +117,45 @@ button {
 }
 
 
-/* v0.1 - Flip con ampliación en móvil */
+/* v0.1 - Flip con ampliación */
 @media (max-width: 768px) {
   .card.ampliada {
-    width: 90vw;
-    height: 75vh;
+    width: 90vw !important;
+    height: 75vh !important;
+    z-index: 9999;
     position: fixed;
     top: 10vh;
     left: 5vw;
-    z-index: 9999;
-    margin: 0 !important;
+    transform: none !important;
+    transition: all 0.3s ease;
   }
+
+  .card.ampliada .card-inner {
+    height: 100%;
+  }
+
+  .card-back {
+    overflow-y: auto;
+  }
+}
+
+
+/* v0.2 - Flip con ampliación en todas las resoluciones */
+.card.ampliada {
+  width: 90vw !important;
+  height: 75vh !important;
+  z-index: 9999;
+  position: fixed;
+  top: 10vh;
+  left: 5vw;
+  transform: none !important;
+  transition: all 0.3s ease;
+}
+
+.card.ampliada .card-inner {
+  height: 100%;
+}
+
+.card-back {
+  overflow-y: auto;
 }

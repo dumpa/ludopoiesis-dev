@@ -1,4 +1,4 @@
-// Versión: v0.1 - Flip con ampliación en móvil
+// Versión: v0.1 - Flip con ampliación
 
 let idioma = localStorage.getItem("idioma") || "es";
 
@@ -137,31 +137,18 @@ function lanzarCartaSuperpuesta() {
       card.dataset.id = carta.id;
 
       card.onclick = () => {
-        const todas = document.querySelectorAll(".card");
-        const yaFlipped = card.classList.contains("flipped");
+  const yaFlipped = card.classList.contains("flipped");
 
-        todas.forEach(c => {
-          if (c !== card) {
-            c.classList.remove("flipped", "ampliada");
-            c.style.transform = c.dataset.originalTransform || "";
-          }
-        });
+  document.querySelectorAll(".card").forEach(c => {
+    c.classList.remove("flipped", "ampliada");
+    c.style.transform = c.dataset.originalTransform || "";
+  });
 
-        if (!yaFlipped) {
-          card.classList.add("flipped", "ampliada");
-          const totalCartas = document.querySelectorAll(".card").length;
-          if (totalCartas > 1) {
-            card.classList.add("ampliada");
-            card.style.transform = "scale(1) rotate(0deg)";
-          } else {
-            card.classList.remove("ampliada");
-            card.style.transform = "scale(1) rotate(0deg)";
-          }
-        } else {
-          card.classList.remove("flipped", "ampliada");
-          card.style.transform = card.dataset.originalTransform || "";
-        }
-      };
+  if (!yaFlipped) {
+    card.classList.add("flipped", "ampliada");
+    card.style.transform = "none";
+  }
+};
 
       const angulo = (Math.random() * 10 - 5).toFixed(2);
       card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
