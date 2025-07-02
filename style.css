@@ -1,6 +1,6 @@
 
 body {
-  font-family: 'Libre Baskerville', serif;
+  font-family: 'Dosis', sans-serif;
   text-align: center;
   padding: 2rem 1rem;
   background: #fefefe;
@@ -189,7 +189,7 @@ button {
 /* v0.4 - Diseño inspirado en página 10 del PDF */
 .card-back h2,
 .carta-titulo {
-  font-family: 'Libre Baskerville', serif;
+  font-family: 'Dosis', sans-serif;
   font-size: 1.1rem;
   text-align: right;
   text-transform: uppercase;
