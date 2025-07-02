@@ -15,7 +15,7 @@ h1, h2 {
 button {
   padding: 0.7rem 1.2rem;
   margin: 1rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
   border-radius: 0.6rem;
   border: none;
   cursor: pointer;
@@ -37,7 +37,7 @@ button {
 .icono-ayuda {
   margin-left: 0.4rem;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   opacity: 0.7;
 }
 .icono-ayuda:hover {
@@ -46,7 +46,7 @@ button {
 .juego-pasos {
   list-style: none;
   padding-left: 0;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 .juego-pasos li {
   margin: 1rem 0;
@@ -170,10 +170,8 @@ button {
 
 .card-back p {
   text-align: left;
-  max-width: 90%;
-  margin: 0 auto;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.65;
   white-space: pre-line;
 }
 
@@ -192,7 +190,7 @@ button {
 .card-back h2,
 .carta-titulo {
   font-family: 'Dosis', sans-serif;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   text-align: right;
   
   margin: 0.5rem 1rem;
@@ -201,13 +199,11 @@ button {
 .card-back p,
 .carta-texto {
   font-family: 'Dosis', sans-serif;
-  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.65;
   text-align: left;
-  max-width: 90%;
-  margin: 0 auto;
   padding: 0 1.5rem 1rem 1.5rem;
-  white-space: pre-wrap;
+  white-space: normal;
 }
 
 /* Proporción realista para cartas en escritorio */
