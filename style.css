@@ -115,3 +115,17 @@ button {
   z-index: 1000;
   position: relative;
 }
+
+
+/* v0.1 - Flip con ampliación en móvil */
+@media (max-width: 768px) {
+  .card.ampliada {
+    width: 90vw;
+    height: 75vh;
+    position: fixed;
+    top: 10vh;
+    left: 5vw;
+    z-index: 9999;
+    margin: 0 !important;
+  }
+}

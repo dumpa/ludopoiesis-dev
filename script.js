@@ -1,3 +1,4 @@
+// Versión: v0.1 - Flip con ampliación en móvil
 
 let idioma = localStorage.getItem("idioma") || "es";
 
@@ -147,7 +148,7 @@ function lanzarCartaSuperpuesta() {
         });
 
         if (!yaFlipped) {
-          card.classList.add("flipped");
+          card.classList.add("flipped", "ampliada");
           const totalCartas = document.querySelectorAll(".card").length;
           if (totalCartas > 1) {
             card.classList.add("ampliada");
