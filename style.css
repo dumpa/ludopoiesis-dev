@@ -306,21 +306,21 @@ input:checked + .slider:before {
   }
 }
 
-/* Estilo robusto para centrar carta ampliada en mÃ³vil y desktop */
+/* Estilo final de carta ampliada â€” centrado absoluto respecto al viewport */
 .card.ampliada {
   position: fixed;
-  inset: 0;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 90vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.1);
+  width: 90vw;
+  max-width: 340px;
+  height: auto;
   max-height: 90vh;
-  aspect-ratio: 340 / 520;
-  z-index: 999;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  z-index: 9999;
   background: white;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
   border-radius: 12px;
+  pointer-events: auto;
 }
 
 
