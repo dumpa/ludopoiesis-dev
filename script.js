@@ -18,9 +18,9 @@ function actualizarPantallaInicialConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.inicio[idioma] || data.inicio["es"];
-      if (document.getElementById("inicio-subtitulo")) document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
-      if (document.getElementById("inicio-mensaje")) document.getElementById("inicio-mensaje").innerText = textos.mensaje;
-      if (document.getElementById("inicio-boton-jugar")) document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
+      document.getElementById("inicio-subtitulo").innerText = textos.subtitulo;
+      document.getElementById("inicio-mensaje").innerText = textos.mensaje;
+      document.getElementById("inicio-boton-jugar").innerText = textos.jugar;
     });
 }
 
@@ -58,12 +58,12 @@ function actualizarPantallaJuegoConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.juego[idioma] || data.juego["es"];
-      if (document.getElementById("juego-titulo")) document.getElementById("juego-titulo").innerText = textos.titulo;
-      if (document.getElementById("juego-paso1")) document.getElementById("juego-paso1").innerText = textos.paso1;
-      if (document.getElementById("juego-paso2")) document.getElementById("juego-paso2").innerText = textos.paso2;
-      if (document.getElementById("juego-paso3")) document.getElementById("juego-paso3").innerText = textos.paso3;
-      if (document.getElementById("juego-boton-tirar")) if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
-      if (document.getElementById("juego-boton-volver")) document.getElementById("juego-boton-volver").innerText = textos.volver;
+      document.getElementById("juego-titulo").innerText = textos.titulo;
+      document.getElementById("juego-paso1").innerText = textos.paso1;
+      document.getElementById("juego-paso2").innerText = textos.paso2;
+      document.getElementById("juego-paso3").innerText = textos.paso3;
+      if (document.getElementById("juego-boton-tirar")) document.getElementById("juego-boton-tirar").innerText = textos.tirar;
+      document.getElementById("juego-boton-volver").innerText = textos.volver;
     });
 }
 
@@ -90,10 +90,10 @@ function actualizarPantallaTiradaConIdioma() {
     .then(res => res.json())
     .then(data => {
       const textos = data.tirada[idioma] || data.tirada["es"];
-      if (document.getElementById("tirada-titulo")) document.getElementById("tirada-titulo").innerText = textos.titulo;
-      if (document.getElementById("tirada-instruccion")) document.getElementById("tirada-instruccion").innerText = textos.instruccion;
-      if (document.getElementById("tirada-boton-lanzar")) document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
-      if (document.getElementById("tirada-boton-volver")) document.getElementById("tirada-boton-volver").innerText = textos.volver;
+      document.getElementById("tirada-titulo").innerText = textos.titulo;
+      document.getElementById("tirada-instruccion").innerText = textos.instruccion;
+      document.getElementById("tirada-boton-lanzar").innerText = textos.boton;
+      document.getElementById("tirada-boton-volver").innerText = textos.volver;
     });
 }
 
@@ -107,18 +107,13 @@ function obtenerLentesActivos() {
 }
 
 function lanzarCartaSuperpuesta() {
-  
-const container = document.getElementById("carta-container");
-if (!container) {
-  console.warn("Contenedor de cartas no encontrado");
-  return;
-}
-container.style.display = "flex";
-container.style.flexDirection = "row";
-container.style.flexWrap = "nowrap";
-container.style.alignItems = "flex-start";
-container.style.justifyContent = "center";
+  const container = document.getElementById("carta-container");
+  if (!container) return;
 
+  container.innerHTML = '';
+  container.style.display = "flex";
+  container.style.flexDirection = "row";
+  container.style.flexWrap = "nowrap";
 
   const activos = obtenerLentesActivos();
 
@@ -191,49 +186,3 @@ container.style.justifyContent = "center";
       mostrarPantalla('pantalla-cartas');
     });
 }
-
-function configurarBotonesLentes() {
-  const botones = document.querySelectorAll(".lente-boton");
-  botones.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.classList.toggle("lente-activo");
-    });
-  });
-}
-
-function obtenerLentesActivos() {
-  const activos = [];
-  document.querySelectorAll(".lente-boton.lente-activo").forEach(btn => {
-    activos.push(btn.dataset.lente);
-  });
-  return activos;
-}
-
-
-function configurarBurbujasToggle() {
-  const ayudas = document.querySelectorAll(".icono-ayuda");
-  ayudas.forEach(icon => {
-    icon.addEventListener("click", () => {
-      const id = icon.dataset.target;
-      const ayuda = document.getElementById(id);
-
-      // Si está visible, la ocultamos
-      if (ayuda.style.display === "block") {
-        ayuda.style.display = "none";
-      } else {
-        // Ocultar todas antes de mostrar esta
-        document.querySelectorAll(".burbuja-ayuda").forEach(b => b.style.display = "none");
-        ayuda.style.display = "block";
-      }
-    });
-  });
-}
-
-    });
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  configurarBotonesLentes();
-  configurarBurbujasToggle();
-});

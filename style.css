@@ -115,37 +115,3 @@ button {
   z-index: 1000;
   position: relative;
 }
-
-
-@media (max-width: 768px) {
-  .card.ampliada {
-    position: fixed;
-    top: 10%;
-    left: 5%;
-    width: 90vw;
-    height: 80vh;
-    z-index: 9999;
-    transform: scale(1) rotate(0deg) !important;
-  }
-}
-
-
-.lente-boton {
-  display: inline-block;
-  margin: 0.5rem;
-  font-size: 1.8rem;
-  cursor: pointer;
-  border-radius: 999px;
-  padding: 0.3rem 0.6rem;
-  border: 2px solid transparent;
-  transition: transform 0.2s, border 0.2s;
-}
-
-.lente-boton:hover {
-  transform: scale(1.1);
-}
-
-.lente-activo {
-  border-color: #007272;
-  background-color: #e0f7f7;
-}
