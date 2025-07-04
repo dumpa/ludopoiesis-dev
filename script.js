@@ -288,6 +288,7 @@ function lanzarCartaSuperpuesta() {
   // Siempre muestra la carta ampliada en el overlay (centrada y volteada)
   ampliarCarta(card);
 };
+}
 /*
   // Click = flip y ampliar
   card.onclick = () => {
