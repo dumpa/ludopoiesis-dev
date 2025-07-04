@@ -24,6 +24,21 @@
 </div>
 <div id="overlay-ampliada"></div>
 
+  <button onclick="lanzarCartaSuperpuesta()">Carta</button>
+      
+<div id="lentes-toggle">
+      <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
+        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+      </div>
+      <div class="lente-horizontal" onclick="toggleLente('fluir')">
+        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
+      </div>
+      <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
+        <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
+      </div>
+    </div>
+  <button onclick="reiniciarCartas()">Nuevo</button>
+
   <div id="instrucciones">
     <div class="paso">
       <h2>
@@ -39,23 +54,9 @@
       </h2>
     </div>
 
-    <div id="lentes-toggle">
-      <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
-        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
-      </div>
-      <div class="lente-horizontal" onclick="toggleLente('fluir')">
-        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
-      </div>
-      <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
-        <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
-      </div>
-    </div>
-
     <div class="paso">
       <h2>3. Tira una carta</h2>
-      <button onclick="lanzarCartaSuperpuesta()">Tirar una carta</button>
-      <button onclick="reiniciarCartas()">Volver a empezar</button>
-    </div>
+          </div>
 
     <div class="idioma-switch">
       <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
