@@ -25,13 +25,14 @@ button:hover {
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: auto;
-   width: 100%;
+  width: fit-content;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   #carta-container {
-    width: fit-content;
+       width: 100%;
+
     margin: 0 auto;
   }
 }
