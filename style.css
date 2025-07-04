@@ -361,7 +361,7 @@ input:checked + .slider:before {
   height: auto;
   max-height: 90vh;
   aspect-ratio: 340 / 520;
-  transform: none !important;
+  
   background: white;
   border-radius: 12px;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
