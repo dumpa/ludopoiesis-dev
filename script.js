@@ -306,6 +306,31 @@ function lanzarCartaSuperpuesta() {
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
+  const cartaClonada = cardOriginal.cloneNode(true);
+  cartaClonada.classList.remove("card-animada");
+  cartaClonada.classList.add("card", "flipped");
+  cartaClonada.style.transform = "none";
+
+  cartaClonada.onclick = (e) => e.stopPropagation();
+
+  overlay.innerHTML = "";
+  overlay.appendChild(cartaClonada);
+  overlay.style.display = "flex";
+
+  // Nuevo comportamiento: clic en overlay hace toggle del flip
+  overlay.onclick = () => {
+    if (cartaClonada.classList.contains("flipped")) {
+      cartaClonada.classList.remove("flipped");
+    } else {
+      overlay.style.display = "none";
+      overlay.innerHTML = "";
+    }
+  };
+}
+/*
+function ampliarCarta(cardOriginal) {
+  const overlay = document.getElementById("overlay-ampliada");
+
   // Clona y limpia la carta
   const cartaClonada = cardOriginal.cloneNode(true);
   cartaClonada.classList.remove("card-animada");
@@ -326,6 +351,7 @@ function ampliarCarta(cardOriginal) {
     overlay.innerHTML = "";
   };
 }
+*/
 /*
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
