@@ -232,13 +232,13 @@ function lanzarCartaSuperpuesta() {
 function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
 
-  // Oculta intros si están visibles
+  // Oculta intros
   ["introShort", "introLong", "dinamica"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
 
-  // Filtrar lentes activos
+  // Lentes activos
   const activos = Object.entries(lentesActivos)
     .filter(([_, activo]) => activo)
     .map(([lente]) => lente);
@@ -246,6 +246,7 @@ function lanzarCartaSuperpuesta() {
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
   if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
 
+  // Selección aleatoria
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
 
@@ -253,41 +254,19 @@ function lanzarCartaSuperpuesta() {
   const texto = idioma === "es" ? carta.texto : carta.texto_pt;
   const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
 
-  // Crear carta DOM
+  // Crear DOM de carta
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
   card.dataset.id = carta.id;
 
-  // Lógica de 1 clic = 3 estados
-  card.onclick = () => {
-    const flipped = card.classList.contains("flipped");
-    const ampliada = card.classList.contains("ampliada");
-
-    // 1. No flipped ni ampliada → voltea y amplía
-    if (!flipped && !ampliada) {
-      card.classList.add("flipped", "ampliada");
-    }
-    // 2. Ya flipped y ampliada → solo desamplía
-    else if (flipped && ampliada) {
-      card.classList.remove("ampliada");
-    }
-    // 3. Ya flipped pero no ampliada → vuelve al frente
-    else if (flipped && !ampliada) {
-      card.classList.remove("flipped");
-    }
-  };
-
-  // Transformación inicial de rotación/escala
   const angulo = (Math.random() * 10 - 5).toFixed(2);
   card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
   card.dataset.angulo = angulo;
   card.dataset.originalTransform = card.style.transform;
 
-  // Separación entre cartas si hay más de una
   const totalCartas = container.querySelectorAll(".card").length;
   card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
 
-  // HTML interno de la carta
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-front">
@@ -300,33 +279,49 @@ function lanzarCartaSuperpuesta() {
     </div>
   `;
 
-  // Configura el contenedor de cartas
+  container.appendChild(card);
   container.style.display = "flex";
   container.style.flexDirection = "row";
   container.style.flexWrap = "nowrap";
 
-  // Añade la carta al DOM
-  container.appendChild(card);
+  // Click = flip y ampliar
+  card.onclick = () => {
+    const flipped = card.classList.contains("flipped");
+
+    if (!flipped) {
+      card.classList.add("flipped");
+      setTimeout(() => {
+        ampliarCarta(card); // Usa overlay
+      }, 300);
+    } else {
+      card.classList.remove("flipped");
+    }
+  };
 }
 
-// Función para manejar la ampliación de una carta
-function ampliarCarta(cartaOriginal) {
-  // Clona la carta original para no alterar el layout
-  const cartaClonada = cartaOriginal.cloneNode(true);
+function ampliarCarta(cardOriginal) {
+  const overlay = document.getElementById("overlay-ampliada");
+
+  // Clona la carta original
+  const cartaClonada = cardOriginal.cloneNode(true);
   cartaClonada.classList.add("ampliada");
 
-  // Mostrar el overlay
-  const overlay = document.getElementById("overlay-ampliada");
-  overlay.innerHTML = ""; // Limpia cualquier carta previa
+  // Asegura que esté flippada también
+  cartaClonada.classList.add("flipped");
+
+  // Limpia overlay, inserta la carta y lo muestra
+  overlay.innerHTML = "";
   overlay.appendChild(cartaClonada);
   overlay.style.display = "flex";
 
-  // Permitir cerrar el overlay al hacer clic fuera
+  // Al hacer clic en el overlay, se cierra
   overlay.onclick = () => {
     overlay.style.display = "none";
     overlay.innerHTML = "";
   };
 }
+
+
 
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
