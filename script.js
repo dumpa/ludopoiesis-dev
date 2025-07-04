@@ -302,7 +302,6 @@ function lanzarCartaSuperpuesta() {
       card.classList.remove("flipped");
     }
   };*/
-}
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
@@ -311,14 +310,10 @@ function ampliarCarta(cardOriginal) {
   cartaClonada.classList.add("card", "flipped");
   cartaClonada.style.transform = "none";
 
-  cartaClonada.onclick = (e) => e.stopPropagation();
+  // El clic en la carta ahora tiene lógica
+  cartaClonada.onclick = (e) => {
+    e.stopPropagation();
 
-  overlay.innerHTML = "";
-  overlay.appendChild(cartaClonada);
-  overlay.style.display = "flex";
-
-  // Nuevo comportamiento: clic en overlay hace toggle del flip
-  overlay.onclick = () => {
     if (cartaClonada.classList.contains("flipped")) {
       cartaClonada.classList.remove("flipped");
     } else {
@@ -326,6 +321,11 @@ function ampliarCarta(cardOriginal) {
       overlay.innerHTML = "";
     }
   };
+
+  // El fondo no hace nada ahora, todo se maneja desde la carta
+  overlay.innerHTML = "";
+  overlay.appendChild(cartaClonada);
+  overlay.style.display = "flex";
 }
 /*
 function ampliarCarta(cardOriginal) {
