@@ -401,8 +401,9 @@ input:checked + .slider:before {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   margin: 2rem auto;
+  max-width: 90%;
 }
 
 .botones-controles {
