@@ -9,7 +9,7 @@ let lentesActivos = {
   tecnologia: true
 };
 
-fetch("cartas_ludopoiesis_naturaleza_fluir.json?v=" + new Date().getTime())
+fetch("cartas.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
