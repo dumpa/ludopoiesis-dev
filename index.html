@@ -10,9 +10,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
 </head>
+  
 <body onload="cargarIntro()">
 <div class="contenedor-principal">
   <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
+
+    <div id="carta-container"></div>
+  <div id="introShort" class="intro-texto" style="display: none;"></div>
+  <div id="introLong" class="intro-texto" style="display: none;"> 
+    <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
+  </div>
+  <div id="dinamica" class="intro-texto" style="display: none;"></div>
+</div>
+<div id="overlay-ampliada"></div>
 
   <div id="instrucciones">
     <div class="paso">
@@ -57,14 +67,6 @@
     </div>
   </div>
 
-  <div id="carta-container"></div>
-  <div id="introShort" class="intro-texto" style="display: none;"></div>
-  <div id="introLong" class="intro-texto" style="display: none;"> 
-    <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
-  </div>
-  <div id="dinamica" class="intro-texto" style="display: none;"></div>
-</div>
-<div id="overlay-ampliada"></div>
 <script src="script.js"></script>
 </body>
 </html>
