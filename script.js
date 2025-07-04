@@ -308,7 +308,7 @@ function ampliarCarta(cardOriginal) {
 
   const cartaClonada = cardOriginal.cloneNode(true);
   cartaClonada.classList.remove("card-animada");
-  cartaClonada.classList.add("card", "flipped", "desampliada", "overlay-zoom");
+  cartaClonada.classList.add("card", "flipped", "desampliada", "overlay-zoom", "zoom-in");
   cartaClonada.style.transform = "none";
 
   // El clic en la carta ahora tiene lógica
