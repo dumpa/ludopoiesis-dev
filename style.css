@@ -372,3 +372,23 @@ input:checked + .slider:before {
   position: relative;
   z-index: 9999;
 }
+
+
+.zona-botones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 2rem auto;
+}
+
+.zona-botones button {
+  margin: 0;
+}
+
+.zona-botones #lentes-toggle {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+}
