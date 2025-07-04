@@ -392,3 +392,32 @@ input:checked + .slider:before {
   gap: 1rem;
   margin: 0;
 }
+
+.zona-controles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem auto;
+  max-width: 90%;
+}
+
+.zona-controles button {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  background-color: #004D4D;
+  color: white;
+  cursor: pointer;
+}
+
+.zona-controles button:hover {
+  background-color: #007171;
+}
+
+.zona-controles #lentes-toggle {
+  display: flex;
+  gap: 1rem;
+}
