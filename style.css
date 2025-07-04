@@ -1,58 +1,374 @@
-/* Estilo para pasos visuales */
-.paso {
-  margin: 1.5rem 0;
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap');
+
+body {
+  font-family: 'Dosis', sans-serif;
   text-align: center;
+  padding: 2rem;
+  background: #f4f1ee;
+  color: rgb(0, 67, 73);
 }
 
-.paso h2 {
-  font-size: 1.2rem;
-  color: #004d4d;
-  margin-bottom: 0.4rem;
-}
-
-.link-guia {
+button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+  margin: 1rem auto 2rem;
+  display: block;
+  background-color: rgb(0, 67, 73);
+  color: white;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  color: #007272;
-  text-decoration: underline dotted;
-  font-size: 0.95rem;
 }
 
-/* Mejor presentación de lentes */
+button:hover {
+  background-color: #00575f;
+}
+
+#carta-container {
+  perspective: 1000px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+
+.card {
+  width: 340px;
+  min-height: 520px;
+  max-width: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
+  cursor: pointer;
+  margin: 0;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  width: 100%;
+  min-height: 520px;
+  position: absolute;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-front {
+  background: white;
+  overflow: hidden;
+}
+
+.card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-back {
+  background: white;
+  color: rgb(0, 67, 73);
+  transform: rotateY(180deg);
+  flex-direction: column;
+  padding: 1.8rem 1.2rem;
+  align-items: flex-start;
+  text-align: left;
+  font-weight: 400;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.card-back h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: right;
+  width: 100%;
+}
+
+.card-back p {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+#instrucciones {
+  font-family: 'Dosis', sans-serif;
+  text-align: center;
+  margin: 30px 0;
+  font-size: 16px;
+  color: #333;
+  letter-spacing: 0.3px;
+}
+
 #lentes-toggle {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  margin: 1.2rem 0;
 }
 
 .lente-horizontal {
-  flex-direction: column;
+  display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  gap: 0.6rem;
+  margin-bottom: 0.1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
 }
 
 .lente-horizontal img {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
+  transition: transform 0.2s;
 }
 
-@media (max-width: 768px) {
-  button {
-    width: 90%;
-    font-size: 1.2rem;
-  }
+.lente-horizontal img:hover {
+  transform: scale(1.1);
+}
 
-  .paso h2 {
-    font-size: 1.1rem;
-  }
+.lente-horizontal:active {
+  transform: scale(0.98);
+}
 
-  .lente-horizontal img {
-    width: 64px;
-    height: 64px;
+.idioma-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem auto;
+}
+
+.bandera {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ddd;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: rgb(0, 67, 73);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+  background-color: #fff;
+}
+
+.mensaje-divertido {
+  text-align: center;
+  font-style: italic;
+  padding: 20px;
+  color: #666;
+}
+
+@media (min-width: 768px) {
+  .contenedor-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
   }
 
   #instrucciones {
-    padding: 0 1rem;
+    width: 40%;
+    text-align: left;
   }
+
+  #carta-container {
+    width: 60%;
+ 
+  }
+}
+
+.intro-texto {
+  font-family: 'Libre Baskerville', serif;
+  padding: 2rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.more-button {
+  cursor: pointer;
+  color: #007272;
+  text-decoration: underline;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+#titulo-home {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+#titulo-home:hover {
+  color: #004d4d;
+}
+
+/* Escalar cartas si hay muchas */
+#carta-container.muchas-cartas .card {
+  transform: scale(0.85);
+}
+
+/* AnimaciÃ³n al aparecer carta */
+.card-animada {
+  animation: entrada-carta 0.4s ease;
+}
+
+@keyframes entrada-carta {
+  from {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hover para escalar en desktop */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: scale(1.05);
+    z-index: 2;
+  }
+}
+
+.card.ampliada {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  max-width: 90vw;
+  height: auto;
+  max-height: 90vh;
+  aspect-ratio: 340 / 520; /* mantiene proporción de carta */
+  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  z-index: 999;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+}
+
+
+.carta-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.4s ease;
+  margin: 0;        /* â—elimina separaciÃ³n entre cartas */
+  padding: 0;       /* â—sin relleno adicional */
+}
+
+/* Escalado progresivo automÃ¡tico */
+#carta-container.card-1 .carta-wrapper { transform: scale(1); }
+#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
+#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
+#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
+#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
+#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
+#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
+#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
+#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
+
+
+/* Ajustes para eliminar bordes blancos y sombras de las cartas */
+.card, .card-inner, .card-front img {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.card-front {
+  background: transparent !important;
+}
+
+
+/* Overlay centrado para carta ampliada */
+#overlay-ampliada {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 9999;
+}
+
+#overlay-ampliada .card {
+  width: 90vw;
+  max-width: 340px;
+  height: auto;
+  max-height: 90vh;
+  aspect-ratio: 340 / 520;
+  transform: none !important;
+  margin: 0;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  border-radius: 12px;
+  position: relative;
+  z-index: 9999;
 }
