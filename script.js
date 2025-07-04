@@ -39,7 +39,7 @@ function cargarIntro(desplegarLargo = false) {
     })
     .catch(err => console.error('Error cargando textos:', err));
 }
-function lanzarCartaSuperpuesta() {
+/*function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
 
   ["introShort", "introLong", "dinamica"].forEach(id => {
@@ -133,6 +133,99 @@ card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
 
  
   
+  container.appendChild(card);
+}*/
+
+function lanzarCartaSuperpuesta() {
+  const container = document.getElementById("carta-container");
+
+  // Oculta intros
+  ["introShort", "introLong", "dinamica"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  // Filtra cartas activas
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, activo]) => activo)
+    .map(([lente]) => lente);
+
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
+  cartaActual = carta;
+
+  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
+  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
+  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+
+  // Crear elemento de carta
+  const card = document.createElement("div");
+  card.classList.add("card", "card-animada");
+  card.dataset.id = carta.id;
+
+  // Evento al hacer clic en la carta
+  card.onclick = () => {
+    const todas = document.querySelectorAll(".card");
+    const yaFlipped = card.classList.contains("flipped");
+
+    // Cierra otras cartas abiertas
+    todas.forEach(c => {
+      if (c !== card) {
+        c.classList.remove("flipped", "ampliada");
+        c.style.transform = c.dataset.originalTransform || "";
+      }
+    });
+
+    if (!yaFlipped) {
+      card.classList.add("flipped");
+
+      const totalCartas = document.querySelectorAll(".card").length;
+
+      if (totalCartas === 1) {
+        card.classList.remove("ampliada");
+      } else {
+        // Usamos overlay si hay múltiples cartas
+        setTimeout(() => {
+          ampliarCarta(card);  // esta función usa #overlay-ampliada
+        }, 300);
+      }
+
+    } else {
+      card.classList.remove("flipped", "ampliada");
+      card.style.transform = card.dataset.originalTransform || "";
+    }
+  };
+
+  // Estilo inicial de rotación
+  const angulo = (Math.random() * 10 - 5).toFixed(2);
+  card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
+  card.dataset.angulo = angulo;
+  card.dataset.originalTransform = card.style.transform;
+
+  // Posición para efecto de superposición
+  const totalCartas = container.querySelectorAll(".card").length;
+  card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
+
+  // Contenido de la carta
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">
+        <img src="${imagen}" alt="${titulo}">
+      </div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+
+  // Asegura display correcto del contenedor
+  container.style.display = "flex";
+  container.style.flexDirection = "row";
+  container.style.flexWrap = "nowrap";
+
   container.appendChild(card);
 }
 
