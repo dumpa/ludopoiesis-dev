@@ -284,6 +284,11 @@ function lanzarCartaSuperpuesta() {
   container.style.flexDirection = "row";
   container.style.flexWrap = "nowrap";
 
+  card.onclick = () => {
+  // Siempre muestra la carta ampliada en el overlay (centrada y volteada)
+  ampliarCarta(card);
+};
+/*
   // Click = flip y ampliar
   card.onclick = () => {
     const flipped = card.classList.contains("flipped");
@@ -296,8 +301,32 @@ function lanzarCartaSuperpuesta() {
     } else {
       card.classList.remove("flipped");
     }
+  };*/
+}
+function ampliarCarta(cardOriginal) {
+  const overlay = document.getElementById("overlay-ampliada");
+
+  // Clona y limpia la carta
+  const cartaClonada = cardOriginal.cloneNode(true);
+  cartaClonada.classList.remove("card-animada");
+  cartaClonada.classList.add("card", "flipped");
+  cartaClonada.style.transform = "none";
+
+  // Evita que el clic dentro de la carta cierre el overlay
+  cartaClonada.onclick = (e) => e.stopPropagation();
+
+  // Inserta la carta clonada en el overlay
+  overlay.innerHTML = "";
+  overlay.appendChild(cartaClonada);
+  overlay.style.display = "flex";
+
+  // Al hacer clic fuera de la carta, se cierra el overlay
+  overlay.onclick = () => {
+    overlay.style.display = "none";
+    overlay.innerHTML = "";
   };
 }
+/*
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
@@ -318,7 +347,7 @@ function ampliarCarta(cardOriginal) {
   };
 }
 
-
+*/
 
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
