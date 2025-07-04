@@ -288,7 +288,6 @@ input:checked + .slider:before {
     z-index: 2;
   }
 }
-
 .card.ampliada {
   position: fixed;
   top: 50%;
@@ -297,12 +296,14 @@ input:checked + .slider:before {
   max-width: 90vw;
   height: auto;
   max-height: 90vh;
-  aspect-ratio: 340 / 520; /* mantiene proporción de carta */
+  aspect-ratio: 340 / 520; /* mantiene proporción */
   transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
   z-index: 999;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
+  border-radius: 12px;
 }
+
 
 
 .carta-wrapper {
