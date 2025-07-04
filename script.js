@@ -298,7 +298,33 @@ function lanzarCartaSuperpuesta() {
     }
   };
 }
+function ampliarCarta(cardOriginal) {
+  const overlay = document.getElementById("overlay-ampliada");
 
+  // Clona la carta sin transformaciones anteriores
+  const cartaClonada = cardOriginal.cloneNode(true);
+
+  // Limpia clases que afecten layout o animación
+  cartaClonada.classList.remove("card-animada");
+  cartaClonada.style.transform = "none";
+
+  // Asegura flip y estilo limpio
+  cartaClonada.classList.add("card", "flipped");
+
+  // Evita que clic dentro cierre el overlay
+  cartaClonada.onclick = (e) => e.stopPropagation();
+
+  // Prepara y muestra el overlay
+  overlay.innerHTML = "";
+  overlay.appendChild(cartaClonada);
+  overlay.style.display = "flex";
+
+  overlay.onclick = () => {
+    overlay.style.display = "none";
+    overlay.innerHTML = "";
+  };
+}
+/*
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
@@ -319,7 +345,7 @@ function ampliarCarta(cardOriginal) {
   };
 }
 
-
+*/
 
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
