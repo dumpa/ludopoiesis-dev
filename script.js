@@ -68,6 +68,14 @@ function lanzarCartaSuperpuesta() {
   card.onclick = () => {
   const todas = document.querySelectorAll(".card");
   const yaFlipped = card.classList.contains("flipped");
+carta.addEventListener("click", () => {
+  carta.classList.toggle("flipped");
+
+  // Espera 300ms para que se complete el giro antes de ampliarla
+  setTimeout(() => {
+    ampliarCarta(carta);
+  }, 300);
+});
 
   todas.forEach(c => {
     if (c !== card) {
