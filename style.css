@@ -451,6 +451,10 @@ input:checked + .slider:before {
   gap: 1rem;
   align-items: center;
 }
+.card.zoom-in {
+  transition: transform 0.3s ease;
+  transform: scale(1.1) rotateY(180deg);
+}
 
 .overlay-zoom {
   animation: zoomInOverlay 0.3s ease;
