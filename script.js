@@ -302,19 +302,17 @@ function lanzarCartaSuperpuesta() {
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
-  // Clona la carta original
   const cartaClonada = cardOriginal.cloneNode(true);
+  cartaClonada.classList.add("flipped");
   cartaClonada.classList.add("ampliada");
 
-  // Asegura que esté flippada también
-  cartaClonada.classList.add("flipped");
+  // Impide que el clic dentro cierre el overlay
+  cartaClonada.onclick = (e) => e.stopPropagation();
 
-  // Limpia overlay, inserta la carta y lo muestra
   overlay.innerHTML = "";
   overlay.appendChild(cartaClonada);
   overlay.style.display = "flex";
 
-  // Al hacer clic en el overlay, se cierra
   overlay.onclick = () => {
     overlay.style.display = "none";
     overlay.innerHTML = "";
