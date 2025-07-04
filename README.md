@@ -1,3 +1,4 @@
 # ludopoiesis
 App for ludopoiesis
-con tirada de varias cartas
+comentarios nuevos cambios,
+dev
