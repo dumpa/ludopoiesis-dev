@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,69 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ludopoiesis - Oráculo Para Jugar la Vida</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
 </head>
-  
-<body onload="cargarIntro()">
-<div class="contenedor-principal">
-  <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
+<body>
+  <div class="contenedor-principal">
+    <h1 id="titulo-home">Ludopoiesis</h1>
 
-    <div id="carta-container"></div>
-  <div id="introShort" class="intro-texto" style="display: none;"></div>
-  <div id="introLong" class="intro-texto" style="display: none;"> 
-    <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
-  </div>
-  <div id="dinamica" class="intro-texto" style="display: none;"></div>
-</div>
-<div id="overlay-ampliada"></div>
+    <div id="cartas"></div>
 
-  <button onclick="lanzarCartaSuperpuesta()">Carta</button>
-  <button onclick="reiniciarCartas()">Nuevo</button>
-
-      
-<div id="lentes-toggle">
-      <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
-        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+    <div class="zona-controles">
+      <div class="botones-controles">
+        <button onclick="lanzarCartaSuperpuesta()">Carta</button>
+        <button onclick="reiniciarCartas()">Nuevo</button>
       </div>
-      <div class="lente-horizontal" onclick="toggleLente('fluir')">
-        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
+      <div id="lentes-toggle">
+        <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
+          <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+        </div>
+        <div class="lente-horizontal" onclick="toggleLente('fluir')">
+          <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
+        </div>
+        <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
+          <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
+        </div>
       </div>
-      <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
-        <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
-      </div>
-    </div>
-  
-  <div id="instrucciones">
-    <div class="paso">
-      <h2>
-        1. Haz una pregunta
-        <i class="fa fa-info-circle" onclick="mostrarPregunta()" title="¿Cómo se hace una buena pregunta?"></i>
-      </h2>
-    </div>
-
-    <div class="paso">
-      <h2>
-        2. Escoge tus lentes
-        <i class="fa fa-info-circle" onclick="mostrarLentes()" title="Ver más sobre los lentes"></i>
-      </h2>
-    </div>
-
-    <div class="paso">
-      <h2>3. Tira una carta</h2>
-          </div>
-
-    <div class="idioma-switch">
-      <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
-      <label class="switch">
-        <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
-        <span class="slider"></span>
-      </label>
-      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
     </div>
   </div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
