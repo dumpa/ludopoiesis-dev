@@ -308,14 +308,17 @@ function ampliarCarta(cardOriginal) {
 
   const cartaClonada = cardOriginal.cloneNode(true);
   cartaClonada.classList.remove("card-animada");
-  cartaClonada.classList.add("card", "flipped");
-  cartaClonada.classList.add("overlay-zoom");
-
+  cartaClonada.classList.add("card", "flipped", "desampliada", "overlay-zoom");
   cartaClonada.style.transform = "none";
 
   // El clic en la carta ahora tiene lógica
   cartaClonada.onclick = (e) => {
     e.stopPropagation();
+// Paso 1: empezamos sin transform final
+cartaClonada.style.transform = "scale(0.8)";
+requestAnimationFrame(() => {
+  cartaClonada.style.transform = "scale(1.1)";
+});
 
     if (cartaClonada.classList.contains("flipped")) {
       cartaClonada.classList.remove("flipped");
