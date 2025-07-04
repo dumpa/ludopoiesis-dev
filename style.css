@@ -451,3 +451,18 @@ input:checked + .slider:before {
   gap: 1rem;
   align-items: center;
 }
+
+.overlay-zoom {
+  animation: zoomInOverlay 0.3s ease;
+}
+
+@keyframes zoomInOverlay {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
