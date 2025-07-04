@@ -10,41 +10,42 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
-
-
-
 </head>
 <body onload="cargarIntro()">
 <div class="contenedor-principal">
   <div id="instrucciones">
     <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
 
-    <p><strong>1.</strong> <span onclick="mostrarPregunta()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Haz una pregunta</span></p>
-
-    <p><strong>2.</strong> <span onclick="mostrarLentes()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Escoge tus lentes</span></p>
-  <div id="lentes-toggle">
-  <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
-    <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
-    <span style="margin-left: 0.5rem;">Naturaleza</span>
-  </div>
-  <div class="lente-horizontal" onclick="toggleLente('fluir')">
-    <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
-    <span style="margin-left: 0.5rem;">Fluir</span>
-  </div>
-  <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
-    <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
-    <span style="margin-left: 0.5rem;">Tecnología</span>
-  </div>
+<div class="paso">
+  <h2>1. Haz una pregunta</h2>
+  <p onclick="mostrarPregunta()" class="link-guia">¿Cómo se hace una buena pregunta?</p>
 </div>
 
-    <p><strong>3.</strong> <span onclick="mostrarDinamica()" style="cursor:pointer; color:#007272; text-decoration: underline dotted;">Saca tus cartas</span></p>
+<div class="paso">
+  <h2>2. Escoge tus lentes</h2>
+  <p onclick="mostrarLentes()" class="link-guia">Ver más sobre los lentes</p>
+</div>
 
+  <div id="lentes-toggle">
+    <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
+      <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+      <span>Naturaleza</span>
+    </div>
+    <div class="lente-horizontal" onclick="toggleLente('fluir')">
+      <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
+      <span>Fluir</span>
+    </div>
+    <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
+      <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
+      <span>Tecnología</span>
+    </div>
+  </div>
+
+  <div class="paso">
+    <h2>3. Tira una carta</h2>
+    <button onclick="lanzarCartaSuperpuesta()">Tirar una carta</button>
     <button onclick="reiniciarCartas()">Volver a empezar</button>
-  <!--  <button onclick="lanzarCartaConEstilo('horizontal')">Lanzar al lado</button>
-    <button onclick="lanzarCartaConEstilo('vertical')">Lanzar debajo</button> -->
-    <button onclick="lanzarCartaSuperpuesta()">Lanzar al lado</button>
-
-
+  </div>
 
     <div class="idioma-switch">
       <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
@@ -62,71 +63,8 @@
     <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
   </div>
  <div id="dinamica" class="intro-texto" style="display: none;"></div>
-
-
-
 </div>
-  <script src="script.js"></script>
-<!--    <button onclick="descargarImagenCarta()">Compartir</button>-->
-<!-- <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>-->
-
- <!--  <button onclick="compartirCarta()">Compartir esta carta</button> -->
-  <!-- Footer estilo Dumpa -->
-  <footer class="footer-dumpa">
-  <div><strong>El blog de dumpa</strong></div>
-  <div>Los problemas se arreglan solos</div>
-  <div class="icons">
-    <a href="https://dumpa.co" target="_blank"><i class="fa-solid fa-globe"></i></a>
-    <a href="https://x.com/@dumpita" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-    <a href="https://instagram.com/superdumpa" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-    <a href="https://github.com/dumpa" target="_blank"><i class="fa-brands fa-github"></i></a>
-    <a href="https://facebook.com/dumpablog" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-  </div>
-
-  <div style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.6;">
-    Creado por Juan Pablo Calderón — físico, poeta y diseñador de juegos.  
-    <a href="https://dumpa.co" target="_blank">www.dumpa.co</a>
-  </div>
-</footer>
-<!--  <div style="margin-top: 0.7rem;">
-    <a href="https://dumpa.substack.com" target="_blank" style="padding: 0.5rem 1rem; background: #007272; color: white; border-radius: 999px;">Suscribirme</a>
-  </div>-->
-
-
-<style>
-  .footer-dumpa {
-    margin-top: 3rem;
-    padding: 1.5rem 1rem;
-    font-family: 'Dosis', sans-serif;
-    font-size: 0.9rem;
-    color: #444;
-    background-color: #f9f9f9;
-    border-top: 1px solid #ddd;
-    text-align: center;
-  }
-  .footer-dumpa img.avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    margin-bottom: 0.5rem;
-  }
-  .footer-dumpa a {
-    color: #007272;
-    text-decoration: none;
-    margin: 0 0.4rem;
-  }
-  .footer-dumpa a:hover {
-    text-decoration: underline;
-  }
-  .footer-dumpa .icons {
-    margin: 0.7rem 0;
-  }
-  .footer-dumpa .icons a {
-    margin: 0 0.3rem;
-    font-size: 1.2rem;
-    display: inline-block;
-  }
-</style>
-  <div id="overlay-ampliada"></div>
+<div id="overlay-ampliada"></div>
+<script src="script.js"></script>
 </body>
 </html>
