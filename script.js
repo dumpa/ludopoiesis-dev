@@ -127,6 +127,26 @@ card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
   
   container.appendChild(card);
 }
+
+// Función para manejar la ampliación de una carta
+function ampliarCarta(cartaOriginal) {
+  // Clona la carta original para no alterar el layout
+  const cartaClonada = cartaOriginal.cloneNode(true);
+  cartaClonada.classList.add("ampliada");
+
+  // Mostrar el overlay
+  const overlay = document.getElementById("overlay-ampliada");
+  overlay.innerHTML = ""; // Limpia cualquier carta previa
+  overlay.appendChild(cartaClonada);
+  overlay.style.display = "flex";
+
+  // Permitir cerrar el overlay al hacer clic fuera
+  overlay.onclick = () => {
+    overlay.style.display = "none";
+    overlay.innerHTML = "";
+  };
+}
+
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
     const el = document.getElementById(id);
