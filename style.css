@@ -127,7 +127,7 @@ button:hover {
 
 #lentes-toggle {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   gap: 0.3rem;
   margin: 1.2rem 0;
