@@ -62,12 +62,35 @@
     
     </div>
 
-    <div class="paso">
-      <h2><a href="https://dumpa.gumroad.com/l/mjesz">Necesitas ayuda con tu Lectura</a></h2>
+
+    <!-- Botón personalizado de lectura -->
+<div class="boton-ludopoiesis" data-gumroad-overlay-checkout="true" data-gumroad-product-id="mjesz">
+  ✨ Pedir una lectura personalizada
+</div>
+
+<!-- Script de Gumroad (solo una vez en tu app) -->
 <script async src="https://gumroad.com/js/gumroad.js"></script>
 
-          </div>
-    
+<!-- Estilo a juego con tu app -->
+<style>
+  .boton-ludopoiesis {
+    font-family: 'Dosis', sans-serif;
+    background-color: #004D4D;
+    color: white;
+    padding: 0.8rem 1.6rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .boton-ludopoiesis:hover {
+    background-color: #007171;
+  }
+</style>
+
 
     <div class="idioma-switch">
       <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
