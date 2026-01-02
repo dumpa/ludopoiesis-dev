@@ -358,10 +358,16 @@ function lanzarCartaSuperpuesta() {
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
 
+  const titulo = cardField(carta, "titulo");
+  const texto  = cardField(carta, "texto");
+  const imagen = cardField(carta, "imagen");
+
+  /*
   const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
   const texto = idioma === "es" ? carta.texto : carta.texto_pt;
   const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
-
+*/
+  
   // Crear DOM de carta
   const card = document.createElement("div");
   card.classList.add("card", "card-animada");
