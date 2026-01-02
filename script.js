@@ -62,38 +62,37 @@ function uiText(node, lang = idioma) {
 function t(node, fallback = "") {
   return (node && (node[idioma] || node.es || node.pt)) || fallback;
 }
-
 function renderUI(data) {
   // Title
   const titleEl = document.getElementById("ui-page-title");
-  if (titleEl) titleEl.textContent = t(data.ui?.page_title, "Ludopoiesis");
+  if (titleEl) titleEl.textContent = uiText(data.ui?.page_title) || "Ludopoiesis";
 
   // Buttons
   const btnCard = document.getElementById("ui-btn-card");
-  if (btnCard) btnCard.textContent = t(data.ui?.buttons?.card, "Card");
+  if (btnCard) btnCard.textContent = uiText(data.ui?.buttons?.card) || "Card";
 
   const btnNew = document.getElementById("ui-btn-new");
-  if (btnNew) btnNew.textContent = t(data.ui?.buttons?.new, "New");
+  if (btnNew) btnNew.textContent = uiText(data.ui?.buttons?.new) || "New";
 
   const moreAutor = document.getElementById("ui-more-autor");
-  if (moreAutor) moreAutor.textContent = t(data.ui?.buttons?.more_author, "➤ About the author");
+  if (moreAutor) moreAutor.textContent = uiText(data.ui?.buttons?.more_author) || "➤ About the author";
 
   // Steps
   const s1 = document.getElementById("ui-step-1");
-  if (s1) s1.textContent = t(data.ui?.steps?.s1);
+  if (s1) s1.textContent = uiText(data.ui?.steps?.s1) || "1. Ask a question";
 
   const s2 = document.getElementById("ui-step-2");
-  if (s2) s2.textContent = t(data.ui?.steps?.s2);
+  if (s2) s2.textContent = uiText(data.ui?.steps?.s2) || "2. Choose your lenses";
 
   const s3 = document.getElementById("ui-step-3");
-  if (s3) s3.textContent = t(data.ui?.steps?.s3);
+  if (s3) s3.textContent = uiText(data.ui?.steps?.s3) || "3. Draw a card";
 
   // Tooltips
   const tipPregunta = document.getElementById("ui-tip-pregunta");
-  if (tipPregunta) tipPregunta.title = t(data.ui?.tooltips?.pregunta);
+  if (tipPregunta) tipPregunta.title = uiText(data.ui?.tooltips?.pregunta) || "How do you ask a good question?";
 
   const tipLentes = document.getElementById("ui-tip-lentes");
-  if (tipLentes) tipLentes.title = t(data.ui?.tooltips?.lentes);
+  if (tipLentes) tipLentes.title = uiText(data.ui?.tooltips?.lentes) || "See more about the lenses";
 }
 
 // EN-only: deja estas funciones vacías por si quedaron referencias
@@ -106,19 +105,22 @@ fetch("cartas.json?v=" + new Date().getTime())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
+
 function cargarIntro(desplegarLargo = false) {
   fetch("textos.json")
     .then(res => res.json())
     .then(data => {
-      // Render UI (botones, pasos, tooltips, title)
+      // 1) UI
       renderUI(data);
 
-      const introCorta = data.intro.short[idioma];
-      const introLarga = data.intro.long[idioma];
-
+      // 2) DOM refs
       const shortEl = document.getElementById("introShort");
-      const longEl = document.getElementById("introLong");
+      const longEl  = document.getElementById("introLong");
       const cartaContainer = document.getElementById("carta-container");
+
+      // 3) Copys
+      const introCorta = uiText(data.intro?.short);
+      const introLarga = uiText(data.intro?.long);
 
       cartaContainer.style.display = "none";
 
@@ -127,8 +129,7 @@ function cargarIntro(desplegarLargo = false) {
         shortEl.style.display = "none";
         longEl.style.display = "block";
       } else {
-        // Botón "conocer más" también debe venir del json (si no existe, fallback)
-        const more = t(data.ui?.intro_more, "➔ Learn more about Ludopoiesis");
+        const more = uiText(data.ui?.intro_more) || "➔ Learn more about Ludopoiesis";
         shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">${more}</span>`;
         shortEl.style.display = "block";
         longEl.style.display = "none";
@@ -136,7 +137,6 @@ function cargarIntro(desplegarLargo = false) {
     })
     .catch(err => console.error("Error cargando textos:", err));
 }
-
 
 /*function cargarIntro(desplegarLargo = false) {
   fetch('textos.json')
@@ -163,7 +163,8 @@ function cargarIntro(desplegarLargo = false) {
     })
     .catch(err => console.error('Error cargando textos:', err));
 }
-/*function lanzarCartaSuperpuesta() {
+
+function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
 
   ["introShort", "introLong", "dinamica"].forEach(id => {
@@ -259,7 +260,7 @@ card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
   
   container.appendChild(card);
 }
-*//*
+
 function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
 
