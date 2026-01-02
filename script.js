@@ -9,8 +9,7 @@ let lentesActivos = {
   tecnologia: true
 };
 
-// EN-only beta (por ahora fijo)
-let idioma = "en";
+
 
 // helper con fallback seguro
 function t(node, fallback = "") {
