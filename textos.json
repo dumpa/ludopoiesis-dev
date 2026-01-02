@@ -30,5 +30,35 @@
     "es": "<p><strong>3. Saca tus cartas</strong></p><p>Ya hiciste una pregunta.<br>Ahora lanza una carta.</p><p>La carta no da respuestas literales.<br>Es un lente.<br>Cambia lo que ves.</p><p>Y al ver distinto,<br>también cambia la pregunta.</p><p>Mira con atención.<br>Deja que la carta converse contigo.</p>",
     "pt": "<p><strong>3. Tire suas cartas</strong></p><p>Você já fez uma pergunta.<br>Agora lance uma carta.</p><p>A carta não dá respostas literais.<br>É uma lente.<br>Muda o que você vê.</p><p>E ao ver diferente,<br>também muda a pergunta.</p><p>Olhe com atenção.<br>Deixe que a carta converse com você.</p>",
     "en": "<p><strong>3. Draw your cards</strong></p><p>You’ve already asked a question.<br>Now draw a card.</p><p>The card doesn’t give literal answers.<br>It’s a lens.<br>It changes what you see.</p><p>And when you see differently,<br>the question changes too.</p><p>Look closely.<br>Let the card talk with you.</p>"
+  },
+  "ui": {
+  "page_title": {
+    "es": "Ludopoiesis - Oráculo Para Jugar la Vida",
+    "pt": "Ludopoiesis - Oráculo Para Jogar a Vida",
+    "en": "Ludopoiesis - An Oracle to Play Life"
+  },
+  "buttons": {
+    "card": { "es": "Carta", "pt": "Carta", "en": "Card" },
+    "new": { "es": "Nuevo", "pt": "Novo", "en": "New" },
+    "more_author": { "es": "➤ Sobre el autor", "pt": "➤ Sobre o autor", "en": "➤ About the author" }
+  },
+  "steps": {
+    "s1": { "es": "1. Haz una pregunta", "pt": "1. Faça uma pergunta", "en": "1. Ask a question" },
+    "s2": { "es": "2. Escoge tus lentes", "pt": "2. Escolha suas lentes", "en": "2. Choose your lenses" },
+    "s3": { "es": "3. Tira una carta", "pt": "3. Tire uma carta", "en": "3. Draw a card" }
+  },
+  "tooltips": {
+    "pregunta": {
+      "es": "¿Cómo se hace una buena pregunta?",
+      "pt": "Como fazer uma boa pergunta?",
+      "en": "How do you ask a good question?"
+    },
+    "lentes": {
+      "es": "Ver más sobre los lentes",
+      "pt": "Ver mais sobre as lentes",
+      "en": "See more about the lenses"
+    }
   }
+}
+
 }
