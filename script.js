@@ -1,5 +1,5 @@
 let cartas = [];
-let idioma = "es";
+let idioma = "en";
 let cartaActual = null;
 let cartasLanzadas = [];
 
