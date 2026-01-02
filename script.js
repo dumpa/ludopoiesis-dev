@@ -9,6 +9,37 @@ let lentesActivos = {
   tecnologia: true
 };
 
+// Idioma actual (hoy EN-only, mañana lo cambias desde UI)
+let idioma = "en";
+
+// Orden de fallback (ajústalo a tu gusto)
+const FALLBACK_LANGS = ["en", "es", "pt"]; 
+// Si estás en EN y falta, cae a ES, luego PT. Para IT/FR caerá a ES por defecto.
+
+// Normaliza idioma (por si llega "en-US")
+function normLang(lang) {
+  if (!lang) return "es";
+  return String(lang).toLowerCase().split("-")[0];
+}
+
+// Devuelve el valor localizado para un campo de carta: titulo/texto/imagen
+function cardField(card, baseField, lang = idioma) {
+  const L = normLang(lang);
+
+  // 1) intenta el campo específico (ej: titulo_en)
+  const key = (L === "es") ? baseField : `${baseField}_${L}`;
+  if (card && card[key]) return card[key];
+
+  // 2) fallback por lista: intenta titulo_en, titulo_es, titulo_pt...
+  for (const fb of FALLBACK_LANGS) {
+    const F = normLang(fb);
+    const fbKey = (F === "es") ? baseField : `${baseField}_${F}`;
+    if (card && card[fbKey]) return card[fbKey];
+  }
+
+  // 3) último recurso: campo base
+  return (card && card[baseField]) || "";
+}
 
 
 // helper con fallback seguro
