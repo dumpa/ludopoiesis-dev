@@ -54,6 +54,11 @@
     "s2": { "es": "2. Escoge tus lentes", "pt": "2. Escolha suas lentes", "en": "2. Choose your lenses" },
     "s3": { "es": "3. Tira una carta", "pt": "3. Tire uma carta", "en": "3. Draw a card" }
   },
+  "intro_more": {
+    "es": "➔ Conocer más sobre Ludopoiesis",
+    "pt": "➔ Conhecer mais sobre Ludopoiesis",
+    "en": "➔ Learn more about Ludopoiesis"
+  },
   "tooltips": {
     "pregunta": {
       "es": "¿Cómo se hace una buena pregunta?",
