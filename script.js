@@ -9,8 +9,6 @@ let lentesActivos = {
   tecnologia: true
 };
 
-// Idioma actual (hoy EN-only, mañana lo cambias desde UI)
-let idioma = "en";
 
 // Orden de fallback (ajústalo a tu gusto)
 const FALLBACK_LANGS = ["en", "es", "pt"]; 
@@ -41,6 +39,24 @@ function cardField(card, baseField, lang = idioma) {
   return (card && card[baseField]) || "";
 }
 
+
+
+// Fallback para textos de UI
+function uiText(node, lang = idioma) {
+  if (!node) return "";
+
+  const L = lang.toLowerCase();
+
+  // 1) idioma solicitado (ej: en)
+  if (node[L]) return node[L];
+
+  // 2) fallback principal: ES
+  if (node.es) return node.es;
+
+  // 3) último recurso: cualquier idioma disponible
+  const any = Object.values(node)[0];
+  return any || "";
+}
 
 // helper con fallback seguro
 function t(node, fallback = "") {
