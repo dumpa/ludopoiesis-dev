@@ -31,6 +31,13 @@
     "pt": "<p><strong>3. Tire suas cartas</strong></p><p>Você já fez uma pergunta.<br>Agora lance uma carta.</p><p>A carta não dá respostas literais.<br>É uma lente.<br>Muda o que você vê.</p><p>E ao ver diferente,<br>também muda a pergunta.</p><p>Olhe com atenção.<br>Deixe que a carta converse com você.</p>",
     "en": "<p><strong>3. Draw your cards</strong></p><p>You’ve already asked a question.<br>Now draw a card.</p><p>The card doesn’t give literal answers.<br>It’s a lens.<br>It changes what you see.</p><p>And when you see differently,<br>the question changes too.</p><p>Look closely.<br>Let the card talk with you.</p>"
   },
+  "mensajes": {
+    "no_lentes": {
+      "es": "<p>No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️</p><p>O... prueba prender alguno para continuar.</p>",
+      "pt": "<p>Não há lentes ativas... talvez seja hora de fechar os olhos e ver com o coração. ❤️</p><p>Ou... tente ativar alguma para continuar.</p>",
+      "en": "<p>No lenses are active… maybe it’s time to close your eyes and see with your heart. ❤️</p><p>Or… try turning one on to continue.</p>"
+    }
+  },
   "ui": {
   "page_title": {
     "es": "Ludopoiesis - Oráculo Para Jugar la Vida",
