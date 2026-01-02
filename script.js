@@ -528,7 +528,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     container.appendChild(wrapper);
   });
 }
-*/
+
 function mostrarObraDeArteOTexto() {
   const container = document.getElementById("carta-container");
   container.innerHTML = `
@@ -537,6 +537,16 @@ function mostrarObraDeArteOTexto() {
       <p>O... prueba prender alguno para continuar.</p>
     </div>
   `;
+}*/
+
+function mostrarObraDeArteOTexto() {
+  fetch('textos.json')
+    .then(res => res.json())
+    .then(data => {
+      const texto = data.mensajes?.no_lentes?.[idioma] || "";
+      const container = document.getElementById("carta-container");
+      container.innerHTML = `<div class="mensaje-divertido">${texto}</div>`;
+    });
 }
 
 function reiniciarCartas() {
