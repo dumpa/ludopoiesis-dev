@@ -9,12 +9,90 @@ let lentesActivos = {
   tecnologia: true
 };
 
+// EN-only beta (por ahora fijo)
+let idioma = "en";
+
+// helper con fallback seguro
+function t(node, fallback = "") {
+  return (node && (node[idioma] || node.es || node.pt)) || fallback;
+}
+
+function renderUI(data) {
+  // Title
+  const titleEl = document.getElementById("ui-page-title");
+  if (titleEl) titleEl.textContent = t(data.ui?.page_title, "Ludopoiesis");
+
+  // Buttons
+  const btnCard = document.getElementById("ui-btn-card");
+  if (btnCard) btnCard.textContent = t(data.ui?.buttons?.card, "Card");
+
+  const btnNew = document.getElementById("ui-btn-new");
+  if (btnNew) btnNew.textContent = t(data.ui?.buttons?.new, "New");
+
+  const moreAutor = document.getElementById("ui-more-autor");
+  if (moreAutor) moreAutor.textContent = t(data.ui?.buttons?.more_author, "➤ About the author");
+
+  // Steps
+  const s1 = document.getElementById("ui-step-1");
+  if (s1) s1.textContent = t(data.ui?.steps?.s1);
+
+  const s2 = document.getElementById("ui-step-2");
+  if (s2) s2.textContent = t(data.ui?.steps?.s2);
+
+  const s3 = document.getElementById("ui-step-3");
+  if (s3) s3.textContent = t(data.ui?.steps?.s3);
+
+  // Tooltips
+  const tipPregunta = document.getElementById("ui-tip-pregunta");
+  if (tipPregunta) tipPregunta.title = t(data.ui?.tooltips?.pregunta);
+
+  const tipLentes = document.getElementById("ui-tip-lentes");
+  if (tipLentes) tipLentes.title = t(data.ui?.tooltips?.lentes);
+}
+
+// EN-only: deja estas funciones vacías por si quedaron referencias
+function toggleIdioma() {}
+function setIdioma() {}
+
+
 fetch("cartas.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
 function cargarIntro(desplegarLargo = false) {
+  fetch("textos.json")
+    .then(res => res.json())
+    .then(data => {
+      // Render UI (botones, pasos, tooltips, title)
+      renderUI(data);
+
+      const introCorta = data.intro.short[idioma];
+      const introLarga = data.intro.long[idioma];
+
+      const shortEl = document.getElementById("introShort");
+      const longEl = document.getElementById("introLong");
+      const cartaContainer = document.getElementById("carta-container");
+
+      cartaContainer.style.display = "none";
+
+      if (desplegarLargo) {
+        longEl.innerHTML = introLarga;
+        shortEl.style.display = "none";
+        longEl.style.display = "block";
+      } else {
+        // Botón "conocer más" también debe venir del json (si no existe, fallback)
+        const more = t(data.ui?.intro_more, "➔ Learn more about Ludopoiesis");
+        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">${more}</span>`;
+        shortEl.style.display = "block";
+        longEl.style.display = "none";
+      }
+    })
+    .catch(err => console.error("Error cargando textos:", err));
+}
+
+
+/*function cargarIntro(desplegarLargo = false) {
   fetch('textos.json')
     .then(res => res.json())
     .then(data => {
