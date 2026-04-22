@@ -2,6 +2,7 @@ let cartas = [];
 let idioma = "es";
 let cartaActual = null;
 let cartasLanzadas = [];
+let textosCache = null;
 
 let lentesActivos = {
   naturaleza: true,
@@ -9,35 +10,99 @@ let lentesActivos = {
   tecnologia: true
 };
 
+// ===== i18n helpers =====
+
+// Lee el campo apropiado de una carta según el idioma, con fallback al español.
+// Ej: getCartaField(carta, 'titulo') devuelve titulo_en si idioma='en' y existe,
+//     si no existe o está vacío, devuelve carta.titulo (español).
+function getCartaField(carta, baseField) {
+  if (!carta) return '';
+  if (idioma === 'es') return carta[baseField] || '';
+  const suffixed = carta[baseField + '_' + idioma];
+  if (suffixed && suffixed.toString().trim() !== '') return suffixed;
+  return carta[baseField] || '';
+}
+
+// Genera el HTML del <img> de la carta con fallback automático.
+// Si la imagen del idioma no existe (404), usa la imagen en español.
+function imgCartaHTML(carta, titulo) {
+  const imagenIdioma = getCartaField(carta, 'imagen');
+  const imagenES = carta.imagen || '';
+  const onerror = imagenIdioma !== imagenES
+    ? `this.onerror=null;this.src='${imagenES}';`
+    : '';
+  return `<img src="${imagenIdioma}" alt="${titulo}" onerror="${onerror}">`;
+}
+
+// Aplica los textos del idioma actual a todos los elementos con data-i18n / data-i18n-title.
+function aplicarIdiomaUI() {
+  if (!textosCache || !textosCache.ui) return;
+  const ui = textosCache.ui;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (ui[key] && ui[key][idioma]) {
+      if (el.tagName === 'TITLE') {
+        document.title = ui[key][idioma];
+      } else {
+        el.textContent = ui[key][idioma];
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle;
+    if (ui[key] && ui[key][idioma]) {
+      el.setAttribute('title', ui[key][idioma]);
+    }
+  });
+  // Actualiza el atributo lang del <html>
+  document.documentElement.setAttribute('lang', idioma);
+  // Actualiza el estado visual de las banderas
+  document.querySelectorAll('.bandera').forEach(b => b.classList.remove('bandera-activa'));
+  const flagActiva = document.getElementById('flag-' + idioma);
+  if (flagActiva) flagActiva.classList.add('bandera-activa');
+}
+
 fetch("cartas.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
 function cargarIntro(desplegarLargo = false) {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const introCorta = data.intro.short[idioma];
-      const introLarga = data.intro.long[idioma];
+  const render = (data) => {
+    textosCache = data;
+    aplicarIdiomaUI();
+    const introCorta = data.intro.short[idioma] || data.intro.short['es'];
+    const introLarga = data.intro.long[idioma] || data.intro.long['es'];
+    const masInfoLabel = (data.ui && data.ui.masInfo && data.ui.masInfo[idioma])
+      || '➔ Conocer más sobre Ludopoiesis';
 
-      const shortEl = document.getElementById('introShort');
-      const longEl = document.getElementById('introLong');
-      const cartaContainer = document.getElementById('carta-container');
+    const shortEl = document.getElementById('introShort');
+    const longEl = document.getElementById('introLong');
+    const cartaContainer = document.getElementById('carta-container');
 
-      cartaContainer.style.display = 'none';
+    cartaContainer.style.display = 'none';
 
-      if (desplegarLargo) {
-        longEl.innerHTML = introLarga;
-        shortEl.style.display = 'none';
-        longEl.style.display = 'block';
-      } else {
-        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">➔ Conocer más sobre Ludopoiesis</span>`;
-        shortEl.style.display = 'block';
-        longEl.style.display = 'none';
-      }
-    })
-    .catch(err => console.error('Error cargando textos:', err));
+    if (desplegarLargo) {
+      longEl.innerHTML = introLarga;
+      longEl.dataset.seccion = 'intro-long';
+      shortEl.style.display = 'none';
+      longEl.style.display = 'block';
+    } else {
+      shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">${masInfoLabel}</span>`;
+      shortEl.dataset.seccion = 'intro';
+      shortEl.style.display = 'block';
+      longEl.style.display = 'none';
+    }
+  };
+
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(render)
+      .catch(err => console.error('Error cargando textos:', err));
+  }
 }
 /*function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
@@ -246,13 +311,11 @@ function lanzarCartaSuperpuesta() {
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
   if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
 
-  // Selección aleatoria
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
 
-  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
-  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
-  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+  const titulo = getCartaField(carta, 'titulo');
+  const texto  = getCartaField(carta, 'texto');
 
   // Crear DOM de carta
   const card = document.createElement("div");
@@ -270,7 +333,7 @@ function lanzarCartaSuperpuesta() {
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-front">
-        <img src="${imagen}" alt="${titulo}">
+        ${imgCartaHTML(carta, titulo)}
       </div>
       <div class="card-back">
         <h2>${titulo}</h2>
@@ -410,13 +473,14 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   const total = cartasLanzadas.length;
   const scale = Math.max(0.6, 1 - total * 0.06);
 
-  cartasLanzadas.forEach(({ titulo, texto, imagen, titulo_pt, texto_pt, imagen_pt, posicion }) => {
-    const t = idioma === "es" ? titulo : titulo_pt;
-    const txt = idioma === "es" ? texto : texto_pt;
-    const img = idioma === "es" ? imagen : imagen_pt;
+  cartasLanzadas.forEach((carta) => {
+    const { posicion } = carta;
+    const t   = getCartaField(carta, 'titulo');
+    const txt = getCartaField(carta, 'texto');
 
     const card = document.createElement("div");
     card.classList.add("card", "card-animada");
+    card.dataset.id = carta.id;
 
     // guardar transform original
     const originalTransform = `scale(${scale})`;
@@ -442,7 +506,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     card.innerHTML = `
       <div class="card-inner">
         <div class="card-front">
-          <img src="${img}" alt="${t}">
+          ${imgCartaHTML(carta, t)}
         </div>
         <div class="card-back">
           <h2>${t}</h2>
@@ -531,10 +595,13 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 */
 function mostrarObraDeArteOTexto() {
   const container = document.getElementById("carta-container");
+  const ui = (textosCache && textosCache.ui) || {};
+  const m1 = (ui.sinLentes && ui.sinLentes[idioma]) || "No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️";
+  const m2 = (ui.sinLentes2 && ui.sinLentes2[idioma]) || "O... prueba prender alguno para continuar.";
   container.innerHTML = `
     <div class="mensaje-divertido">
-      <p>No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️</p>
-      <p>O... prueba prender alguno para continuar.</p>
+      <p>${m1}</p>
+      <p>${m2}</p>
     </div>
   `;
 }
@@ -546,44 +613,30 @@ function reiniciarCartas() {
   container.innerHTML = "";
 }
 
-function mostrarPregunta() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.pregunta?.[idioma] || data.pregunta['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de pregunta:', err));
+function _mostrarSeccion(key, seccionTag) {
+  const render = (data) => {
+    textosCache = data;
+    const texto = data[key]?.[idioma] || data[key]['es'];
+    const longEl = document.getElementById('introLong');
+    document.getElementById('introShort').style.display = 'none';
+    longEl.innerHTML = texto;
+    longEl.dataset.seccion = seccionTag;
+    longEl.style.display = 'block';
+    document.getElementById('carta-container').style.display = 'none';
+  };
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(render)
+      .catch(err => console.error('Error al cargar texto:', err));
+  }
 }
 
-function mostrarLentes() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.lentes?.[idioma] || data.lentes['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de lentes:', err));
-}
-
-function mostrarDinamica() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.dinamica?.[idioma] || data.dinamica['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de dinamica:', err));
-}
+function mostrarPregunta() { _mostrarSeccion('pregunta', 'pregunta'); }
+function mostrarLentes()   { _mostrarSeccion('lentes', 'lentes'); }
+function mostrarDinamica() { _mostrarSeccion('dinamica', 'dinamica'); }
 
 function toggleLente(lente) {
   lentesActivos[lente] = !lentesActivos[lente];
@@ -592,16 +645,20 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
-function toggleIdioma() {
-  idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
+function setIdioma(nuevoIdioma) {
+  if (!['es','pt','en'].includes(nuevoIdioma)) return;
+  if (nuevoIdioma === idioma) return;
+  idioma = nuevoIdioma;
+
+  // Aplica la UI estática (botones, pasos, banderas activas, título)
+  aplicarIdiomaUI();
 
   const longEl = document.getElementById("introLong");
   const shortEl = document.getElementById("introShort");
   const longVisible = longEl.style.display === "block";
   const shortVisible = shortEl.style.display === "block";
-  const contenidoActual = longEl.innerHTML.toLowerCase();
 
-  // Si hay cartas en pantalla, solo actualizar cartas
+  // Si hay cartas en pantalla, actualizar cada una con el texto/imagen del nuevo idioma
   const cartasEnPantalla = document.querySelectorAll(".card");
   if (cartasEnPantalla.length > 0) {
     cartasEnPantalla.forEach(card => {
@@ -609,35 +666,42 @@ function toggleIdioma() {
       const cartaData = cartas.find(c => c.id == id);
       if (!cartaData) return;
 
-      const titulo = idioma === "es" ? cartaData.titulo : cartaData.titulo_pt;
-      const texto = idioma === "es" ? cartaData.texto : cartaData.texto_pt;
-      const imagen = idioma === "es" ? cartaData.imagen : cartaData.imagen_pt;
+      const titulo = getCartaField(cartaData, 'titulo');
+      const texto  = getCartaField(cartaData, 'texto');
+      const imagenIdioma = getCartaField(cartaData, 'imagen');
+      const imagenES = cartaData.imagen || '';
 
       const front = card.querySelector(".card-front img");
       const backH2 = card.querySelector(".card-back h2");
       const backP = card.querySelector(".card-back p");
 
       if (front) {
-        front.src = imagen;
+        front.src = imagenIdioma;
         front.alt = titulo;
+        // Fallback si la imagen del idioma no existe
+        if (imagenIdioma !== imagenES) {
+          front.onerror = function() { this.onerror = null; this.src = imagenES; };
+        } else {
+          front.onerror = null;
+        }
       }
       if (backH2) backH2.textContent = titulo;
       if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
-      card.dataset.originalTransform = card.style.transform;
     });
     return;
   }
 
-  // Si estaba viendo introducción
+  // Si estaba viendo intro o sección, re-renderiza usando la sección registrada
   if (shortVisible || longVisible) {
-    if (contenidoActual.includes("pregunta") || contenidoActual.includes("question")) {
-      mostrarPregunta();
-    } else if (contenidoActual.includes("lentes") || contenidoActual.includes("lens")) {
-      mostrarLentes();
-    } else if (contenidoActual.includes("dinámica") || contenidoActual.includes("dinâmica")) {
-      mostrarDinamica();
-    } else {
-      cargarIntro(longVisible);
+    const seccion = longEl.dataset.seccion || shortEl.dataset.seccion || 'intro';
+    switch (seccion) {
+      case 'pregunta': mostrarPregunta(); break;
+      case 'lentes':   mostrarLentes();   break;
+      case 'dinamica': mostrarDinamica(); break;
+      case 'autor':    mostrarAutor();    break;
+      case 'intro-long': cargarIntro(true); break;
+      case 'intro':
+      default:         cargarIntro(false);
     }
     return;
   }
@@ -646,9 +710,38 @@ function toggleIdioma() {
   cargarIntro(false);
 }
 
+// Compatibilidad con código antiguo que pueda llamar toggleIdioma
+function toggleIdioma() {
+  const checkbox = document.getElementById("idiomaToggle");
+  setIdioma(checkbox && checkbox.checked ? "pt" : "es");
+}
+
+function mostrarAutor() {
+  const render = (data) => {
+    const texto = data.autor?.[idioma] || data.autor['es'];
+    document.getElementById('introShort').style.display = 'none';
+    document.getElementById('introLong').innerHTML = texto;
+    document.getElementById('introLong').style.display = 'block';
+    document.getElementById('carta-container').style.display = 'none';
+  };
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(data => { textosCache = data; render(data); })
+      .catch(err => console.error('Error al cargar el texto de autor:', err));
+  }
+}
+
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
+window.lanzarCartaSuperpuesta = lanzarCartaSuperpuesta;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
 window.mostrarPregunta = mostrarPregunta;
 window.mostrarLentes = mostrarLentes;
 window.mostrarDinamica = mostrarDinamica;
+window.mostrarAutor = mostrarAutor;
+window.setIdioma = setIdioma;
+window.toggleLente = toggleLente;
+window.toggleIdioma = toggleIdioma;
