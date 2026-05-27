@@ -477,21 +477,21 @@ function lanzarTirada() {
   // Renderizar con delay escalonado (sensación de tirada secuencial)
   seleccionadas.forEach((carta, i) => {
     setTimeout(() => {
-      renderCartaTirada(carta, i, tirada, container);
+      renderCartaTirada(carta, i, tirada, container, esAcumulativo);
       cartasLanzadas.push(carta);
-      // En modo acumulativo, aplicar clase card-N para que el CSS escale
+      // En modo acumulativo, ajustar el escalado fluido via CSS var según total
       if (esAcumulativo) {
-        const n = Math.min(cartasLanzadas.length, 6);
-        container.classList.remove('card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
-        container.classList.add('card-' + n);
-        if (cartasLanzadas.length > 3) container.classList.add('muchas-cartas');
+        const N = cartasLanzadas.length;
+        const scale = N <= 1 ? 1 : Math.max(0.5, 1 - (N - 1) * 0.07);
+        container.style.setProperty('--cards-scale', scale.toFixed(3));
       }
     }, i * 220);
   });
 }
 
 // Renderiza UNA carta dentro de un wrapper con su label de posición (si aplica).
-function renderCartaTirada(carta, posIndex, tirada, container) {
+// Si esAcumulativo, agrega rotación aleatoria leve al wrapper (sensación de baraja natural).
+function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
   const titulo = getCartaField(carta, 'titulo');
   const texto  = getCartaField(carta, 'texto');
   const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
@@ -499,6 +499,12 @@ function renderCartaTirada(carta, posIndex, tirada, container) {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'carta-wrapper';
+
+  // En modo carta (acumulativo): ángulo aleatorio entre -4° y +4°
+  if (esAcumulativo) {
+    const angulo = (Math.random() * 8 - 4).toFixed(1);
+    wrapper.style.setProperty('--tilt', angulo + 'deg');
+  }
 
   if (posLabel) {
     const labelEl = document.createElement('div');
@@ -556,6 +562,7 @@ function reiniciarCartas() {
   const container = document.getElementById("carta-container");
   container.innerHTML = "";
   container.removeAttribute('data-layout');
+  container.style.removeProperty('--cards-scale');
   container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
 }
 

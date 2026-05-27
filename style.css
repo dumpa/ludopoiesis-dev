@@ -195,6 +195,25 @@ body {
 }
 
 /* === Layouts por tipo de tirada === */
+
+/* Modo carta acumulativo: cartas en row con overlap natural y leve rotación */
+#carta-container:not([data-layout]) {
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 30px 22px;
+  --cards-scale: 1;
+}
+#carta-container:not([data-layout])::-webkit-scrollbar { display: none; }
+/* Cada carta a partir de la segunda se monta levemente sobre la anterior */
+#carta-container:not([data-layout]) .carta-wrapper + .carta-wrapper {
+  margin-left: -60px;
+}
+
 #carta-container[data-layout="horizontal"] {
   flex-wrap: nowrap;
   justify-content: flex-start;
@@ -204,7 +223,6 @@ body {
   scroll-padding: 22px;
   padding: 8px 22px 24px;
   gap: 18px;
-  /* Esconder scrollbar pero permitir scroll */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -220,23 +238,16 @@ body {
   gap: 24px;
 }
 
-/* Escalado progresivo según cantidad de cartas (modo "carta" acumulado) */
-#carta-container.muchas-cartas .card { transform: scale(0.85); }
-#carta-container.card-1 .carta-wrapper { transform: scale(1); }
-#carta-container.card-2 .carta-wrapper { transform: scale(0.92); }
-#carta-container.card-3 .carta-wrapper { transform: scale(0.86); }
-#carta-container.card-4 .carta-wrapper { transform: scale(0.8); }
-#carta-container.card-5 .carta-wrapper { transform: scale(0.74); }
-#carta-container.card-6 .carta-wrapper { transform: scale(0.7); }
-
 .carta-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
-  transform-origin: center;
-  transition: transform 0.4s ease;
+  transform: scale(var(--cards-scale, 1)) rotate(var(--tilt, 0deg));
+  transform-origin: center center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.4s ease;
+  flex-shrink: 0;
 }
 
 /* Label de posición arriba de cada carta en tiradas múltiples
