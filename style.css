@@ -1,81 +1,229 @@
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap');
+/* ================================================================
+   LUDOPOIESIS · Dirección "Minimal Ritual"
+   Fraunces (display, light) + DM Sans (body)
+   Paleta base: #FAFAF8 + #1A1A1A · Acento dinámico por naipe activo
+   ================================================================ */
 
-/* ============================================================
-   BASE
-   ============================================================ */
-body {
-  font-family: 'Dosis', sans-serif;
-  text-align: center;
-  padding: 0;
-  background: #f4f1ee;
-  color: rgb(0, 67, 73);
+/* ===== CSS VARIABLES (paleta) ============================== */
+:root {
+  /* Base fija */
+  --bg:          #FAFAF8;
+  --ink:         #1A1A1A;
+  --ink-soft:    #555555;
+  --ink-mute:    #999999;
+  --hairline:    #EAEAE6;
+
+  /* Paleta dinámica — default = neutro (en home sin carta) */
+  --primary:     #1A1A1A;
+  --accent:      #1A1A1A;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
-#titulo-home {
+/* Paletas activas según naipe (las setea el JS al tirar carta) */
+body[data-naipe="naturaleza"]  {
+  --primary: #003C3C;
+  --accent:  #FF8B5C;
+}
+body[data-naipe="fluir"] {
+  --primary: #1A3A5C;
+  --accent:  #E96B98;
+}
+body[data-naipe="tecnologia"] {
+  --primary: #3C0F3C;
+  --accent:  #A6D656;
+}
+
+/* ===== RESET ================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+
+/* ===== BASE ================================================= */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: color 0.5s ease;
+}
+
+/* ===== HEADER STICKY ======================================== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--hairline);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--ink);
   cursor: pointer;
+  user-select: none;
   transition: color 0.3s ease;
 }
+.logo b {
+  font-weight: 500;
+  color: var(--accent);
+  transition: color 0.5s ease;
+}
+.logo:hover { color: var(--primary); }
 
-#titulo-home:hover {
-  color: #004d4d;
+/* Idioma switch ES · PT · EN */
+.idioma-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.bandera {
+  color: var(--ink-mute);
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  border-bottom: 1px solid transparent;
+  user-select: none;
+}
+.bandera:hover { color: var(--ink); }
+.bandera-activa {
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom-color: var(--accent);
+}
+.lang-sep {
+  color: var(--ink-mute);
+  font-size: 10px;
+  user-select: none;
 }
 
-/* ============================================================
-   CONTENEDOR DE CARTAS
-   ============================================================ */
+/* ===== MAIN ================================================= */
+.app-main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Etiqueta sutil con el lente activo, arriba de la carta */
+.card-meta-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+  min-height: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.card-meta-label.show {
+  opacity: 1;
+}
+
+/* ===== INTRO / TEXTOS LARGOS ================================ */
+.intro-texto {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+  max-width: 38ch;
+  text-align: center;
+  margin: 8px auto 32px;
+  padding: 0;
+}
+.intro-texto p { margin: 0 0 14px; }
+.intro-texto strong, .intro-texto b {
+  font-weight: 500;
+}
+.intro-texto em, .intro-texto i {
+  font-style: italic;
+  color: var(--accent);
+}
+.more-button {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 3px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.more-button:hover { color: var(--accent); }
+
+/* ===== CONTENEDOR DE CARTAS ================================= */
 #carta-container {
   perspective: 1000px;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 1rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: auto;
-  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
   width: 100%;
-  max-width: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
+  padding: 8px 0 24px;
+  min-height: 0;
 }
 
 /* Escalado progresivo según cantidad de cartas */
 #carta-container.muchas-cartas .card { transform: scale(0.85); }
 #carta-container.card-1 .carta-wrapper { transform: scale(1); }
-#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
-#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
-#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
-#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
-#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
-#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
-#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
-#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
+#carta-container.card-2 .carta-wrapper { transform: scale(0.92); }
+#carta-container.card-3 .carta-wrapper { transform: scale(0.86); }
+#carta-container.card-4 .carta-wrapper { transform: scale(0.8); }
+#carta-container.card-5 .carta-wrapper { transform: scale(0.74); }
+#carta-container.card-6 .carta-wrapper { transform: scale(0.7); }
 
 .carta-wrapper {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  transform-origin: center center;
+  transform-origin: center;
   transition: transform 0.4s ease;
-  margin: 0;
-  padding: 0;
 }
 
-/* ============================================================
-   CARTA (flip 3D)
-   ============================================================ */
+/* ===== CARTA · FLIP 3D ====================================== */
 .card {
-  width: 340px;
-  min-height: 520px;
-  max-width: 100%;
+  width: 280px;
+  height: 428px;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s;
+  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1),
+              box-shadow 0.5s ease;
   cursor: pointer;
-  margin: 0;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 16px 48px -12px var(--accent-glow);
 }
 
 .card-inner {
@@ -83,7 +231,7 @@ body {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s;
+  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .card.flipped .card-inner {
@@ -92,68 +240,58 @@ body {
 
 .card-front,
 .card-back {
-  width: 100%;
-  min-height: 520px;
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   backface-visibility: hidden;
-  border-radius: 12px;
-  padding: 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-front {
-  background: transparent;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px;
   overflow: hidden;
 }
 
+.card-front {
+  background: #fff;
+}
 .card-front img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .card-back {
-  background: white;
-  color: rgb(0, 67, 73);
+  background: #fff;
+  color: var(--ink);
   transform: rotateY(180deg);
+  padding: 30px 26px 26px;
+  display: flex;
   flex-direction: column;
-  padding: 1.8rem 1.2rem;
   align-items: flex-start;
+  justify-content: flex-start;
   text-align: left;
-  font-weight: 400;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  box-sizing: border-box;
+  border-top: 3px solid var(--accent);
 }
-
 .card-back h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: right;
-  width: 100%;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  margin: 0 0 18px;
+  color: var(--primary);
 }
-
 .card-back p {
-  font-size: 0.75rem;
-  line-height: 1.6;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0;
   white-space: pre-line;
+  flex: 1;
+  overflow-y: auto;
 }
 
-/* Limpia bordes y sombras heredadas */
-.card,
-.card-inner,
-.card-front img {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Carta ampliada (en línea, no overlay) */
+/* Carta ampliada en overlay (mantenido del original, refinado) */
 .card.ampliada {
   position: fixed;
   top: 50%;
@@ -162,253 +300,288 @@ body {
   max-width: 90vw;
   height: auto;
   max-height: 90vh;
-  aspect-ratio: 340 / 520;
-  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  aspect-ratio: 280 / 428;
+  transform: translate(-50%, -50%) scale(1) !important;
   z-index: 999;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
-  border-radius: 12px;
+  border-radius: 8px;
 }
-
 .card.zoom-in {
   transition: transform 0.3s ease;
-  transform: scale(1.1) rotateY(180deg);
+  transform: scale(1) rotateY(180deg);
 }
 
-/* ============================================================
-   INSTRUCCIONES
-   ============================================================ */
-#instrucciones {
-  font-family: 'Dosis', sans-serif;
-  text-align: center;
-  margin: 30px 0;
-  font-size: 16px;
-  color: #333;
-  letter-spacing: 0.3px;
-}
-
-/* ============================================================
-   CONTROLES (botones + lentes)
-   ============================================================ */
-.zona-controles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-  margin: 2rem auto;
-  max-width: 90%;
-}
-
-.botones-controles {
-  display: flex;
-  gap: 1rem;
-}
-
-.botones-controles button {
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 12px;
-  background-color: #004D4D;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.botones-controles button:hover {
-  background-color: #007171;
-}
-
-button:hover {
-  background-color: #00575f;
-}
-
-#lentes-toggle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-  margin: 1.2rem 0;
-}
-
-.lente-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.1rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.lente-horizontal img {
-  width: 40px;
-  height: 40px;
-  transition: transform 0.2s;
-}
-
-.lente-horizontal img:hover {
-  transform: scale(1.1);
-}
-
-.lente-horizontal:active {
-  transform: scale(0.98);
-}
-
-/* ============================================================
-   IDIOMA SWITCH (banderas)
-   ============================================================ */
-.idioma-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  margin: 1rem auto;
-}
-
-.bandera {
-  font-size: 1.6rem;
-  cursor: pointer;
-  opacity: 0.35;
-  filter: grayscale(60%);
-  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.15s ease;
-  padding: 0.15rem 0.25rem;
-  border-radius: 6px;
-  user-select: none;
-}
-
-.bandera:hover {
-  opacity: 0.8;
-  filter: grayscale(0%);
-}
-
-.bandera-activa {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.15);
-}
-
-/* ============================================================
-   INTRO / TEXTOS LARGOS
-   ============================================================ */
-.intro-texto {
-  font-family: 'Libre Baskerville', serif;
-  padding: 2rem;
-  line-height: 1.6;
-  font-size: 1.1rem;
-}
-
-.mensaje-divertido {
-  text-align: center;
-  font-style: italic;
-  padding: 20px;
-  color: #666;
-}
-
-/* ============================================================
-   ANIMACIONES
-   ============================================================ */
-.card-animada {
-  animation: entrada-carta 0.4s ease;
-}
-
-@keyframes entrada-carta {
-  from {
-    transform: scale(0.8) translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
-
-.overlay-zoom {
-  animation: zoomInOverlay 0.3s ease;
-}
-
-@keyframes zoomInOverlay {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Hover para escalar en desktop */
+/* Hover sutil en desktop */
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
-    transform: scale(1.05);
-    z-index: 2;
+    transform: translateY(-4px);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 24px 56px -10px var(--accent-glow);
   }
+  .card.flipped:hover { transform: translateY(-4px); }
 }
 
-/* ============================================================
-   OVERLAY DE CARTA AMPLIADA
-   ============================================================ */
+/* ===== ZONA DE CONTROLES ==================================== */
+.zona-controles {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 22px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* ----- Botones primarios ----- */
+.botones-controles {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 26px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  min-width: 130px;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn-primary:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* ----- Fila de lentes con hairlines ----- */
+.lentes-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: 22px 0;
+  margin-bottom: 32px;
+}
+.lente-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+  user-select: none;
+  position: relative;
+  padding: 4px 0;
+  transition: opacity 0.2s ease;
+}
+.lente-mini::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: var(--hairline);
+}
+.lente-mini:last-child::after { display: none; }
+.lente-mini img {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.lente-mini:hover img { transform: scale(1.08); }
+.lente-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ----- Pasos 1-2-3 ----- */
+.steps-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 auto;
+  max-width: 380px;
+}
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  position: relative;
+}
+.step-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -1.5px;
+  transition: color 0.5s ease;
+}
+.step-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  max-width: 100px;
+  font-weight: 500;
+}
+.step-info {
+  font-size: 11px;
+  color: var(--ink-mute);
+  cursor: pointer;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+.step-info:hover { color: var(--accent); }
+
+/* ===== MENSAJE DIVERTIDO (sin lentes activos) =============== */
+.mensaje-divertido {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 32ch;
+  margin: 0 auto;
+}
+.mensaje-divertido p { margin: 0 0 8px; }
+
+/* ===== OVERLAY DE CARTA AMPLIADA ============================ */
 #overlay-ampliada {
   position: fixed;
   inset: 0;
   display: none;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
-  overflow: hidden;
+  padding: 24px;
 }
-
 #overlay-ampliada .card {
   all: unset;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 90vw;
-  max-width: 340px;
-  height: auto;
-  max-height: 90vh;
-  aspect-ratio: 340 / 520;
-  animation: zoomInOverlay 0.3s ease;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+  display: block;
+  width: min(85vw, 360px);
+  aspect-ratio: 280 / 428;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  animation: zoomInOverlay 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 30px 80px -10px var(--accent-glow);
+  border-top: 3px solid var(--accent);
 }
-
 #overlay-ampliada .card-back {
+  padding: 36px 30px;
   overflow-y: auto;
-  padding: 1.5rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  text-align: left;
+  border-top: 0;
+}
+#overlay-ampliada .card-back h2 {
+  font-size: 30px;
+  margin-bottom: 22px;
+}
+#overlay-ampliada .card-back p {
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* ===== ANIMACIONES ========================================== */
+.card-animada {
+  animation: entradaCarta 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes entradaCarta {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zoomInOverlay {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Transición suave al cambiar paleta */
+.card,
+.card-back,
+.btn,
+.bandera,
+.step-num,
+.lente-label,
+.card-meta-label,
+.more-button {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 0.45s;
+  transition-timing-function: ease;
+}
+
+/* ===== RESPONSIVE =========================================== */
 @media (min-width: 768px) {
-  .contenedor-principal {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+  .app-header {
+    padding: 22px 40px;
   }
-
-  #instrucciones {
-    width: 40%;
-    text-align: left;
+  .logo {
+    font-size: 26px;
   }
-
-  #carta-container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
+  .app-main {
+    padding: 56px 40px 32px;
+    max-width: 560px;
   }
+  .card {
+    width: 320px;
+    height: 489px;
+  }
+  .card-back h2 { font-size: 28px; }
+  .card-back p { font-size: 14px; }
+  .zona-controles {
+    max-width: 560px;
+    padding: 8px 40px 80px;
+  }
+  .step-num { font-size: 44px; }
+  .intro-texto { font-size: 20px; max-width: 42ch; }
 }

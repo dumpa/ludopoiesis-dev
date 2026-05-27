@@ -11,6 +11,32 @@ function detectarIdiomaInicial() {
   return 'es';
 }
 
+// Nombres de los 3 lentes/naipes por idioma (paleta dinámica + label sutil)
+const lenteNombres = {
+  es: { naturaleza: 'Naturaleza', fluir: 'Fluir', tecnologia: 'Tecnología' },
+  pt: { naturaleza: 'Natureza',   fluir: 'Fluir', tecnologia: 'Tecnologia' },
+  en: { naturaleza: 'Nature',     fluir: 'Flow',  tecnologia: 'Technology' }
+};
+
+// Activa la paleta dinámica del naipe + actualiza el label sutil arriba de la carta.
+// Llamar con un lente ('naturaleza' | 'fluir' | 'tecnologia') o null para volver a estado neutro.
+function setNaipeActivo(lente) {
+  const metaLabel = document.getElementById('card-meta-label');
+  if (lente) {
+    document.body.setAttribute('data-naipe', lente);
+    if (metaLabel) {
+      const nombre = (lenteNombres[idioma] && lenteNombres[idioma][lente]) || lente;
+      metaLabel.textContent = nombre;
+      metaLabel.classList.add('show');
+    }
+  } else {
+    document.body.removeAttribute('data-naipe');
+    if (metaLabel) {
+      metaLabel.classList.remove('show');
+    }
+  }
+}
+
 let cartas = [];
 let idioma = detectarIdiomaInicial();
 let cartaActual = null;
@@ -84,6 +110,7 @@ function cargarIntro(desplegarLargo = false) {
   const render = (data) => {
     textosCache = data;
     aplicarIdiomaUI();
+    setNaipeActivo(null);
     const introCorta = data.intro.short[idioma] || data.intro.short['es'];
     const introLarga = data.intro.long[idioma] || data.intro.long['es'];
     const masInfoLabel = (data.ui && data.ui.masInfo && data.ui.masInfo[idioma])
@@ -136,6 +163,7 @@ function lanzarCartaSuperpuesta() {
 
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
+  setNaipeActivo(carta.lente);
 
   const titulo = getCartaField(carta, 'titulo');
   const texto  = getCartaField(carta, 'texto');
@@ -229,6 +257,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   const nuevaCarta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = nuevaCarta;
+  setNaipeActivo(nuevaCarta.lente);
   cartasLanzadas.push({ ...nuevaCarta, posicion });
 
   const total = cartasLanzadas.length;
@@ -289,6 +318,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   });
 }
 function mostrarObraDeArteOTexto() {
+  setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   const ui = (textosCache && textosCache.ui) || {};
   const m1 = (ui.sinLentes && ui.sinLentes[idioma]) || "No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️";
@@ -304,6 +334,7 @@ function mostrarObraDeArteOTexto() {
 function reiniciarCartas() {
   cartasLanzadas = [];
   cartaActual = null;
+  setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   container.innerHTML = "";
 }
@@ -311,6 +342,7 @@ function reiniciarCartas() {
 function _mostrarSeccion(key, seccionTag) {
   const render = (data) => {
     textosCache = data;
+    setNaipeActivo(null);
     const texto = data[key]?.[idioma] || data[key]['es'];
     const longEl = document.getElementById('introLong');
     document.getElementById('introShort').style.display = 'none';
@@ -383,6 +415,8 @@ function setIdioma(nuevoIdioma) {
       if (backH2) backH2.textContent = titulo;
       if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
     });
+    // Refresca el label sutil del naipe con el nuevo idioma
+    if (cartaActual) setNaipeActivo(cartaActual.lente);
     return;
   }
 
@@ -413,6 +447,7 @@ function toggleIdioma() {
 
 function mostrarAutor() {
   const render = (data) => {
+    setNaipeActivo(null);
     const texto = data.autor?.[idioma] || data.autor['es'];
     document.getElementById('introShort').style.display = 'none';
     document.getElementById('introLong').innerHTML = texto;
