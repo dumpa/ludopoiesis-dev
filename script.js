@@ -42,6 +42,9 @@ let idioma = detectarIdiomaInicial();
 let cartaActual = null;
 let cartasLanzadas = [];
 let textosCache = null;
+// Source of truth de qué sección está visible en pantalla.
+// Valores posibles: 'intro', 'intro-long', 'pregunta', 'lentes', 'dinamica', 'autor', 'cartas', null
+let seccionActiva = null;
 
 let lentesActivos = {
   naturaleza: true,
@@ -73,6 +76,18 @@ function imgCartaHTML(carta, titulo) {
   return `<img src="${imagenIdioma}" alt="${titulo}" onerror="${onerror}">`;
 }
 
+// Aplica los nombres de los lentes (Naturaleza/Fluir/Tecnología) en el idioma activo
+// a los .lente-label dentro de #lentes-toggle. Se llama desde aplicarIdiomaUI.
+function aplicarLenteLabels() {
+  const nombres = lenteNombres[idioma] || lenteNombres.es;
+  ['naturaleza', 'fluir', 'tecnologia'].forEach(lente => {
+    const wrapper = document.querySelector(`.lente-mini[onclick*="${lente}"]`);
+    if (!wrapper) return;
+    const labelEl = wrapper.querySelector('.lente-label');
+    if (labelEl) labelEl.textContent = nombres[lente];
+  });
+}
+
 // Aplica los textos del idioma actual a todos los elementos con data-i18n / data-i18n-title.
 function aplicarIdiomaUI() {
   if (!textosCache || !textosCache.ui) return;
@@ -99,6 +114,10 @@ function aplicarIdiomaUI() {
   document.querySelectorAll('.bandera').forEach(b => b.classList.remove('bandera-activa'));
   const flagActiva = document.getElementById('flag-' + idioma);
   if (flagActiva) flagActiva.classList.add('bandera-activa');
+  // Actualiza los labels de los lentes (Naturaleza/Fluir/Tecnología → Nature/Flow/Technology, etc.)
+  aplicarLenteLabels();
+  // Si hay una carta activa, refresca el label sutil del naipe con el nuevo idioma
+  if (cartaActual) setNaipeActivo(cartaActual.lente);
 }
 
 fetch("cartas.json?v=" + new Date().getTime())
@@ -123,15 +142,19 @@ function cargarIntro(desplegarLargo = false) {
     cartaContainer.style.display = 'none';
 
     if (desplegarLargo) {
-      longEl.innerHTML = introLarga;
+      const sobreAutorLabel = (data.ui && data.ui.sobreAutor && data.ui.sobreAutor[idioma])
+        || '➤ Sobre el autor';
+      longEl.innerHTML = introLarga + `<span class="more-button" onclick="mostrarAutor()">${sobreAutorLabel}</span>`;
       longEl.dataset.seccion = 'intro-long';
       shortEl.style.display = 'none';
       longEl.style.display = 'block';
+      seccionActiva = 'intro-long';
     } else {
       shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">${masInfoLabel}</span>`;
       shortEl.dataset.seccion = 'intro';
       shortEl.style.display = 'block';
       longEl.style.display = 'none';
+      seccionActiva = 'intro';
     }
   };
 
@@ -164,6 +187,7 @@ function lanzarCartaSuperpuesta() {
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
   setNaipeActivo(carta.lente);
+  seccionActiva = 'cartas';
 
   const titulo = getCartaField(carta, 'titulo');
   const texto  = getCartaField(carta, 'texto');
@@ -258,6 +282,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
   const nuevaCarta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = nuevaCarta;
   setNaipeActivo(nuevaCarta.lente);
+  seccionActiva = 'cartas';
   cartasLanzadas.push({ ...nuevaCarta, posicion });
 
   const total = cartasLanzadas.length;
@@ -350,6 +375,7 @@ function _mostrarSeccion(key, seccionTag) {
     longEl.dataset.seccion = seccionTag;
     longEl.style.display = 'block';
     document.getElementById('carta-container').style.display = 'none';
+    seccionActiva = seccionTag;
   };
   if (textosCache) {
     render(textosCache);
@@ -377,17 +403,12 @@ function setIdioma(nuevoIdioma) {
   if (nuevoIdioma === idioma) return;
   idioma = nuevoIdioma;
 
-  // Aplica la UI estática (botones, pasos, banderas activas, título)
+  // Aplica la UI estática (botones, pasos, banderas activas, título, labels de lentes)
   aplicarIdiomaUI();
 
-  const longEl = document.getElementById("introLong");
-  const shortEl = document.getElementById("introShort");
-  const longVisible = longEl.style.display === "block";
-  const shortVisible = shortEl.style.display === "block";
-
   // Si hay cartas en pantalla, actualizar cada una con el texto/imagen del nuevo idioma
-  const cartasEnPantalla = document.querySelectorAll(".card");
-  if (cartasEnPantalla.length > 0) {
+  if (seccionActiva === 'cartas') {
+    const cartasEnPantalla = document.querySelectorAll(".card");
     cartasEnPantalla.forEach(card => {
       const id = card.dataset.id;
       const cartaData = cartas.find(c => c.id == id);
@@ -405,7 +426,6 @@ function setIdioma(nuevoIdioma) {
       if (front) {
         front.src = imagenIdioma;
         front.alt = titulo;
-        // Fallback si la imagen del idioma no existe
         if (imagenIdioma !== imagenES) {
           front.onerror = function() { this.onerror = null; this.src = imagenES; };
         } else {
@@ -420,23 +440,16 @@ function setIdioma(nuevoIdioma) {
     return;
   }
 
-  // Si estaba viendo intro o sección, re-renderiza usando la sección registrada
-  if (shortVisible || longVisible) {
-    const seccion = longEl.dataset.seccion || shortEl.dataset.seccion || 'intro';
-    switch (seccion) {
-      case 'pregunta': mostrarPregunta(); break;
-      case 'lentes':   mostrarLentes();   break;
-      case 'dinamica': mostrarDinamica(); break;
-      case 'autor':    mostrarAutor();    break;
-      case 'intro-long': cargarIntro(true); break;
-      case 'intro':
-      default:         cargarIntro(false);
-    }
-    return;
+  // Re-renderiza la sección activa con el nuevo idioma
+  switch (seccionActiva) {
+    case 'pregunta':   mostrarPregunta(); break;
+    case 'lentes':     mostrarLentes();   break;
+    case 'dinamica':   mostrarDinamica(); break;
+    case 'autor':      mostrarAutor();    break;
+    case 'intro-long': cargarIntro(true); break;
+    case 'intro':
+    default:           cargarIntro(false);
   }
-
-  // Si todo falla, mostrar introducción corta
-  cargarIntro(false);
 }
 
 // Compatibilidad con código antiguo que pueda llamar toggleIdioma
@@ -451,8 +464,10 @@ function mostrarAutor() {
     const texto = data.autor?.[idioma] || data.autor['es'];
     document.getElementById('introShort').style.display = 'none';
     document.getElementById('introLong').innerHTML = texto;
+    document.getElementById('introLong').dataset.seccion = 'autor';
     document.getElementById('introLong').style.display = 'block';
     document.getElementById('carta-container').style.display = 'none';
+    seccionActiva = 'autor';
   };
   if (textosCache) {
     render(textosCache);
