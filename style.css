@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap');
 
+/* ============================================================
+   BASE
+   ============================================================ */
 body {
   font-family: 'Dosis', sans-serif;
   text-align: center;
@@ -8,12 +11,18 @@ body {
   color: rgb(0, 67, 73);
 }
 
-
-
-button:hover {
-  background-color: #00575f;
+#titulo-home {
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
+#titulo-home:hover {
+  color: #004d4d;
+}
+
+/* ============================================================
+   CONTENEDOR DE CARTAS
+   ============================================================ */
 #carta-container {
   perspective: 1000px;
   display: flex;
@@ -25,7 +34,6 @@ button:hover {
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: auto;
-  
   margin: 0 auto;
   width: 100%;
   max-width: 100%;
@@ -33,8 +41,32 @@ button:hover {
   box-sizing: border-box;
 }
 
+/* Escalado progresivo según cantidad de cartas */
+#carta-container.muchas-cartas .card { transform: scale(0.85); }
+#carta-container.card-1 .carta-wrapper { transform: scale(1); }
+#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
+#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
+#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
+#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
+#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
+#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
+#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
+#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
 
+.carta-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.4s ease;
+  margin: 0;
+  padding: 0;
+}
 
+/* ============================================================
+   CARTA (flip 3D)
+   ============================================================ */
 .card {
   width: 340px;
   min-height: 520px;
@@ -58,7 +90,8 @@ button:hover {
   transform: rotateY(180deg);
 }
 
-.card-front, .card-back {
+.card-front,
+.card-back {
   width: 100%;
   min-height: 520px;
   position: absolute;
@@ -72,7 +105,7 @@ button:hover {
 }
 
 .card-front {
-  background: white;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -112,6 +145,39 @@ button:hover {
   white-space: pre-line;
 }
 
+/* Limpia bordes y sombras heredadas */
+.card,
+.card-inner,
+.card-front img {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Carta ampliada (en línea, no overlay) */
+.card.ampliada {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  max-width: 90vw;
+  height: auto;
+  max-height: 90vh;
+  aspect-ratio: 340 / 520;
+  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  z-index: 999;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.card.zoom-in {
+  transition: transform 0.3s ease;
+  transform: scale(1.1) rotateY(180deg);
+}
+
+/* ============================================================
+   INSTRUCCIONES
+   ============================================================ */
 #instrucciones {
   font-family: 'Dosis', sans-serif;
   text-align: center;
@@ -121,272 +187,9 @@ button:hover {
   letter-spacing: 0.3px;
 }
 
-#lentes-toggle {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0.3rem;
-  margin: 1.2rem 0;
-}
-
-.lente-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.1rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.lente-horizontal img {
-  width: 40px;
-  height: 40px;
-  transition: transform 0.2s;
-}
-
-.lente-horizontal img:hover {
-  transform: scale(1.1);
-}
-
-.lente-horizontal:active {
-  transform: scale(0.98);
-}
-
-.idioma-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  margin: 1rem auto;
-}
-
-.bandera {
-  font-size: 1.6rem;
-  cursor: pointer;
-  opacity: 0.35;
-  filter: grayscale(60%);
-  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.15s ease;
-  padding: 0.15rem 0.25rem;
-  border-radius: 6px;
-  user-select: none;
-}
-
-.bandera:hover {
-  opacity: 0.8;
-  filter: grayscale(0%);
-}
-
-.bandera-activa {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.15);
-}
-
-.mensaje-divertido {
-  text-align: center;
-  font-style: italic;
-  padding: 20px;
-  color: #666;
-}
-
-@media (min-width: 768px) {
-  .contenedor-principal {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  #instrucciones {
-    width: 40%;
-    text-align: left;
-  }
-
-  #carta-container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-  }
-}
-
-.intro-texto {
-  font-family: 'Libre Baskerville', serif;
-  padding: 2rem;
-  line-height: 1.6;
-  font-size: 1.1rem;
-}
-
-.more-
-
-#titulo-home {
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-#titulo-home:hover {
-  color: #004d4d;
-}
-
-/* Escalar cartas si hay muchas */
-#carta-container.muchas-cartas .card {
-  transform: scale(0.85);
-}
-
-/* AnimaciÃ³n al aparecer carta */
-.card-animada {
-  animation: entrada-carta 0.4s ease;
-}
-
-@keyframes entrada-carta {
-  from {
-    transform: scale(0.8) translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Hover para escalar en desktop */
-@media (hover: hover) and (pointer: fine) {
-  .card:hover {
-    transform: scale(1.05);
-    z-index: 2;
-  }
-}
-.card.ampliada {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: auto;
-  max-width: 90vw;
-  height: auto;
-  max-height: 90vh;
-  aspect-ratio: 340 / 520; /* mantiene proporción */
-  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
-  z-index: 999;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  transition: all 0.3s ease;
-  border-radius: 12px;
-}
-
-
-
-.carta-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center center;
-  transition: transform 0.4s ease;
-  margin: 0;        /* â—elimina separaciÃ³n entre cartas */
-  padding: 0;       /* â—sin relleno adicional */
-}
-
-/* Escalado progresivo automÃ¡tico */
-#carta-container.card-1 .carta-wrapper { transform: scale(1); }
-#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
-#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
-#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
-#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
-#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
-#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
-#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
-#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
-
-
-/* Ajustes para eliminar bordes blancos y sombras de las cartas */
-.card, .card-inner, .card-front img {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.card-front {
-  background: transparent !important;
-}
-
-#overlay-ampliada {
-  position: fixed;
-  inset: 0;
-  display: none; /* se activa con JS */
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 255, 255, 0); /* completamente transparente */
-  z-index: 9999;
-  overflow: hidden;
-}
-
-#overlay-ampliada .card {
-  all: unset; /* 🧠 borra todos los estilos heredados (muy importante) */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 90vw;
-  max-width: 340px;
-  height: auto;
-  max-height: 90vh;
-  aspect-ratio: 340 / 520;
-  animation: zoomInOverlay 0.3s ease;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  z-index: 9999;
-}
-
-#overlay-ampliada .card-back {
-  overflow-y: auto;
-  padding: 1.5rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  text-align: left;
-}
-
-
-
-.zona-botones {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 2rem auto;
-}
-
-.zona-botones 
-
-.zona-botones #lentes-toggle {
-  display: flex;
-  gap: 1rem;
-  margin: 0;
-}
-
-.zona-controles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin: 2rem auto;
-  max-width: 90%;
-}
-
-.zona-controles 
-
-.zona-controles button:hover {
-  background-color: #007171;
-}
-
-.zona-controles #lentes-toggle {
-  display: flex;
-  gap: 1rem;
-}
-
+/* ============================================================
+   CONTROLES (botones + lentes)
+   ============================================================ */
 .zona-controles {
   display: flex;
   flex-wrap: wrap;
@@ -417,14 +220,108 @@ button:hover {
   background-color: #007171;
 }
 
+button:hover {
+  background-color: #00575f;
+}
+
 #lentes-toggle {
   display: flex;
-  gap: 1rem;
+  flex-direction: row;
   align-items: center;
+  gap: 1rem;
+  margin: 1.2rem 0;
 }
-.card.zoom-in {
-  transition: transform 0.3s ease;
-  transform: scale(1.1) rotateY(180deg);
+
+.lente-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.lente-horizontal img {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.2s;
+}
+
+.lente-horizontal img:hover {
+  transform: scale(1.1);
+}
+
+.lente-horizontal:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================
+   IDIOMA SWITCH (banderas)
+   ============================================================ */
+.idioma-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 1rem auto;
+}
+
+.bandera {
+  font-size: 1.6rem;
+  cursor: pointer;
+  opacity: 0.35;
+  filter: grayscale(60%);
+  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.15s ease;
+  padding: 0.15rem 0.25rem;
+  border-radius: 6px;
+  user-select: none;
+}
+
+.bandera:hover {
+  opacity: 0.8;
+  filter: grayscale(0%);
+}
+
+.bandera-activa {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.15);
+}
+
+/* ============================================================
+   INTRO / TEXTOS LARGOS
+   ============================================================ */
+.intro-texto {
+  font-family: 'Libre Baskerville', serif;
+  padding: 2rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.mensaje-divertido {
+  text-align: center;
+  font-style: italic;
+  padding: 20px;
+  color: #666;
+}
+
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+.card-animada {
+  animation: entrada-carta 0.4s ease;
+}
+
+@keyframes entrada-carta {
+  from {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 .overlay-zoom {
@@ -439,5 +336,79 @@ button:hover {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* Hover para escalar en desktop */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: scale(1.05);
+    z-index: 2;
+  }
+}
+
+/* ============================================================
+   OVERLAY DE CARTA AMPLIADA
+   ============================================================ */
+#overlay-ampliada {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0);
+  z-index: 9999;
+  overflow: hidden;
+}
+
+#overlay-ampliada .card {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90vw;
+  max-width: 340px;
+  height: auto;
+  max-height: 90vh;
+  aspect-ratio: 340 / 520;
+  animation: zoomInOverlay 0.3s ease;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+
+#overlay-ampliada .card-back {
+  overflow-y: auto;
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (min-width: 768px) {
+  .contenedor-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  #instrucciones {
+    width: 40%;
+    text-align: left;
+  }
+
+  #carta-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
 }
