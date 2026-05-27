@@ -479,12 +479,6 @@ function lanzarTirada() {
     setTimeout(() => {
       renderCartaTirada(carta, i, tirada, container, esAcumulativo);
       cartasLanzadas.push(carta);
-      // En modo acumulativo, ajustar el escalado fluido via CSS var según total
-      if (esAcumulativo) {
-        const N = cartasLanzadas.length;
-        const scale = N <= 1 ? 1 : Math.max(0.5, 1 - (N - 1) * 0.07);
-        container.style.setProperty('--cards-scale', scale.toFixed(3));
-      }
     }, i * 220);
   });
 }
