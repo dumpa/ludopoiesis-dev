@@ -414,22 +414,30 @@ function setModoTirada(modo) {
     sub.textContent = (TIRADAS[modo].subtitle && TIRADAS[modo].subtitle[idioma]) || '';
   }
 
-  // Limpiar cartas y volver a intro (cada tirada es un nuevo intento)
+  // Limpiar cartas y volver a intro (cada cambio de modo es un nuevo intento)
   reiniciarCartas();
+  cargarIntro(false);
 }
 
 // Tira N cartas según el modoTirada actual, las renderiza con sus labels de posición
 // y delay escalonado para sensación ritual.
+// Modo 'carta' ACUMULA cartas. Modos 'horizontal' y 'vertical' REEMPLAZAN.
 function lanzarTirada() {
   const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
   const container = document.getElementById('carta-container');
+  const esAcumulativo = modoTirada === 'carta';
 
-  // Limpiar estado anterior (cada tirada reemplaza)
-  cartasLanzadas = [];
-  cartaActual = null;
-  container.innerHTML = '';
-  container.setAttribute('data-layout', tirada.layout);
-  container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
+  if (esAcumulativo) {
+    // Modo Carta: NO limpia cartas anteriores, solo agrega una más al pool
+    container.removeAttribute('data-layout');
+  } else {
+    // Modos múltiples: limpia y arranca de cero
+    cartasLanzadas = [];
+    cartaActual = null;
+    container.innerHTML = '';
+    container.setAttribute('data-layout', tirada.layout);
+    container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
+  }
   container.style.display = 'flex';
 
   // Ocultar intros / textos largos
@@ -445,15 +453,21 @@ function lanzarTirada() {
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
   if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
 
-  // Seleccionar N cartas distintas (sin repetición dentro de la tirada)
-  const pool = [...cartasFiltradas];
+  // En modo acumulativo, evitar repetir cartas ya en pantalla
+  const yaEnPantalla = new Set(cartasLanzadas.map(c => c.id));
+  const pool = cartasFiltradas.filter(c => !yaEnPantalla.has(c.id));
+  // Si ya se mostraron todas las cartas filtradas, reusar el pool completo
+  const poolEfectivo = pool.length ? pool : [...cartasFiltradas];
+
+  // Seleccionar N cartas distintas
   const seleccionadas = [];
-  for (let i = 0; i < tirada.count && pool.length; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    seleccionadas.push(pool.splice(idx, 1)[0]);
+  const poolCopy = [...poolEfectivo];
+  for (let i = 0; i < tirada.count && poolCopy.length; i++) {
+    const idx = Math.floor(Math.random() * poolCopy.length);
+    seleccionadas.push(poolCopy.splice(idx, 1)[0]);
   }
 
-  // Setear paleta dinámica con la primera carta
+  // Setear paleta dinámica con la primera carta de la nueva tirada
   if (seleccionadas.length > 0) {
     cartaActual = seleccionadas[0];
     setNaipeActivo(cartaActual.lente);
@@ -465,6 +479,13 @@ function lanzarTirada() {
     setTimeout(() => {
       renderCartaTirada(carta, i, tirada, container);
       cartasLanzadas.push(carta);
+      // En modo acumulativo, aplicar clase card-N para que el CSS escale
+      if (esAcumulativo) {
+        const n = Math.min(cartasLanzadas.length, 6);
+        container.classList.remove('card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
+        container.classList.add('card-' + n);
+        if (cartasLanzadas.length > 3) container.classList.add('muchas-cartas');
+      }
     }, i * 220);
   });
 }
