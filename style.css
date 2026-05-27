@@ -187,14 +187,40 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   width: 100%;
   padding: 8px 0 24px;
   min-height: 0;
 }
 
-/* Escalado progresivo según cantidad de cartas */
+/* === Layouts por tipo de tirada === */
+#carta-container[data-layout="horizontal"] {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 22px;
+  padding: 8px 22px 24px;
+  gap: 18px;
+  /* Esconder scrollbar pero permitir scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#carta-container[data-layout="horizontal"]::-webkit-scrollbar { display: none; }
+#carta-container[data-layout="horizontal"] .carta-wrapper {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+#carta-container[data-layout="vertical"] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Escalado progresivo según cantidad de cartas (modo "carta" acumulado) */
 #carta-container.muchas-cartas .card { transform: scale(0.85); }
 #carta-container.card-1 .carta-wrapper { transform: scale(1); }
 #carta-container.card-2 .carta-wrapper { transform: scale(0.92); }
@@ -205,16 +231,35 @@ body {
 
 .carta-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 10px;
   transform-origin: center;
   transition: transform 0.4s ease;
 }
 
+/* Label de posición arriba de cada carta en tiradas múltiples
+   ("Pasado", "Presente", "Futuro" / "Pensar", "Sentir", "Hacer") */
+.carta-posicion {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  text-align: center;
+  min-height: 13px;
+  transition: color 0.4s ease;
+}
+
 /* ===== CARTA · FLIP 3D ====================================== */
 .card {
-  width: 280px;
-  height: 428px;
+  width: min(280px, calc(85vw - 32px));
+  aspect-ratio: 280 / 428;
+  height: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1),
@@ -331,6 +376,70 @@ body {
   align-items: stretch;
   gap: 0;
 }
+
+/* ----- Selector de modo de tirada (Carta · 3 horizontal · 3 vertical) ----- */
+.modo-selector {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 8px;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.modo-btn {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  padding: 14px 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.25s ease;
+}
+.modo-btn:hover { color: var(--ink); }
+.modo-btn.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+.modo-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  background: var(--accent);
+  transition: background 0.4s ease, width 0.25s ease;
+}
+.modo-btn:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.modo-subtitle {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.5px;
+  min-height: 18px;
+  margin-bottom: 24px;
+  transition: opacity 0.3s ease;
+}
+.modo-subtitle:empty { opacity: 0; }
 
 /* ----- Botones primarios ----- */
 .botones-controles {

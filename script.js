@@ -18,6 +18,47 @@ const lenteNombres = {
   en: { naturaleza: 'Nature',     fluir: 'Flow',  tecnologia: 'Technology' }
 };
 
+// Tipos de tirada disponibles. Cada tirada define cuántas cartas, su layout,
+// los labels semánticos por posición (en cada idioma) y el subtítulo del selector.
+const TIRADAS = {
+  carta: {
+    count: 1,
+    layout: 'single',
+    labels: { es: [], pt: [], en: [] },
+    subtitle: { es: '', pt: '', en: '' }
+  },
+  horizontal: {
+    count: 3,
+    layout: 'horizontal',
+    labels: {
+      es: ['Pasado', 'Presente', 'Futuro'],
+      pt: ['Passado', 'Presente', 'Futuro'],
+      en: ['Past', 'Present', 'Future']
+    },
+    subtitle: {
+      es: 'pasado · presente · futuro',
+      pt: 'passado · presente · futuro',
+      en: 'past · present · future'
+    }
+  },
+  vertical: {
+    count: 3,
+    layout: 'vertical',
+    labels: {
+      es: ['Pensar', 'Sentir', 'Hacer'],
+      pt: ['Pensar', 'Sentir', 'Fazer'],
+      en: ['Think', 'Feel', 'Do']
+    },
+    subtitle: {
+      es: 'pensar · sentir · hacer',
+      pt: 'pensar · sentir · fazer',
+      en: 'think · feel · do'
+    }
+  }
+};
+
+let modoTirada = 'carta';
+
 // Activa la paleta dinámica del naipe + actualiza el label sutil arriba de la carta.
 // Llamar con un lente ('naturaleza' | 'fluir' | 'tecnologia') o null para volver a estado neutro.
 function setNaipeActivo(lente) {
@@ -116,8 +157,17 @@ function aplicarIdiomaUI() {
   if (flagActiva) flagActiva.classList.add('bandera-activa');
   // Actualiza los labels de los lentes (Naturaleza/Fluir/Tecnología → Nature/Flow/Technology, etc.)
   aplicarLenteLabels();
+  // Actualiza el subtítulo del modo activo en el selector de tirada
+  aplicarModoSubtitle();
   // Si hay una carta activa, refresca el label sutil del naipe con el nuevo idioma
   if (cartaActual) setNaipeActivo(cartaActual.lente);
+}
+
+// Actualiza el subtítulo bajo el selector de modo de tirada (ej. "pasado · presente · futuro").
+function aplicarModoSubtitle() {
+  const sub = document.getElementById('modo-subtitle');
+  const t = TIRADAS[modoTirada];
+  if (sub && t) sub.textContent = (t.subtitle && t.subtitle[idioma]) || '';
 }
 
 fetch("cartas.json?v=" + new Date().getTime())
@@ -342,6 +392,128 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     container.appendChild(wrapper);
   });
 }
+
+// === SISTEMA DE TIRADAS (nuevo, reemplaza a lanzarCartaSuperpuesta para flujo normal) ===
+
+// Cambia el modo de tirada (carta | horizontal | vertical) y actualiza la UI del selector.
+// Reinicia las cartas en pantalla porque el layout cambia.
+function setModoTirada(modo) {
+  if (!TIRADAS[modo]) return;
+  modoTirada = modo;
+
+  // Marcar botón activo en el selector
+  document.querySelectorAll('.modo-btn').forEach(b => {
+    const isActive = b.dataset.modo === modo;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-checked', String(isActive));
+  });
+
+  // Actualizar subtítulo del selector con el idioma actual
+  const sub = document.getElementById('modo-subtitle');
+  if (sub) {
+    sub.textContent = (TIRADAS[modo].subtitle && TIRADAS[modo].subtitle[idioma]) || '';
+  }
+
+  // Limpiar cartas y volver a intro (cada tirada es un nuevo intento)
+  reiniciarCartas();
+}
+
+// Tira N cartas según el modoTirada actual, las renderiza con sus labels de posición
+// y delay escalonado para sensación ritual.
+function lanzarTirada() {
+  const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
+  const container = document.getElementById('carta-container');
+
+  // Limpiar estado anterior (cada tirada reemplaza)
+  cartasLanzadas = [];
+  cartaActual = null;
+  container.innerHTML = '';
+  container.setAttribute('data-layout', tirada.layout);
+  container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
+  container.style.display = 'flex';
+
+  // Ocultar intros / textos largos
+  ['introShort', 'introLong', 'dinamica'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Lentes activos
+  const activos = Object.entries(lentesActivos)
+    .filter(([_, a]) => a)
+    .map(([l]) => l);
+  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
+  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
+
+  // Seleccionar N cartas distintas (sin repetición dentro de la tirada)
+  const pool = [...cartasFiltradas];
+  const seleccionadas = [];
+  for (let i = 0; i < tirada.count && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    seleccionadas.push(pool.splice(idx, 1)[0]);
+  }
+
+  // Setear paleta dinámica con la primera carta
+  if (seleccionadas.length > 0) {
+    cartaActual = seleccionadas[0];
+    setNaipeActivo(cartaActual.lente);
+  }
+  seccionActiva = 'cartas';
+
+  // Renderizar con delay escalonado (sensación de tirada secuencial)
+  seleccionadas.forEach((carta, i) => {
+    setTimeout(() => {
+      renderCartaTirada(carta, i, tirada, container);
+      cartasLanzadas.push(carta);
+    }, i * 220);
+  });
+}
+
+// Renderiza UNA carta dentro de un wrapper con su label de posición (si aplica).
+function renderCartaTirada(carta, posIndex, tirada, container) {
+  const titulo = getCartaField(carta, 'titulo');
+  const texto  = getCartaField(carta, 'texto');
+  const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
+  const posLabel = labels[posIndex] || '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'carta-wrapper';
+
+  if (posLabel) {
+    const labelEl = document.createElement('div');
+    labelEl.className = 'carta-posicion';
+    labelEl.dataset.posIndex = String(posIndex);
+    labelEl.textContent = posLabel;
+    wrapper.appendChild(labelEl);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'card card-animada';
+  card.dataset.id = carta.id;
+  card.dataset.lente = carta.lente;
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">${imgCartaHTML(carta, titulo)}</div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\n/g, '<br>')}</p>
+      </div>
+    </div>
+  `;
+
+  // Click: voltear y, si tirada múltiple, hacer que la paleta global tome el lente de esta carta
+  card.onclick = () => {
+    card.classList.toggle('flipped');
+    if (card.classList.contains('flipped')) {
+      cartaActual = carta;
+      setNaipeActivo(carta.lente);
+    }
+  };
+
+  wrapper.appendChild(card);
+  container.appendChild(wrapper);
+}
+
 function mostrarObraDeArteOTexto() {
   setNaipeActivo(null);
   const container = document.getElementById("carta-container");
@@ -362,6 +534,8 @@ function reiniciarCartas() {
   setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   container.innerHTML = "";
+  container.removeAttribute('data-layout');
+  container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
 }
 
 function _mostrarSeccion(key, seccionTag) {
@@ -435,6 +609,15 @@ function setIdioma(nuevoIdioma) {
       if (backH2) backH2.textContent = titulo;
       if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
     });
+    // Actualizar labels de posición (Pasado/Presente/Futuro, etc.) si es tirada múltiple
+    const tirada = TIRADAS[modoTirada];
+    if (tirada && tirada.labels) {
+      const newLabels = tirada.labels[idioma] || tirada.labels.es || [];
+      document.querySelectorAll('.carta-posicion').forEach(el => {
+        const i = parseInt(el.dataset.posIndex || '0', 10);
+        if (newLabels[i]) el.textContent = newLabels[i];
+      });
+    }
     // Refresca el label sutil del naipe con el nuevo idioma
     if (cartaActual) setNaipeActivo(cartaActual.lente);
     return;
@@ -481,6 +664,8 @@ function mostrarAutor() {
 
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.lanzarCartaSuperpuesta = lanzarCartaSuperpuesta;
+window.lanzarTirada = lanzarTirada;
+window.setModoTirada = setModoTirada;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
 window.mostrarPregunta = mostrarPregunta;

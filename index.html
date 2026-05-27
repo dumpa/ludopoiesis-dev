@@ -51,8 +51,15 @@
   <!-- ============ CONTROLES: BOTONES + LENTES + PASOS ============ -->
   <section class="zona-controles" aria-label="Controles">
 
+    <div class="modo-selector" role="radiogroup" aria-label="Tipo de tirada">
+      <button class="modo-btn active" data-modo="carta" onclick="setModoTirada('carta')" role="radio" aria-checked="true">Carta</button>
+      <button class="modo-btn" data-modo="horizontal" onclick="setModoTirada('horizontal')" role="radio" aria-checked="false">3 horizontal</button>
+      <button class="modo-btn" data-modo="vertical" onclick="setModoTirada('vertical')" role="radio" aria-checked="false">3 vertical</button>
+    </div>
+    <div class="modo-subtitle" id="modo-subtitle" aria-live="polite"></div>
+
     <div class="botones-controles">
-      <button class="btn btn-primary" onclick="lanzarCartaSuperpuesta()" data-i18n="btnCarta">Tirar carta</button>
+      <button class="btn btn-primary" onclick="lanzarTirada()" data-i18n="btnCarta">Tirar</button>
       <button class="btn btn-outline" onclick="reiniciarCartas()" data-i18n="btnNuevo">Nuevo</button>
     </div>
 
