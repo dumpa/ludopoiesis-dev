@@ -802,27 +802,47 @@ async function generarImagenCompartible() {
   if (!ok) return null;
   const canvas = document.getElementById('share-canvas');
 
-  // Esperar a que las imágenes (ya resueltas a URLs válidas) terminen de cargar
-  await new Promise(r => requestAnimationFrame(r));
-  const imgs = canvas.querySelectorAll('img');
-  await Promise.all(Array.from(imgs).map(img => {
-    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-    return new Promise(resolve => {
-      img.addEventListener('load', resolve, { once: true });
-      img.addEventListener('error', resolve, { once: true });
-    });
-  }));
+  // CRÍTICO: algunos navegadores no pintan elementos en left:-10000px, así que
+  // html-to-image los captura vacíos. Solución: traer el canvas al viewport
+  // durante la captura, tapado por un loader opaco para no mostrar el flash.
+  const loader = document.createElement('div');
+  loader.style.cssText =
+    'position:fixed;inset:0;background:#FAFAF8;z-index:99999;display:flex;' +
+    'align-items:center;justify-content:center;font-family:"DM Sans",sans-serif;' +
+    'font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#999;';
+  loader.textContent = '…';
+  document.body.appendChild(loader);
+
+  canvas.style.left = '0';
+  canvas.style.top = '0';
+  canvas.style.zIndex = '99998';
 
   try {
+    // Dos frames + espera de imágenes para garantizar layout y paint completos
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const imgs = canvas.querySelectorAll('img');
+    await Promise.all(Array.from(imgs).map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(resolve => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }));
+
     const dataUrl = await htmlToImage.toPng(canvas, {
       pixelRatio: 2,
       skipFonts: true,
-      backgroundColor: getComputedStyle(canvas).backgroundColor || '#FAFAF8'
+      backgroundColor: '#FAFAF8'
     });
     return dataUrl;
   } catch (e) {
     console.error('Error generando imagen:', e);
     return null;
+  } finally {
+    canvas.style.left = '-10000px';
+    canvas.style.top = '0';
+    canvas.style.zIndex = '-1';
+    loader.remove();
   }
 }
 
