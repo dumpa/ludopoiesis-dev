@@ -525,16 +525,15 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
     </div>
   `;
 
-  // Click: la carta sube al frente y voltea. Las demás NO cambian su estado
-  // (la que está en texto se queda en texto, la que está en imagen en imagen),
-  // solo dejan de estar al frente. Segundo click la baja y la des-voltea.
+  // Click: la carta sube al frente y voltea. Las demás mantienen su estado
+  // (texto sigue en texto, imagen en imagen), solo dejan de estar al frente.
+  // Segundo click sobre la misma: solo des-voltea, PERO queda encima (como un
+  // dealer que deja la carta arriba). Una carta solo baja cuando se toca otra.
   card.onclick = () => {
     const yaAlFrente = wrapper.classList.contains('al-frente');
     if (yaAlFrente) {
-      wrapper.classList.remove('al-frente');
-      card.classList.remove('flipped');
+      card.classList.toggle('flipped');
     } else {
-      // Quitar solo el "al frente" de las demás, sin tocar su flip
       container.querySelectorAll('.carta-wrapper.al-frente').forEach(w => {
         w.classList.remove('al-frente');
       });
@@ -806,7 +805,6 @@ async function generarImagenCompartible() {
   try {
     const dataUrl = await htmlToImage.toPng(canvas, {
       pixelRatio: 2,
-      cacheBust: true,
       skipFonts: true,
       backgroundColor: getComputedStyle(canvas).backgroundColor || '#FAFAF8'
     });
