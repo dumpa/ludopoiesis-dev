@@ -157,6 +157,9 @@ function aplicarIdiomaUI() {
   if (flagActiva) flagActiva.classList.add('bandera-activa');
   // Actualiza los labels de los lentes (Naturaleza/Fluir/Tecnología → Nature/Flow/Technology, etc.)
   aplicarLenteLabels();
+  // Actualiza el label del botón Compartir según idioma
+  const shareBtnLabel = document.querySelector('[data-i18n-share]');
+  if (shareBtnLabel) shareBtnLabel.textContent = compartirLabels[idioma] || compartirLabels.es;
   // Actualiza el subtítulo del modo activo en el selector de tirada
   aplicarModoSubtitle();
   // Si hay una carta activa, refresca el label sutil del naipe con el nuevo idioma
@@ -522,10 +525,23 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
     </div>
   `;
 
-  // Click: voltear y, si tirada múltiple, hacer que la paleta global tome el lente de esta carta
+  // Click: voltear y subir al frente para que el reverso quede expuesto.
+  // Otra carta al frente vuelve atrás. Si re-click, esta vuelve atrás.
   card.onclick = () => {
-    card.classList.toggle('flipped');
-    if (card.classList.contains('flipped')) {
+    const yaFlipped = card.classList.contains('flipped');
+    if (yaFlipped) {
+      card.classList.remove('flipped');
+      wrapper.classList.remove('al-frente');
+    } else {
+      // Bajar las otras cartas que estuvieran al frente
+      container.querySelectorAll('.carta-wrapper.al-frente').forEach(w => {
+        w.classList.remove('al-frente');
+        const c = w.querySelector('.card');
+        if (c) c.classList.remove('flipped');
+      });
+      // Subir esta carta al frente
+      card.classList.add('flipped');
+      wrapper.classList.add('al-frente');
       cartaActual = carta;
       setNaipeActivo(carta.lente);
     }
@@ -684,12 +700,162 @@ function mostrarAutor() {
   }
 }
 
+// ============================================================
+// COMPARTIR LECTURA · Generación de imagen 4:5 + Web Share API
+// ============================================================
+
+const compartirLabels = {
+  es: 'Compartir',
+  pt: 'Compartilhar',
+  en: 'Share'
+};
+
+// Llena el template oculto #share-canvas con los datos de la(s) carta(s)
+// que se están mostrando. Modo "solo" para 1 carta, "triple" para 3.
+function llenarShareCanvas() {
+  const naipeEl = document.getElementById('share-naipe');
+  const cardsEl = document.getElementById('share-cards');
+  const subtitleEl = document.getElementById('share-subtitle');
+  if (!naipeEl || !cardsEl || !subtitleEl) return false;
+
+  cardsEl.innerHTML = '';
+
+  // Determinar qué compartir: en modo 'carta' la cartaActual; en 3-h/3-v las cartasLanzadas
+  const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
+  const esMultiple = tirada.count > 1 && cartasLanzadas.length >= tirada.count;
+
+  if (esMultiple) {
+    // 3 cartas con sus labels de posición
+    const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
+    cartasLanzadas.slice(0, tirada.count).forEach((carta, i) => {
+      const t = getCartaField(carta, 'titulo');
+      const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
+      const slot = document.createElement('div');
+      slot.className = 'share-card triple';
+      slot.innerHTML = `
+        <div class="share-card-pos">${labels[i] || ''}</div>
+        <div class="share-card-img"><img src="${imgUrl}" alt="" crossorigin="anonymous"></div>
+        <div class="share-card-title">${t}</div>
+      `;
+      cardsEl.appendChild(slot);
+    });
+    // Naipe en header: mostrar los lentes presentes
+    const lentesPresentes = [...new Set(cartasLanzadas.slice(0, tirada.count).map(c => c.lente))];
+    const nombresLentes = lentesPresentes.map(l => (lenteNombres[idioma] || lenteNombres.es)[l]).join(' · ');
+    naipeEl.textContent = nombresLentes;
+    subtitleEl.textContent = (tirada.subtitle && tirada.subtitle[idioma]) || '';
+  } else {
+    // 1 carta sola, layout horizontal (imagen izq + texto der)
+    const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
+    if (!carta) return false;
+    const titulo = getCartaField(carta, 'titulo');
+    const texto = getCartaField(carta, 'texto');
+    const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
+    const slot = document.createElement('div');
+    slot.className = 'share-card solo';
+    slot.innerHTML = `
+      <div class="share-card-img"><img src="${imgUrl}" alt="" crossorigin="anonymous"></div>
+      <div class="share-card-text">
+        <h2 class="share-card-title">${titulo}</h2>
+        <p class="share-card-body">${texto.replace(/\n/g, '<br>')}</p>
+      </div>
+    `;
+    cardsEl.appendChild(slot);
+    naipeEl.textContent = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
+    subtitleEl.textContent = '';
+  }
+
+  return true;
+}
+
+// Genera la imagen como PNG (dataURL) usando html-to-image.
+async function generarImagenCompartible() {
+  // Llenar el template primero (independiente de la librería de imagen)
+  const ok = llenarShareCanvas();
+  if (!ok) return null;
+
+  if (typeof htmlToImage === 'undefined') {
+    console.error('html-to-image no cargó (¿CDN bloqueado?)');
+    return null;
+  }
+  const canvas = document.getElementById('share-canvas');
+
+  // Esperar 1 frame para que las imágenes/fuentes terminen de aplicar
+  await new Promise(r => requestAnimationFrame(r));
+  // Esperar imágenes (las cartas son PNGs locales del sitio)
+  const imgs = canvas.querySelectorAll('img');
+  await Promise.all(Array.from(imgs).map(img => {
+    if (img.complete) return Promise.resolve();
+    return new Promise(r => { img.onload = r; img.onerror = r; });
+  }));
+
+  try {
+    const dataUrl = await htmlToImage.toPng(canvas, {
+      pixelRatio: 2,
+      cacheBust: true,
+      backgroundColor: getComputedStyle(canvas).backgroundColor || '#FAFAF8'
+    });
+    return dataUrl;
+  } catch (e) {
+    console.error('Error generando imagen:', e);
+    return null;
+  }
+}
+
+// Comparte la imagen vía Web Share API (móvil) o descarga (desktop/fallback).
+async function compartirLectura() {
+  if (!cartasLanzadas.length && !cartaActual) return;
+
+  const btn = document.querySelector('.btn-share');
+  if (btn) btn.disabled = true;
+
+  try {
+    const dataUrl = await generarImagenCompartible();
+    if (!dataUrl) return;
+
+    // Convertir dataURL → Blob → File
+    const blob = await (await fetch(dataUrl)).blob();
+    const filename = `ludopoiesis-${Date.now()}.png`;
+    const file = new File([blob], filename, { type: 'image/png' });
+
+    // Intentar Web Share API con archivo (móvil principalmente)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Ludopoiesis',
+          text: 'Ludopoiesis'
+        });
+        return;
+      } catch (e) {
+        // AbortError = usuario canceló, no es error real
+        if (e.name !== 'AbortError') console.error('Share falló, fallback a descarga:', e);
+        else return;
+      }
+    }
+
+    // Fallback: descarga directa
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ============================================================
+// EXPORTS A WINDOW
+// ============================================================
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
 window.lanzarCartaSuperpuesta = lanzarCartaSuperpuesta;
 window.lanzarTirada = lanzarTirada;
 window.setModoTirada = setModoTirada;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
+window.compartirLectura = compartirLectura;
 window.mostrarPregunta = mostrarPregunta;
 window.mostrarLentes = mostrarLentes;
 window.mostrarDinamica = mostrarDinamica;

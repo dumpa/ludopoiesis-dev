@@ -248,6 +248,15 @@ body {
   transform-origin: center center;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.4s ease;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Carta clickeada: sube al frente, se endereza y se eleva levemente
+   para que su contenido (reverso volteado) no quede tapado por las siguientes. */
+.carta-wrapper.al-frente {
+  z-index: 50;
+  transform: translateY(-24px) scale(1.04) rotate(0deg);
 }
 
 /* Label de posición arriba de cada carta en tiradas múltiples
@@ -488,6 +497,202 @@ body {
   color: var(--bg);
 }
 
+/* Botón Compartir: solo visible cuando hay una tirada activa.
+   Estilo discreto, color del acento del naipe activo. */
+.btn-share {
+  display: none;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 22px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  min-width: 110px;
+}
+.btn-share:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+body[data-naipe] .btn-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   SHARE CANVAS · Template oculto para generar imagen compartible
+   Formato 4:5 vertical (800×1000), invisible al usuario,
+   se renderiza a PNG con html-to-image al tap "Compartir".
+   ============================================================ */
+#share-canvas {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 800px;
+  height: 1000px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+#share-canvas .share-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 56px 56px 40px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%);
+}
+#share-canvas .share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 36px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+}
+#share-canvas .share-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+}
+#share-canvas .share-logo b {
+  font-weight: 500;
+  color: var(--accent);
+}
+#share-canvas .share-naipe {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+}
+#share-canvas .share-cards {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 0;
+}
+#share-canvas .share-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+#share-canvas .share-card.solo {
+  flex-direction: row;
+  gap: 36px;
+  align-items: center;
+  width: 100%;
+}
+#share-canvas .share-card-pos {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  min-height: 14px;
+}
+#share-canvas .share-card-img {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.06),
+    0 20px 60px -16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+#share-canvas .share-card-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#share-canvas .share-card.solo .share-card-img {
+  width: 280px;
+  height: 428px;
+  flex-shrink: 0;
+}
+#share-canvas .share-card.solo .share-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  text-align: left;
+}
+#share-canvas .share-card.solo .share-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 36px;
+  line-height: 1.05;
+  letter-spacing: -0.8px;
+  color: var(--primary);
+  margin: 0;
+}
+#share-canvas .share-card.solo .share-card-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+#share-canvas .share-card.triple .share-card-img {
+  width: 170px;
+  height: 260px;
+}
+#share-canvas .share-card.triple .share-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.15;
+  color: var(--primary);
+  margin: 0;
+  text-align: center;
+  max-width: 170px;
+  letter-spacing: -0.3px;
+}
+#share-canvas .share-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  margin-top: 36px;
+  border-top: 1px solid var(--hairline);
+}
+#share-canvas .share-subtitle {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink-soft);
+  letter-spacing: 0.3px;
+}
+#share-canvas .share-url {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+
 /* ----- Fila de lentes con hairlines ----- */
 .lentes-row {
   display: flex;
@@ -690,18 +895,22 @@ body {
   }
   .app-main {
     padding: 56px 40px 32px;
-    max-width: 560px;
+    max-width: 1100px;
   }
   .card {
-    width: 320px;
-    height: 489px;
+    width: min(340px, calc(85vw - 32px));
   }
   .card-back h2 { font-size: 28px; }
   .card-back p { font-size: 14px; }
   .zona-controles {
-    max-width: 560px;
+    max-width: 1100px;
     padding: 8px 40px 80px;
   }
   .step-num { font-size: 44px; }
   .intro-texto { font-size: 20px; max-width: 42ch; }
+  /* En desktop, 3 cartas horizontales caben holgadas — no necesita scroll */
+  #carta-container[data-layout="horizontal"] {
+    justify-content: center;
+    gap: 28px;
+  }
 }
