@@ -709,7 +709,7 @@ const compartirLabels = {
 
 // Llena el template oculto #share-canvas con los datos de la(s) carta(s)
 // que se están mostrando. Modo "solo" para 1 carta, "triple" para 3.
-function llenarShareCanvas() {
+async function llenarShareCanvas() {
   const canvas = document.getElementById('share-canvas');
   if (!canvas) return false;
 
@@ -734,40 +734,34 @@ function llenarShareCanvas() {
   const esMultiple = tirada.count > 1 && cartasLanzadas.length >= tirada.count;
 
   if (esMultiple) {
-    // 3 cartas con sus labels de posición
     const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
-    cartasLanzadas.slice(0, tirada.count).forEach((carta, i) => {
+    const seleccion = cartasLanzadas.slice(0, tirada.count);
+    // Pre-resolver las URLs de imagen que realmente cargan (evita imágenes rotas en html-to-image)
+    const urls = await Promise.all(seleccion.map(resolverImagenCarta));
+    seleccion.forEach((carta, i) => {
       const t = getCartaField(carta, 'titulo');
-      const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
-      const imgES = carta.imagen || '';
-      const onerr = (imgUrl !== imgES && imgES) ? `this.onerror=null;this.src='${imgES}';` : '';
       const slot = document.createElement('div');
       slot.className = 'share-card triple';
       slot.innerHTML = `
         <div class="share-card-pos">${labels[i] || ''}</div>
-        <div class="share-card-img"><img src="${imgUrl}" alt="" onerror="${onerr}"></div>
+        <div class="share-card-img"><img src="${urls[i]}" alt=""></div>
         <div class="share-card-title">${t}</div>
       `;
       cardsEl.appendChild(slot);
     });
-    // Naipe en header: mostrar los lentes presentes
-    const lentesPresentes = [...new Set(cartasLanzadas.slice(0, tirada.count).map(c => c.lente))];
-    const nombresLentes = lentesPresentes.map(l => (lenteNombres[idioma] || lenteNombres.es)[l]).join(' · ');
-    naipeEl.textContent = nombresLentes;
+    const lentesPresentes = [...new Set(seleccion.map(c => c.lente))];
+    naipeEl.textContent = lentesPresentes.map(l => (lenteNombres[idioma] || lenteNombres.es)[l]).join(' · ');
     subtitleEl.textContent = (tirada.subtitle && tirada.subtitle[idioma]) || '';
   } else {
-    // 1 carta sola, layout horizontal (imagen izq + texto der)
     const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
     if (!carta) return false;
     const titulo = getCartaField(carta, 'titulo');
     const texto = getCartaField(carta, 'texto');
-    const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
-    const imgES = carta.imagen || '';
-    const onerr = (imgUrl !== imgES && imgES) ? `this.onerror=null;this.src='${imgES}';` : '';
+    const url = await resolverImagenCarta(carta);
     const slot = document.createElement('div');
     slot.className = 'share-card solo';
     slot.innerHTML = `
-      <div class="share-card-img"><img src="${imgUrl}" alt="" onerror="${onerr}"></div>
+      <div class="share-card-img"><img src="${url}" alt=""></div>
       <div class="share-card-text">
         <h2 class="share-card-title">${titulo}</h2>
         <p class="share-card-body">${texto.replace(/\n/g, '<br>')}</p>
@@ -781,25 +775,42 @@ function llenarShareCanvas() {
   return true;
 }
 
+// Devuelve una promesa con la URL de imagen que realmente carga para una carta:
+// intenta la del idioma activo; si falla (ej. imagen EN inexistente), cae a la ES.
+function resolverImagenCarta(carta) {
+  const imgIdioma = getCartaField(carta, 'imagen') || carta.imagen || '';
+  const imgES = carta.imagen || '';
+  if (!imgIdioma || imgIdioma === imgES) {
+    return Promise.resolve(imgES || imgIdioma);
+  }
+  return new Promise(resolve => {
+    const test = new Image();
+    test.onload = () => resolve(imgIdioma);
+    test.onerror = () => resolve(imgES);
+    test.src = imgIdioma;
+  });
+}
+
 // Genera la imagen como PNG (dataURL) usando html-to-image.
 async function generarImagenCompartible() {
-  // Llenar el template primero (independiente de la librería de imagen)
-  const ok = llenarShareCanvas();
-  if (!ok) return null;
-
   if (typeof htmlToImage === 'undefined') {
     console.error('html-to-image no cargó (¿CDN bloqueado?)');
     return null;
   }
+  // Llenar el template (async: pre-resuelve qué imágenes cargan)
+  const ok = await llenarShareCanvas();
+  if (!ok) return null;
   const canvas = document.getElementById('share-canvas');
 
-  // Esperar 1 frame para que las imágenes/fuentes terminen de aplicar
+  // Esperar a que las imágenes (ya resueltas a URLs válidas) terminen de cargar
   await new Promise(r => requestAnimationFrame(r));
-  // Esperar imágenes (las cartas son PNGs locales del sitio)
   const imgs = canvas.querySelectorAll('img');
   await Promise.all(Array.from(imgs).map(img => {
-    if (img.complete) return Promise.resolve();
-    return new Promise(r => { img.onload = r; img.onerror = r; });
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(resolve => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
   }));
 
   try {
