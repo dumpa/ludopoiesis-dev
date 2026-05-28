@@ -252,11 +252,12 @@ body {
   z-index: 1;
 }
 
-/* Carta clickeada: sube al frente, se endereza y se eleva levemente
-   para que su contenido (reverso volteado) no quede tapado por las siguientes. */
+/* Carta clickeada: sube al frente (z-index) y se endereza para leerse mejor.
+   Sin desplazamiento vertical — el z-index alto ya expone su contenido completo,
+   y al bajar vuelve naturalmente detrás de las vecinas. */
 .carta-wrapper.al-frente {
   z-index: 50;
-  transform: translateY(-24px) scale(1.04) rotate(0deg);
+  transform: scale(1.03) rotate(0deg);
 }
 
 /* Label de posición arriba de cada carta en tiradas múltiples

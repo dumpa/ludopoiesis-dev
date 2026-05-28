@@ -525,23 +525,21 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
     </div>
   `;
 
-  // Click: voltear y subir al frente para que el reverso quede expuesto.
-  // Otra carta al frente vuelve atrás. Si re-click, esta vuelve atrás.
+  // Click: la carta sube al frente y voltea. Las demás NO cambian su estado
+  // (la que está en texto se queda en texto, la que está en imagen en imagen),
+  // solo dejan de estar al frente. Segundo click la baja y la des-voltea.
   card.onclick = () => {
-    const yaFlipped = card.classList.contains('flipped');
-    if (yaFlipped) {
-      card.classList.remove('flipped');
+    const yaAlFrente = wrapper.classList.contains('al-frente');
+    if (yaAlFrente) {
       wrapper.classList.remove('al-frente');
+      card.classList.remove('flipped');
     } else {
-      // Bajar las otras cartas que estuvieran al frente
+      // Quitar solo el "al frente" de las demás, sin tocar su flip
       container.querySelectorAll('.carta-wrapper.al-frente').forEach(w => {
         w.classList.remove('al-frente');
-        const c = w.querySelector('.card');
-        if (c) c.classList.remove('flipped');
       });
-      // Subir esta carta al frente
-      card.classList.add('flipped');
       wrapper.classList.add('al-frente');
+      card.classList.add('flipped');
       cartaActual = carta;
       setNaipeActivo(carta.lente);
     }
@@ -713,6 +711,18 @@ const compartirLabels = {
 // Llena el template oculto #share-canvas con los datos de la(s) carta(s)
 // que se están mostrando. Modo "solo" para 1 carta, "triple" para 3.
 function llenarShareCanvas() {
+  const canvas = document.getElementById('share-canvas');
+  if (!canvas) return false;
+
+  // CRÍTICO: html-to-image clona el nodo y pierde las CSS variables heredadas
+  // del body. Las copiamos resueltas como inline properties en el canvas para
+  // que el clon (y sus hijos vía var()) las tenga disponibles.
+  const bs = getComputedStyle(document.body);
+  ['--bg', '--ink', '--ink-soft', '--ink-mute', '--hairline', '--primary', '--accent'].forEach(v => {
+    const val = bs.getPropertyValue(v).trim();
+    if (val) canvas.style.setProperty(v, val);
+  });
+
   const naipeEl = document.getElementById('share-naipe');
   const cardsEl = document.getElementById('share-cards');
   const subtitleEl = document.getElementById('share-subtitle');
@@ -730,11 +740,13 @@ function llenarShareCanvas() {
     cartasLanzadas.slice(0, tirada.count).forEach((carta, i) => {
       const t = getCartaField(carta, 'titulo');
       const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
+      const imgES = carta.imagen || '';
+      const onerr = (imgUrl !== imgES && imgES) ? `this.onerror=null;this.src='${imgES}';` : '';
       const slot = document.createElement('div');
       slot.className = 'share-card triple';
       slot.innerHTML = `
         <div class="share-card-pos">${labels[i] || ''}</div>
-        <div class="share-card-img"><img src="${imgUrl}" alt="" crossorigin="anonymous"></div>
+        <div class="share-card-img"><img src="${imgUrl}" alt="" onerror="${onerr}"></div>
         <div class="share-card-title">${t}</div>
       `;
       cardsEl.appendChild(slot);
@@ -751,10 +763,12 @@ function llenarShareCanvas() {
     const titulo = getCartaField(carta, 'titulo');
     const texto = getCartaField(carta, 'texto');
     const imgUrl = getCartaField(carta, 'imagen') || carta.imagen || '';
+    const imgES = carta.imagen || '';
+    const onerr = (imgUrl !== imgES && imgES) ? `this.onerror=null;this.src='${imgES}';` : '';
     const slot = document.createElement('div');
     slot.className = 'share-card solo';
     slot.innerHTML = `
-      <div class="share-card-img"><img src="${imgUrl}" alt="" crossorigin="anonymous"></div>
+      <div class="share-card-img"><img src="${imgUrl}" alt="" onerror="${onerr}"></div>
       <div class="share-card-text">
         <h2 class="share-card-title">${titulo}</h2>
         <p class="share-card-body">${texto.replace(/\n/g, '<br>')}</p>
@@ -793,6 +807,7 @@ async function generarImagenCompartible() {
     const dataUrl = await htmlToImage.toPng(canvas, {
       pixelRatio: 2,
       cacheBust: true,
+      skipFonts: true,
       backgroundColor: getComputedStyle(canvas).backgroundColor || '#FAFAF8'
     });
     return dataUrl;
