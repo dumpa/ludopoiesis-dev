@@ -1,49 +1,294 @@
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap');
+/* ================================================================
+   LUDOPOIESIS · Dirección "Minimal Ritual"
+   Fraunces (display, light) + DM Sans (body)
+   Paleta base: #FAFAF8 + #1A1A1A · Acento dinámico por naipe activo
+   ================================================================ */
 
+/* ===== CSS VARIABLES (paleta) ============================== */
+:root {
+  /* Base fija */
+  --bg:          #FAFAF8;
+  --ink:         #1A1A1A;
+  --ink-soft:    #555555;
+  --ink-mute:    #999999;
+  --hairline:    #EAEAE6;
+
+  /* Paleta dinámica — default = neutro (en home sin carta) */
+  --primary:     #1A1A1A;
+  --accent:      #1A1A1A;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+/* Paletas activas según naipe (las setea el JS al tirar carta) */
+body[data-naipe="naturaleza"]  {
+  --primary: #003C3C;
+  --accent:  #FF8B5C;
+}
+body[data-naipe="fluir"] {
+  --primary: #1A3A5C;
+  --accent:  #E96B98;
+}
+body[data-naipe="tecnologia"] {
+  --primary: #3C0F3C;
+  --accent:  #A6D656;
+}
+
+/* ===== RESET ================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+
+/* ===== BASE ================================================= */
 body {
-  font-family: 'Dosis', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: color 0.5s ease;
+}
+
+/* ===== HEADER STICKY ======================================== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--hairline);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+.logo b {
+  font-weight: 500;
+  color: var(--accent);
+  transition: color 0.5s ease;
+}
+.logo:hover { color: var(--primary); }
+
+/* Idioma switch ES · PT · EN */
+.idioma-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.bandera {
+  color: var(--ink-mute);
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  border-bottom: 1px solid transparent;
+  user-select: none;
+}
+.bandera:hover { color: var(--ink); }
+.bandera-activa {
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom-color: var(--accent);
+}
+.lang-sep {
+  color: var(--ink-mute);
+  font-size: 10px;
+  user-select: none;
+}
+
+/* ===== MAIN ================================================= */
+.app-main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Etiqueta sutil con el lente activo, arriba de la carta */
+.card-meta-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+  min-height: 14px;
+  font-weight: 500;
   text-align: center;
+  transition: color 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.card-meta-label.show {
+  opacity: 1;
+}
+
+/* ===== INTRO / TEXTOS LARGOS ================================ */
+.intro-texto {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+  max-width: 38ch;
+  text-align: center;
+  margin: 8px auto 32px;
   padding: 0;
-  background: #f4f1ee;
-  color: rgb(0, 67, 73);
 }
-
-
-
-button:hover {
-  background-color: #00575f;
+.intro-texto p { margin: 0 0 14px; }
+.intro-texto strong, .intro-texto b {
+  font-weight: 500;
 }
+.intro-texto em, .intro-texto i {
+  font-style: italic;
+  color: var(--accent);
+}
+.more-button {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 3px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.more-button:hover { color: var(--accent); }
 
+/* ===== CONTENEDOR DE CARTAS ================================= */
 #carta-container {
   perspective: 1000px;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-start;
-  gap: 1rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: auto;
-  
-  margin: 0 auto;
+  gap: 16px;
   width: 100%;
-  max-width: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
+  padding: 8px 0 24px;
+  min-height: 0;
 }
 
+/* === Layouts por tipo de tirada === */
 
+/* Modo carta acumulativo: cartas en row con overlap natural y leve rotación */
+#carta-container:not([data-layout]) {
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 30px 22px;
+  --cards-scale: 1;
+}
+#carta-container:not([data-layout])::-webkit-scrollbar { display: none; }
+/* Cada carta a partir de la segunda se monta levemente sobre la anterior */
+#carta-container:not([data-layout]) .carta-wrapper + .carta-wrapper {
+  margin-left: -60px;
+}
 
+#carta-container[data-layout="horizontal"] {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 22px;
+  padding: 8px 22px 24px;
+  gap: 18px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#carta-container[data-layout="horizontal"]::-webkit-scrollbar { display: none; }
+#carta-container[data-layout="horizontal"] .carta-wrapper {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+#carta-container[data-layout="vertical"] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 24px;
+}
+
+.carta-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  transform: scale(var(--cards-scale, 1)) rotate(var(--tilt, 0deg));
+  transform-origin: center center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.4s ease;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Carta clickeada: sube al frente, se endereza y se eleva levemente.
+   Queda encima incluso al des-voltear; solo baja cuando se toca otra carta. */
+.carta-wrapper.al-frente {
+  z-index: 50;
+  transform: translateY(-24px) scale(1.04) rotate(0deg);
+}
+
+/* Label de posición arriba de cada carta en tiradas múltiples
+   ("Pasado", "Presente", "Futuro" / "Pensar", "Sentir", "Hacer") */
+.carta-posicion {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  text-align: center;
+  min-height: 13px;
+  transition: color 0.4s ease;
+}
+
+/* ===== CARTA · FLIP 3D ====================================== */
 .card {
-  width: 340px;
-  min-height: 520px;
-  max-width: 100%;
+  width: min(280px, calc(85vw - 32px));
+  aspect-ratio: 280 / 428;
+  height: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s;
+  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1),
+              box-shadow 0.5s ease;
   cursor: pointer;
-  margin: 0;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 16px 48px -12px var(--accent-glow);
 }
 
 .card-inner {
@@ -51,243 +296,67 @@ button:hover {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s;
+  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .card.flipped .card-inner {
   transform: rotateY(180deg);
 }
 
-.card-front, .card-back {
-  width: 100%;
-  min-height: 520px;
+.card-front,
+.card-back {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   backface-visibility: hidden;
-  border-radius: 12px;
-  padding: 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-front {
-  background: white;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px;
   overflow: hidden;
 }
 
+.card-front {
+  background: #fff;
+}
 .card-front img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .card-back {
-  background: white;
-  color: rgb(0, 67, 73);
+  background: #fff;
+  color: var(--ink);
   transform: rotateY(180deg);
+  padding: 30px 26px 26px;
+  display: flex;
   flex-direction: column;
-  padding: 1.8rem 1.2rem;
   align-items: flex-start;
+  justify-content: flex-start;
   text-align: left;
-  font-weight: 400;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  box-sizing: border-box;
+  border-top: 3px solid var(--accent);
 }
-
 .card-back h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: right;
-  width: 100%;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  margin: 0 0 18px;
+  color: var(--primary);
 }
-
 .card-back p {
-  font-size: 0.75rem;
-  line-height: 1.6;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0;
   white-space: pre-line;
+  flex: 1;
+  overflow-y: auto;
 }
 
-#instrucciones {
-  font-family: 'Dosis', sans-serif;
-  text-align: center;
-  margin: 30px 0;
-  font-size: 16px;
-  color: #333;
-  letter-spacing: 0.3px;
-}
-
-#lentes-toggle {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0.3rem;
-  margin: 1.2rem 0;
-}
-
-.lente-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.1rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.lente-horizontal img {
-  width: 40px;
-  height: 40px;
-  transition: transform 0.2s;
-}
-
-.lente-horizontal img:hover {
-  transform: scale(1.1);
-}
-
-.lente-horizontal:active {
-  transform: scale(0.98);
-}
-
-.idioma-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem auto;
-}
-
-.bandera {
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 28px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ddd;
-  transition: 0.4s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #fff;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: rgb(0, 67, 73);
-}
-
-input:checked + .slider:before {
-  transform: translateX(22px);
-  background-color: #fff;
-}
-
-.mensaje-divertido {
-  text-align: center;
-  font-style: italic;
-  padding: 20px;
-  color: #666;
-}
-
-@media (min-width: 768px) {
-  .contenedor-principal {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  #instrucciones {
-    width: 40%;
-    text-align: left;
-  }
-
-  #carta-container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-  }
-}
-
-.intro-texto {
-  font-family: 'Libre Baskerville', serif;
-  padding: 2rem;
-  line-height: 1.6;
-  font-size: 1.1rem;
-}
-
-.more-
-
-#titulo-home {
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-#titulo-home:hover {
-  color: #004d4d;
-}
-
-/* Escalar cartas si hay muchas */
-#carta-container.muchas-cartas .card {
-  transform: scale(0.85);
-}
-
-/* AnimaciÃ³n al aparecer carta */
-.card-animada {
-  animation: entrada-carta 0.4s ease;
-}
-
-@keyframes entrada-carta {
-  from {
-    transform: scale(0.8) translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Hover para escalar en desktop */
-@media (hover: hover) and (pointer: fine) {
-  .card:hover {
-    transform: scale(1.05);
-    z-index: 2;
-  }
-}
+/* Carta ampliada en overlay (mantenido del original, refinado) */
 .card.ampliada {
   position: fixed;
   top: 50%;
@@ -296,177 +365,549 @@ input:checked + .slider:before {
   max-width: 90vw;
   height: auto;
   max-height: 90vh;
-  aspect-ratio: 340 / 520; /* mantiene proporción */
-  transform: translate(-50%, -50%) scale(1.1) rotate(0deg) !important;
+  aspect-ratio: 280 / 428;
+  transform: translate(-50%, -50%) scale(1) !important;
   z-index: 999;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  transition: all 0.3s ease;
-  border-radius: 12px;
-}
-
-
-
-.carta-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center center;
-  transition: transform 0.4s ease;
-  margin: 0;        /* â—elimina separaciÃ³n entre cartas */
-  padding: 0;       /* â—sin relleno adicional */
-}
-
-/* Escalado progresivo automÃ¡tico */
-#carta-container.card-1 .carta-wrapper { transform: scale(1); }
-#carta-container.card-2 .carta-wrapper { transform: scale(0.95); }
-#carta-container.card-3 .carta-wrapper { transform: scale(0.9); }
-#carta-container.card-4 .carta-wrapper { transform: scale(0.85); }
-#carta-container.card-5 .carta-wrapper { transform: scale(0.8); }
-#carta-container.card-6 .carta-wrapper { transform: scale(0.75); }
-#carta-container.card-7 .carta-wrapper { transform: scale(0.7); }
-#carta-container.card-8 .carta-wrapper { transform: scale(0.65); }
-#carta-container.card-9 .carta-wrapper { transform: scale(0.6); }
-
-
-/* Ajustes para eliminar bordes blancos y sombras de las cartas */
-.card, .card-inner, .card-front img {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.card-front {
-  background: transparent !important;
-}
-
-#overlay-ampliada {
-  position: fixed;
-  inset: 0;
-  display: none; /* se activa con JS */
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 255, 255, 0); /* completamente transparente */
-  z-index: 9999;
-  overflow: hidden;
-}
-
-#overlay-ampliada .card {
-  all: unset; /* 🧠 borra todos los estilos heredados (muy importante) */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 90vw;
-  max-width: 340px;
-  height: auto;
-  max-height: 90vh;
-  aspect-ratio: 340 / 520;
-  animation: zoomInOverlay 0.3s ease;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-  z-index: 9999;
-}
-
-#overlay-ampliada .card-back {
-  overflow-y: auto;
-  padding: 1.5rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  text-align: left;
-}
-
-
-
-.zona-botones {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 2rem auto;
-}
-
-.zona-botones 
-
-.zona-botones #lentes-toggle {
-  display: flex;
-  gap: 1rem;
-  margin: 0;
-}
-
-.zona-controles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin: 2rem auto;
-  max-width: 90%;
-}
-
-.zona-controles 
-
-.zona-controles button:hover {
-  background-color: #007171;
-}
-
-.zona-controles #lentes-toggle {
-  display: flex;
-  gap: 1rem;
-}
-
-.zona-controles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-  margin: 2rem auto;
-  max-width: 90%;
-}
-
-.botones-controles {
-  display: flex;
-  gap: 1rem;
-}
-
-.botones-controles button {
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 12px;
-  background-color: #004D4D;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.botones-controles button:hover {
-  background-color: #007171;
-}
-
-#lentes-toggle {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  border-radius: 8px;
 }
 .card.zoom-in {
   transition: transform 0.3s ease;
-  transform: scale(1.1) rotateY(180deg);
+  transform: scale(1) rotateY(180deg);
 }
 
-.overlay-zoom {
-  animation: zoomInOverlay 0.3s ease;
+/* Hover sutil en desktop */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 24px 56px -10px var(--accent-glow);
+  }
+  .card.flipped:hover { transform: translateY(-4px); }
+}
+
+/* ===== ZONA DE CONTROLES ==================================== */
+.zona-controles {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 22px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* ----- Selector de modo de tirada (Carta · 3 horizontal · 3 vertical) ----- */
+.modo-selector {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 8px;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.modo-btn {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  padding: 14px 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.25s ease;
+}
+.modo-btn:hover { color: var(--ink); }
+.modo-btn.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+.modo-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  background: var(--accent);
+  transition: background 0.4s ease, width 0.25s ease;
+}
+.modo-btn:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.modo-subtitle {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.5px;
+  min-height: 18px;
+  margin-bottom: 24px;
+  transition: opacity 0.3s ease;
+}
+.modo-subtitle:empty { opacity: 0; }
+
+/* ----- Botones primarios ----- */
+.botones-controles {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 26px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  min-width: 130px;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn-primary:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Botón Compartir: solo visible cuando hay una tirada activa.
+   Estilo discreto, color del acento del naipe activo. */
+.btn-share {
+  display: none;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 22px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  min-width: 110px;
+}
+.btn-share:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+body[data-naipe] .btn-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   SHARE CANVAS · Template oculto para generar imagen compartible
+   Formato 4:5 vertical (800×1000), invisible al usuario,
+   se renderiza a PNG con html-to-image al tap "Compartir".
+   ============================================================ */
+#share-canvas {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 800px;
+  height: 1000px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+#share-canvas .share-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 56px 56px 40px;
+  box-sizing: border-box;
+  background: var(--bg);
+}
+#share-canvas .share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 36px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+}
+#share-canvas .share-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+}
+#share-canvas .share-logo b {
+  font-weight: 500;
+  color: var(--accent);
+}
+#share-canvas .share-naipe {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+}
+#share-canvas .share-cards {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 0;
+}
+#share-canvas .share-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+#share-canvas .share-card.solo {
+  flex-direction: row;
+  gap: 36px;
+  align-items: center;
+  width: 100%;
+}
+#share-canvas .share-card-pos {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  min-height: 14px;
+}
+#share-canvas .share-card-img {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.06),
+    0 20px 60px -16px rgba(0,0,0,0.18);
+}
+#share-canvas .share-card-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#share-canvas .share-card.solo .share-card-img {
+  width: 280px;
+  height: 428px;
+  flex-shrink: 0;
+}
+#share-canvas .share-card.solo .share-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  text-align: left;
+}
+#share-canvas .share-card.solo .share-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 36px;
+  line-height: 1.05;
+  letter-spacing: -0.8px;
+  color: var(--primary);
+  margin: 0;
+}
+#share-canvas .share-card.solo .share-card-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+#share-canvas .share-card.triple .share-card-img {
+  width: 170px;
+  height: 260px;
+}
+#share-canvas .share-card.triple .share-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.15;
+  color: var(--primary);
+  margin: 0;
+  text-align: center;
+  max-width: 170px;
+  letter-spacing: -0.3px;
+}
+#share-canvas .share-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  margin-top: 36px;
+  border-top: 1px solid var(--hairline);
+}
+#share-canvas .share-subtitle {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink-soft);
+  letter-spacing: 0.3px;
+}
+#share-canvas .share-url {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+
+/* ----- Fila de lentes con hairlines ----- */
+.lentes-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: 22px 0;
+  margin-bottom: 32px;
+}
+.lente-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+  user-select: none;
+  position: relative;
+  padding: 4px 0;
+  transition: opacity 0.2s ease;
+}
+.lente-mini::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: var(--hairline);
+}
+.lente-mini:last-child::after { display: none; }
+.lente-mini img {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.lente-mini:hover img { transform: scale(1.08); }
+.lente-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ----- Pasos 1-2-3 ----- */
+.steps-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 auto;
+  max-width: 380px;
+}
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  position: relative;
+}
+.step-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -1.5px;
+  transition: color 0.5s ease;
+}
+.step-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  max-width: 100px;
+  font-weight: 500;
+}
+.step-info {
+  font-size: 11px;
+  color: var(--ink-mute);
+  cursor: pointer;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+.step-info:hover { color: var(--accent); }
+
+/* ===== MENSAJE DIVERTIDO (sin lentes activos) =============== */
+.mensaje-divertido {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 32ch;
+  margin: 0 auto;
+}
+.mensaje-divertido p { margin: 0 0 8px; }
+
+/* ===== OVERLAY DE CARTA AMPLIADA ============================ */
+#overlay-ampliada {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  padding: 24px;
+}
+#overlay-ampliada .card {
+  all: unset;
+  display: block;
+  width: min(85vw, 360px);
+  aspect-ratio: 280 / 428;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  animation: zoomInOverlay 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 30px 80px -10px var(--accent-glow);
+  border-top: 3px solid var(--accent);
+}
+#overlay-ampliada .card-back {
+  padding: 36px 30px;
+  overflow-y: auto;
+  border-top: 0;
+}
+#overlay-ampliada .card-back h2 {
+  font-size: 30px;
+  margin-bottom: 22px;
+}
+#overlay-ampliada .card-back p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ===== ANIMACIONES ========================================== */
+.card-animada {
+  animation: entradaCarta 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes entradaCarta {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes zoomInOverlay {
   from {
-    transform: scale(0.8);
     opacity: 0;
+    transform: scale(0.9);
   }
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Transición suave al cambiar paleta */
+.card,
+.card-back,
+.btn,
+.bandera,
+.step-num,
+.lente-label,
+.card-meta-label,
+.more-button {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 0.45s;
+  transition-timing-function: ease;
+}
+
+/* ===== RESPONSIVE =========================================== */
+@media (min-width: 768px) {
+  .app-header {
+    padding: 22px 40px;
+  }
+  .logo {
+    font-size: 26px;
+  }
+  .app-main {
+    padding: 56px 40px 32px;
+    max-width: 1100px;
+  }
+  .card {
+    width: min(340px, calc(85vw - 32px));
+  }
+  .card-back h2 { font-size: 28px; }
+  .card-back p { font-size: 14px; }
+  .zona-controles {
+    max-width: 1100px;
+    padding: 8px 40px 80px;
+  }
+  .step-num { font-size: 44px; }
+  .intro-texto { font-size: 20px; max-width: 42ch; }
+  /* En desktop, 3 cartas horizontales caben holgadas — no necesita scroll */
+  #carta-container[data-layout="horizontal"] {
+    justify-content: center;
+    gap: 28px;
   }
 }

@@ -1,7 +1,91 @@
+// Detecta el idioma inicial:
+// 1) Por subdominio: en.* → 'en', pt.* → 'pt'
+// 2) Por idioma del navegador si está soportado
+// 3) Fallback: 'es'
+function detectarIdiomaInicial() {
+  const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+  if (host.startsWith('en.')) return 'en';
+  if (host.startsWith('pt.')) return 'pt';
+  const browserLang = (typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'es').slice(0, 2);
+  if (['es', 'pt', 'en'].includes(browserLang)) return browserLang;
+  return 'es';
+}
+
+// Nombres de los 3 lentes/naipes por idioma (paleta dinámica + label sutil)
+const lenteNombres = {
+  es: { naturaleza: 'Naturaleza', fluir: 'Fluir', tecnologia: 'Tecnología' },
+  pt: { naturaleza: 'Natureza',   fluir: 'Fluir', tecnologia: 'Tecnologia' },
+  en: { naturaleza: 'Nature',     fluir: 'Flow',  tecnologia: 'Technology' }
+};
+
+// Tipos de tirada disponibles. Cada tirada define cuántas cartas, su layout,
+// los labels semánticos por posición (en cada idioma) y el subtítulo del selector.
+const TIRADAS = {
+  carta: {
+    count: 1,
+    layout: 'single',
+    labels: { es: [], pt: [], en: [] },
+    subtitle: { es: '', pt: '', en: '' }
+  },
+  horizontal: {
+    count: 3,
+    layout: 'horizontal',
+    labels: {
+      es: ['Pasado', 'Presente', 'Futuro'],
+      pt: ['Passado', 'Presente', 'Futuro'],
+      en: ['Past', 'Present', 'Future']
+    },
+    subtitle: {
+      es: 'pasado · presente · futuro',
+      pt: 'passado · presente · futuro',
+      en: 'past · present · future'
+    }
+  },
+  vertical: {
+    count: 3,
+    layout: 'vertical',
+    labels: {
+      es: ['Pensar', 'Sentir', 'Hacer'],
+      pt: ['Pensar', 'Sentir', 'Fazer'],
+      en: ['Think', 'Feel', 'Do']
+    },
+    subtitle: {
+      es: 'pensar · sentir · hacer',
+      pt: 'pensar · sentir · fazer',
+      en: 'think · feel · do'
+    }
+  }
+};
+
+let modoTirada = 'carta';
+
+// Activa la paleta dinámica del naipe + actualiza el label sutil arriba de la carta.
+// Llamar con un lente ('naturaleza' | 'fluir' | 'tecnologia') o null para volver a estado neutro.
+function setNaipeActivo(lente) {
+  const metaLabel = document.getElementById('card-meta-label');
+  if (lente) {
+    document.body.setAttribute('data-naipe', lente);
+    if (metaLabel) {
+      const nombre = (lenteNombres[idioma] && lenteNombres[idioma][lente]) || lente;
+      metaLabel.textContent = nombre;
+      metaLabel.classList.add('show');
+    }
+  } else {
+    document.body.removeAttribute('data-naipe');
+    if (metaLabel) {
+      metaLabel.classList.remove('show');
+    }
+  }
+}
+
 let cartas = [];
-let idioma = "es";
+let idioma = detectarIdiomaInicial();
 let cartaActual = null;
 let cartasLanzadas = [];
+let textosCache = null;
+// Source of truth de qué sección está visible en pantalla.
+// Valores posibles: 'intro', 'intro-long', 'pregunta', 'lentes', 'dinamica', 'autor', 'cartas', null
+let seccionActiva = null;
 
 let lentesActivos = {
   naturaleza: true,
@@ -9,226 +93,133 @@ let lentesActivos = {
   tecnologia: true
 };
 
+// ===== i18n helpers =====
+
+// Lee el campo apropiado de una carta según el idioma, con fallback al español.
+// Ej: getCartaField(carta, 'titulo') devuelve titulo_en si idioma='en' y existe,
+//     si no existe o está vacío, devuelve carta.titulo (español).
+function getCartaField(carta, baseField) {
+  if (!carta) return '';
+  if (idioma === 'es') return carta[baseField] || '';
+  const suffixed = carta[baseField + '_' + idioma];
+  if (suffixed && suffixed.toString().trim() !== '') return suffixed;
+  return carta[baseField] || '';
+}
+
+// Genera el HTML del <img> de la carta con fallback automático.
+// Si la imagen del idioma no existe (404), usa la imagen en español.
+function imgCartaHTML(carta, titulo) {
+  const imagenIdioma = getCartaField(carta, 'imagen');
+  const imagenES = carta.imagen || '';
+  const onerror = imagenIdioma !== imagenES
+    ? `this.onerror=null;this.src='${imagenES}';`
+    : '';
+  return `<img src="${imagenIdioma}" alt="${titulo}" onerror="${onerror}">`;
+}
+
+// Aplica los nombres de los lentes (Naturaleza/Fluir/Tecnología) en el idioma activo
+// a los .lente-label dentro de #lentes-toggle. Se llama desde aplicarIdiomaUI.
+function aplicarLenteLabels() {
+  const nombres = lenteNombres[idioma] || lenteNombres.es;
+  ['naturaleza', 'fluir', 'tecnologia'].forEach(lente => {
+    const wrapper = document.querySelector(`.lente-mini[onclick*="${lente}"]`);
+    if (!wrapper) return;
+    const labelEl = wrapper.querySelector('.lente-label');
+    if (labelEl) labelEl.textContent = nombres[lente];
+  });
+}
+
+// Aplica los textos del idioma actual a todos los elementos con data-i18n / data-i18n-title.
+function aplicarIdiomaUI() {
+  if (!textosCache || !textosCache.ui) return;
+  const ui = textosCache.ui;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (ui[key] && ui[key][idioma]) {
+      if (el.tagName === 'TITLE') {
+        document.title = ui[key][idioma];
+      } else {
+        el.textContent = ui[key][idioma];
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle;
+    if (ui[key] && ui[key][idioma]) {
+      el.setAttribute('title', ui[key][idioma]);
+    }
+  });
+  // Actualiza el atributo lang del <html>
+  document.documentElement.setAttribute('lang', idioma);
+  // Actualiza el estado visual de las banderas
+  document.querySelectorAll('.bandera').forEach(b => b.classList.remove('bandera-activa'));
+  const flagActiva = document.getElementById('flag-' + idioma);
+  if (flagActiva) flagActiva.classList.add('bandera-activa');
+  // Actualiza los labels de los lentes (Naturaleza/Fluir/Tecnología → Nature/Flow/Technology, etc.)
+  aplicarLenteLabels();
+  // Actualiza el label del botón Compartir según idioma
+  const shareBtnLabel = document.querySelector('[data-i18n-share]');
+  if (shareBtnLabel) shareBtnLabel.textContent = compartirLabels[idioma] || compartirLabels.es;
+  // Actualiza el subtítulo del modo activo en el selector de tirada
+  aplicarModoSubtitle();
+  // Si hay una carta activa, refresca el label sutil del naipe con el nuevo idioma
+  if (cartaActual) setNaipeActivo(cartaActual.lente);
+}
+
+// Actualiza el subtítulo bajo el selector de modo de tirada (ej. "pasado · presente · futuro").
+function aplicarModoSubtitle() {
+  const sub = document.getElementById('modo-subtitle');
+  const t = TIRADAS[modoTirada];
+  if (sub && t) sub.textContent = (t.subtitle && t.subtitle[idioma]) || '';
+}
+
 fetch("cartas.json?v=" + new Date().getTime())
   .then(res => res.json())
   .then(data => cartas = data)
   .catch(err => console.error("Error al cargar cartas:", err));
 
 function cargarIntro(desplegarLargo = false) {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const introCorta = data.intro.short[idioma];
-      const introLarga = data.intro.long[idioma];
+  const render = (data) => {
+    textosCache = data;
+    aplicarIdiomaUI();
+    setNaipeActivo(null);
+    const introCorta = data.intro.short[idioma] || data.intro.short['es'];
+    const introLarga = data.intro.long[idioma] || data.intro.long['es'];
+    const masInfoLabel = (data.ui && data.ui.masInfo && data.ui.masInfo[idioma])
+      || '➔ Conocer más sobre Ludopoiesis';
 
-      const shortEl = document.getElementById('introShort');
-      const longEl = document.getElementById('introLong');
-      const cartaContainer = document.getElementById('carta-container');
+    const shortEl = document.getElementById('introShort');
+    const longEl = document.getElementById('introLong');
+    const cartaContainer = document.getElementById('carta-container');
 
-      cartaContainer.style.display = 'none';
+    cartaContainer.style.display = 'none';
 
-      if (desplegarLargo) {
-        longEl.innerHTML = introLarga;
-        shortEl.style.display = 'none';
-        longEl.style.display = 'block';
-      } else {
-        shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">➔ Conocer más sobre Ludopoiesis</span>`;
-        shortEl.style.display = 'block';
-        longEl.style.display = 'none';
-      }
-    })
-    .catch(err => console.error('Error cargando textos:', err));
-}
-/*function lanzarCartaSuperpuesta() {
-  const container = document.getElementById("carta-container");
-
-  ["introShort", "introLong", "dinamica"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-
-  const activos = Object.entries(lentesActivos)
-    .filter(([_, activo]) => activo)
-    .map(([lente]) => lente);
-
-  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
-  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
-
-  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
-  cartaActual = carta;
-
-  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
-  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
-  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
-
-  const card = document.createElement("div");
-  card.classList.add("card", "card-animada");
-  card.dataset.id = carta.id;
-
-  card.onclick = () => {
-  const todas = document.querySelectorAll(".card");
-  const yaFlipped = card.classList.contains("flipped");
-carta.addEventListener("click", () => {
-  carta.classList.toggle("flipped");
-
-  // Espera 300ms para que se complete el giro antes de ampliarla
-  setTimeout(() => {
-    ampliarCarta(carta);
-  }, 300);
-});
-
-  todas.forEach(c => {
-    if (c !== card) {
-      c.classList.remove("flipped", "ampliada");
-      c.style.transform = c.dataset.originalTransform || "";
-    }
-  });
-
-  if (!yaFlipped) {
-    card.classList.add("flipped");
-
-    const totalCartas = document.querySelectorAll(".card").length;
-
-    if (totalCartas > 1) {
-      card.classList.add("ampliada");
-      card.style.transform = "scale(1) rotate(0deg)";
+    if (desplegarLargo) {
+      const sobreAutorLabel = (data.ui && data.ui.sobreAutor && data.ui.sobreAutor[idioma])
+        || '➤ Sobre el autor';
+      longEl.innerHTML = introLarga + `<span class="more-button" onclick="mostrarAutor()">${sobreAutorLabel}</span>`;
+      longEl.dataset.seccion = 'intro-long';
+      shortEl.style.display = 'none';
+      longEl.style.display = 'block';
+      seccionActiva = 'intro-long';
     } else {
-      card.classList.remove("ampliada"); // no usar ampliada si es la única
-      card.style.transform = "scale(1) rotate(0deg)";
-    }
-  } else {
-    card.classList.remove("flipped", "ampliada");
-    card.style.transform = card.dataset.originalTransform || "";
-  }
-};
-
-  const angulo = (Math.random() * 10 - 5).toFixed(2);
-  card.style.transform = `rotate(${angulo}deg) scale(0.9)`;  // o el valor que estés usando
-  card.dataset.angulo = angulo;
-  card.dataset.originalTransform = card.style.transform;
-
-
-  
-const totalCartas = container.querySelectorAll(".card").length;
-card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
-
-  
-//  card.style.marginLeft = "-60px"; // sobreposición leve a la izquierda
-  card.dataset.originalTransform = card.style.transform; // guardar transform inicial
-  card.innerHTML = `
-    <div class="card-inner">
-      <div class="card-front">
-        <img src="${imagen}" alt="${titulo}">
-      </div>
-      <div class="card-back">
-        <h2>${titulo}</h2>
-        <p>${texto.replace(/\n/g, "<br>")}</p>
-      </div>
-    </div>
-  `;
-
-  container.style.display = "flex";
-  container.style.flexDirection = "row";
-  container.style.flexWrap = "nowrap";
-
- 
-  
-  container.appendChild(card);
-}
-*//*
-function lanzarCartaSuperpuesta() {
-  const container = document.getElementById("carta-container");
-
-  // Oculta intros
-  ["introShort", "introLong", "dinamica"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-
-  // Filtra cartas activas
-  const activos = Object.entries(lentesActivos)
-    .filter(([_, activo]) => activo)
-    .map(([lente]) => lente);
-
-  const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
-  if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
-
-  const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
-  cartaActual = carta;
-
-  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
-  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
-  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
-
-  // Crear elemento de carta
-  const card = document.createElement("div");
-  card.classList.add("card", "card-animada");
-  card.dataset.id = carta.id;
-
-  // Evento al hacer clic en la carta
-  card.onclick = () => {
-    const todas = document.querySelectorAll(".card");
-    const yaFlipped = card.classList.contains("flipped");
-
-    // Cierra otras cartas abiertas
-    todas.forEach(c => {
-      if (c !== card) {
-        c.classList.remove("flipped", "ampliada");
-        c.style.transform = c.dataset.originalTransform || "";
-      }
-    });
-
-    if (!yaFlipped) {
-      card.classList.add("flipped");
-
-      const totalCartas = document.querySelectorAll(".card").length;
-
-      if (totalCartas === 1) {
-        card.classList.remove("ampliada");
-      } else {
-        // Usamos overlay si hay múltiples cartas
-        setTimeout(() => {
-          ampliarCarta(card);  // esta función usa #overlay-ampliada
-        }, 300);
-      }
-
-    } else {
-      card.classList.remove("flipped", "ampliada");
-      card.style.transform = card.dataset.originalTransform || "";
+      shortEl.innerHTML = introCorta + `<span class="more-button" onclick="cargarIntro(true)">${masInfoLabel}</span>`;
+      shortEl.dataset.seccion = 'intro';
+      shortEl.style.display = 'block';
+      longEl.style.display = 'none';
+      seccionActiva = 'intro';
     }
   };
 
-  // Estilo inicial de rotación
-  const angulo = (Math.random() * 10 - 5).toFixed(2);
-  card.style.transform = `rotate(${angulo}deg) scale(0.9)`;
-  card.dataset.angulo = angulo;
-  card.dataset.originalTransform = card.style.transform;
-
-  // Posición para efecto de superposición
-  const totalCartas = container.querySelectorAll(".card").length;
-  card.style.marginLeft = totalCartas > 0 ? "-60px" : "0px";
-
-  // Contenido de la carta
-  card.innerHTML = `
-    <div class="card-inner">
-      <div class="card-front">
-        <img src="${imagen}" alt="${titulo}">
-      </div>
-      <div class="card-back">
-        <h2>${titulo}</h2>
-        <p>${texto.replace(/\n/g, "<br>")}</p>
-      </div>
-    </div>
-  `;
-
-  // Asegura display correcto del contenedor
-  container.style.display = "flex";
-  container.style.flexDirection = "row";
-  container.style.flexWrap = "nowrap";
-
-  container.appendChild(card);
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(render)
+      .catch(err => console.error('Error cargando textos:', err));
+  }
 }
-*/
 function lanzarCartaSuperpuesta() {
   const container = document.getElementById("carta-container");
 
@@ -246,13 +237,13 @@ function lanzarCartaSuperpuesta() {
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
   if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
 
-  // Selección aleatoria
   const carta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = carta;
+  setNaipeActivo(carta.lente);
+  seccionActiva = 'cartas';
 
-  const titulo = idioma === "es" ? carta.titulo : carta.titulo_pt;
-  const texto = idioma === "es" ? carta.texto : carta.texto_pt;
-  const imagen = idioma === "es" ? carta.imagen : carta.imagen_pt;
+  const titulo = getCartaField(carta, 'titulo');
+  const texto  = getCartaField(carta, 'texto');
 
   // Crear DOM de carta
   const card = document.createElement("div");
@@ -270,7 +261,7 @@ function lanzarCartaSuperpuesta() {
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-front">
-        <img src="${imagen}" alt="${titulo}">
+        ${imgCartaHTML(carta, titulo)}
       </div>
       <div class="card-back">
         <h2>${titulo}</h2>
@@ -289,20 +280,6 @@ function lanzarCartaSuperpuesta() {
   ampliarCarta(card);
 };
 }
-/*
-  // Click = flip y ampliar
-  card.onclick = () => {
-    const flipped = card.classList.contains("flipped");
-
-    if (!flipped) {
-      card.classList.add("flipped");
-      setTimeout(() => {
-        ampliarCarta(card); // Usa overlay
-      }, 300);
-    } else {
-      card.classList.remove("flipped");
-    }
-  };*/
 function ampliarCarta(cardOriginal) {
   const overlay = document.getElementById("overlay-ampliada");
 
@@ -333,54 +310,6 @@ requestAnimationFrame(() => {
   overlay.appendChild(cartaClonada);
   overlay.style.display = "flex";
 }
-/*
-function ampliarCarta(cardOriginal) {
-  const overlay = document.getElementById("overlay-ampliada");
-
-  // Clona y limpia la carta
-  const cartaClonada = cardOriginal.cloneNode(true);
-  cartaClonada.classList.remove("card-animada");
-  cartaClonada.classList.add("card", "flipped");
-  cartaClonada.style.transform = "none";
-
-  // Evita que el clic dentro de la carta cierre el overlay
-  cartaClonada.onclick = (e) => e.stopPropagation();
-
-  // Inserta la carta clonada en el overlay
-  overlay.innerHTML = "";
-  overlay.appendChild(cartaClonada);
-  overlay.style.display = "flex";
-
-  // Al hacer clic fuera de la carta, se cierra el overlay
-  overlay.onclick = () => {
-    overlay.style.display = "none";
-    overlay.innerHTML = "";
-  };
-}
-*/
-/*
-function ampliarCarta(cardOriginal) {
-  const overlay = document.getElementById("overlay-ampliada");
-
-  const cartaClonada = cardOriginal.cloneNode(true);
-  cartaClonada.classList.add("flipped");
-  cartaClonada.classList.add("ampliada");
-
-  // Impide que el clic dentro cierre el overlay
-  cartaClonada.onclick = (e) => e.stopPropagation();
-
-  overlay.innerHTML = "";
-  overlay.appendChild(cartaClonada);
-  overlay.style.display = "flex";
-
-  overlay.onclick = () => {
-    overlay.style.display = "none";
-    overlay.innerHTML = "";
-  };
-}
-
-*/
-
 function lanzarCartaConEstilo(posicion = 'horizontal') {
   ["introShort", "introLong", "dinamica"].forEach(id => {
     const el = document.getElementById(id);
@@ -405,18 +334,21 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
 
   const nuevaCarta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
   cartaActual = nuevaCarta;
+  setNaipeActivo(nuevaCarta.lente);
+  seccionActiva = 'cartas';
   cartasLanzadas.push({ ...nuevaCarta, posicion });
 
   const total = cartasLanzadas.length;
   const scale = Math.max(0.6, 1 - total * 0.06);
 
-  cartasLanzadas.forEach(({ titulo, texto, imagen, titulo_pt, texto_pt, imagen_pt, posicion }) => {
-    const t = idioma === "es" ? titulo : titulo_pt;
-    const txt = idioma === "es" ? texto : texto_pt;
-    const img = idioma === "es" ? imagen : imagen_pt;
+  cartasLanzadas.forEach((carta) => {
+    const { posicion } = carta;
+    const t   = getCartaField(carta, 'titulo');
+    const txt = getCartaField(carta, 'texto');
 
     const card = document.createElement("div");
     card.classList.add("card", "card-animada");
+    card.dataset.id = carta.id;
 
     // guardar transform original
     const originalTransform = `scale(${scale})`;
@@ -442,7 +374,7 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     card.innerHTML = `
       <div class="card-inner">
         <div class="card-front">
-          <img src="${img}" alt="${t}">
+          ${imgCartaHTML(carta, t)}
         </div>
         <div class="card-back">
           <h2>${t}</h2>
@@ -463,78 +395,169 @@ function lanzarCartaConEstilo(posicion = 'horizontal') {
     container.appendChild(wrapper);
   });
 }
-/*
-function lanzarCartaConEstilo(posicion = 'horizontal') {
-  ["introShort", "introLong", "dinamica"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
+
+// === SISTEMA DE TIRADAS (nuevo, reemplaza a lanzarCartaSuperpuesta para flujo normal) ===
+
+// Cambia el modo de tirada (carta | horizontal | vertical) y actualiza la UI del selector.
+// Reinicia las cartas en pantalla porque el layout cambia.
+function setModoTirada(modo) {
+  if (!TIRADAS[modo]) return;
+  modoTirada = modo;
+
+  // Marcar botón activo en el selector
+  document.querySelectorAll('.modo-btn').forEach(b => {
+    const isActive = b.dataset.modo === modo;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-checked', String(isActive));
   });
 
-  const container = document.getElementById("carta-container");
-  const mensaje = container.querySelector(".mensaje-divertido");
-  if (mensaje) mensaje.remove();
+  // Actualizar subtítulo del selector con el idioma actual
+  const sub = document.getElementById('modo-subtitle');
+  if (sub) {
+    sub.textContent = (TIRADAS[modo].subtitle && TIRADAS[modo].subtitle[idioma]) || '';
+  }
 
-  container.style.display = "flex";
-  container.style.flexWrap = "wrap";
-  container.style.alignItems = "flex-start";
-  container.innerHTML = "";
+  // Limpiar cartas y volver a intro (cada cambio de modo es un nuevo intento)
+  reiniciarCartas();
+  cargarIntro(false);
+}
 
+// Tira N cartas según el modoTirada actual, las renderiza con sus labels de posición
+// y delay escalonado para sensación ritual.
+// Modo 'carta' ACUMULA cartas. Modos 'horizontal' y 'vertical' REEMPLAZAN.
+function lanzarTirada() {
+  const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
+  const container = document.getElementById('carta-container');
+  const esAcumulativo = modoTirada === 'carta';
+
+  if (esAcumulativo) {
+    // Modo Carta: NO limpia cartas anteriores, solo agrega una más al pool
+    container.removeAttribute('data-layout');
+  } else {
+    // Modos múltiples: limpia y arranca de cero
+    cartasLanzadas = [];
+    cartaActual = null;
+    container.innerHTML = '';
+    container.setAttribute('data-layout', tirada.layout);
+    container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
+  }
+  container.style.display = 'flex';
+
+  // Ocultar intros / textos largos
+  ['introShort', 'introLong', 'dinamica'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Lentes activos
   const activos = Object.entries(lentesActivos)
-    .filter(([_, activo]) => activo)
-    .map(([lente]) => lente);
-
+    .filter(([_, a]) => a)
+    .map(([l]) => l);
   const cartasFiltradas = cartas.filter(c => activos.includes(c.lente));
   if (!cartasFiltradas.length) return mostrarObraDeArteOTexto();
 
-  const nuevaCarta = cartasFiltradas[Math.floor(Math.random() * cartasFiltradas.length)];
-  cartaActual = nuevaCarta;
-  cartasLanzadas.push({ ...nuevaCarta, posicion });
+  // En modo acumulativo, evitar repetir cartas ya en pantalla
+  const yaEnPantalla = new Set(cartasLanzadas.map(c => c.id));
+  const pool = cartasFiltradas.filter(c => !yaEnPantalla.has(c.id));
+  // Si ya se mostraron todas las cartas filtradas, reusar el pool completo
+  const poolEfectivo = pool.length ? pool : [...cartasFiltradas];
 
-  const total = cartasLanzadas.length;
-  const scale = Math.max(0.6, 1 - total * 0.06);
+  // Seleccionar N cartas distintas
+  const seleccionadas = [];
+  const poolCopy = [...poolEfectivo];
+  for (let i = 0; i < tirada.count && poolCopy.length; i++) {
+    const idx = Math.floor(Math.random() * poolCopy.length);
+    seleccionadas.push(poolCopy.splice(idx, 1)[0]);
+  }
 
-  cartasLanzadas.forEach(({ titulo, texto, imagen, titulo_pt, texto_pt, imagen_pt, posicion }) => {
-    const t = idioma === "es" ? titulo : titulo_pt;
-    const txt = idioma === "es" ? texto : texto_pt;
-    const img = idioma === "es" ? imagen : imagen_pt;
+  // Setear paleta dinámica con la primera carta de la nueva tirada
+  if (seleccionadas.length > 0) {
+    cartaActual = seleccionadas[0];
+    setNaipeActivo(cartaActual.lente);
+  }
+  seccionActiva = 'cartas';
 
-    const card = document.createElement("div");
-    card.classList.add("card", "card-animada");
-    card.onclick = () => card.classList.toggle("flipped");
-
-    card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-front">
-          <img src="${img}" alt="${t}">
-        </div>
-        <div class="card-back">
-          <h2>${t}</h2>
-          <p>${txt.replace(/\n/g, "<br>")}</p>
-        </div>
-      </div>
-    `;
-
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("carta-wrapper");
-    wrapper.style.display = "flex";
-    wrapper.style.flexDirection = posicion === 'vertical' ? 'column' : 'row';
-    wrapper.style.alignItems = "center";
-    wrapper.style.justifyContent = "center";
-    wrapper.style.margin = "0.1rem";
-
-    card.style.transform = `scale(${scale})`;
-
-    wrapper.appendChild(card);
-    container.appendChild(wrapper);
+  // Renderizar con delay escalonado (sensación de tirada secuencial)
+  seleccionadas.forEach((carta, i) => {
+    setTimeout(() => {
+      renderCartaTirada(carta, i, tirada, container, esAcumulativo);
+      cartasLanzadas.push(carta);
+    }, i * 220);
   });
 }
-*/
+
+// Renderiza UNA carta dentro de un wrapper con su label de posición (si aplica).
+// Si esAcumulativo, agrega rotación aleatoria leve al wrapper (sensación de baraja natural).
+function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
+  const titulo = getCartaField(carta, 'titulo');
+  const texto  = getCartaField(carta, 'texto');
+  const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
+  const posLabel = labels[posIndex] || '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'carta-wrapper';
+
+  // En modo carta (acumulativo): ángulo aleatorio entre -4° y +4°
+  if (esAcumulativo) {
+    const angulo = (Math.random() * 8 - 4).toFixed(1);
+    wrapper.style.setProperty('--tilt', angulo + 'deg');
+  }
+
+  if (posLabel) {
+    const labelEl = document.createElement('div');
+    labelEl.className = 'carta-posicion';
+    labelEl.dataset.posIndex = String(posIndex);
+    labelEl.textContent = posLabel;
+    wrapper.appendChild(labelEl);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'card card-animada';
+  card.dataset.id = carta.id;
+  card.dataset.lente = carta.lente;
+  card.innerHTML = `
+    <div class="card-inner">
+      <div class="card-front">${imgCartaHTML(carta, titulo)}</div>
+      <div class="card-back">
+        <h2>${titulo}</h2>
+        <p>${texto.replace(/\n/g, '<br>')}</p>
+      </div>
+    </div>
+  `;
+
+  // Click: la carta sube al frente y voltea. Las demás mantienen su estado
+  // (texto sigue en texto, imagen en imagen), solo dejan de estar al frente.
+  // Segundo click sobre la misma: solo des-voltea, PERO queda encima (como un
+  // dealer que deja la carta arriba). Una carta solo baja cuando se toca otra.
+  card.onclick = () => {
+    const yaAlFrente = wrapper.classList.contains('al-frente');
+    if (yaAlFrente) {
+      card.classList.toggle('flipped');
+    } else {
+      container.querySelectorAll('.carta-wrapper.al-frente').forEach(w => {
+        w.classList.remove('al-frente');
+      });
+      wrapper.classList.add('al-frente');
+      card.classList.add('flipped');
+      cartaActual = carta;
+      setNaipeActivo(carta.lente);
+    }
+  };
+
+  wrapper.appendChild(card);
+  container.appendChild(wrapper);
+}
+
 function mostrarObraDeArteOTexto() {
+  setNaipeActivo(null);
   const container = document.getElementById("carta-container");
+  const ui = (textosCache && textosCache.ui) || {};
+  const m1 = (ui.sinLentes && ui.sinLentes[idioma]) || "No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️";
+  const m2 = (ui.sinLentes2 && ui.sinLentes2[idioma]) || "O... prueba prender alguno para continuar.";
   container.innerHTML = `
     <div class="mensaje-divertido">
-      <p>No hay lentes activados... tal vez sea momento de cerrar los ojos y ver con el corazón. ❤️</p>
-      <p>O... prueba prender alguno para continuar.</p>
+      <p>${m1}</p>
+      <p>${m2}</p>
     </div>
   `;
 }
@@ -542,48 +565,40 @@ function mostrarObraDeArteOTexto() {
 function reiniciarCartas() {
   cartasLanzadas = [];
   cartaActual = null;
+  setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   container.innerHTML = "";
+  container.removeAttribute('data-layout');
+  container.style.removeProperty('--cards-scale');
+  container.classList.remove('muchas-cartas', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6');
 }
 
-function mostrarPregunta() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.pregunta?.[idioma] || data.pregunta['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de pregunta:', err));
+function _mostrarSeccion(key, seccionTag) {
+  const render = (data) => {
+    textosCache = data;
+    setNaipeActivo(null);
+    const texto = data[key]?.[idioma] || data[key]['es'];
+    const longEl = document.getElementById('introLong');
+    document.getElementById('introShort').style.display = 'none';
+    longEl.innerHTML = texto;
+    longEl.dataset.seccion = seccionTag;
+    longEl.style.display = 'block';
+    document.getElementById('carta-container').style.display = 'none';
+    seccionActiva = seccionTag;
+  };
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(render)
+      .catch(err => console.error('Error al cargar texto:', err));
+  }
 }
 
-function mostrarLentes() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.lentes?.[idioma] || data.lentes['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de lentes:', err));
-}
-
-function mostrarDinamica() {
-  fetch('textos.json')
-    .then(res => res.json())
-    .then(data => {
-      const texto = data.dinamica?.[idioma] || data.dinamica['es'];
-      document.getElementById('introShort').style.display = 'none';
-      document.getElementById('introLong').innerHTML = texto;
-      document.getElementById('introLong').style.display = 'block';
-      document.getElementById('carta-container').style.display = 'none';
-    })
-    .catch(err => console.error('Error al cargar el texto de dinamica:', err));
-}
+function mostrarPregunta() { _mostrarSeccion('pregunta', 'pregunta'); }
+function mostrarLentes()   { _mostrarSeccion('lentes', 'lentes'); }
+function mostrarDinamica() { _mostrarSeccion('dinamica', 'dinamica'); }
 
 function toggleLente(lente) {
   lentesActivos[lente] = !lentesActivos[lente];
@@ -592,63 +607,303 @@ function toggleLente(lente) {
   const estado = lentesActivos[lente] ? "" : "_apagado";
   btn.src = `img/iconos/icono_${lente}${estado}.png`;
 }
-function toggleIdioma() {
-  idioma = document.getElementById("idiomaToggle").checked ? "pt" : "es";
+function setIdioma(nuevoIdioma) {
+  if (!['es','pt','en'].includes(nuevoIdioma)) return;
+  if (nuevoIdioma === idioma) return;
+  idioma = nuevoIdioma;
 
-  const longEl = document.getElementById("introLong");
-  const shortEl = document.getElementById("introShort");
-  const longVisible = longEl.style.display === "block";
-  const shortVisible = shortEl.style.display === "block";
-  const contenidoActual = longEl.innerHTML.toLowerCase();
+  // Aplica la UI estática (botones, pasos, banderas activas, título, labels de lentes)
+  aplicarIdiomaUI();
 
-  // Si hay cartas en pantalla, solo actualizar cartas
-  const cartasEnPantalla = document.querySelectorAll(".card");
-  if (cartasEnPantalla.length > 0) {
+  // Si hay cartas en pantalla, actualizar cada una con el texto/imagen del nuevo idioma
+  if (seccionActiva === 'cartas') {
+    const cartasEnPantalla = document.querySelectorAll(".card");
     cartasEnPantalla.forEach(card => {
       const id = card.dataset.id;
       const cartaData = cartas.find(c => c.id == id);
       if (!cartaData) return;
 
-      const titulo = idioma === "es" ? cartaData.titulo : cartaData.titulo_pt;
-      const texto = idioma === "es" ? cartaData.texto : cartaData.texto_pt;
-      const imagen = idioma === "es" ? cartaData.imagen : cartaData.imagen_pt;
+      const titulo = getCartaField(cartaData, 'titulo');
+      const texto  = getCartaField(cartaData, 'texto');
+      const imagenIdioma = getCartaField(cartaData, 'imagen');
+      const imagenES = cartaData.imagen || '';
 
       const front = card.querySelector(".card-front img");
       const backH2 = card.querySelector(".card-back h2");
       const backP = card.querySelector(".card-back p");
 
       if (front) {
-        front.src = imagen;
+        front.src = imagenIdioma;
         front.alt = titulo;
+        if (imagenIdioma !== imagenES) {
+          front.onerror = function() { this.onerror = null; this.src = imagenES; };
+        } else {
+          front.onerror = null;
+        }
       }
       if (backH2) backH2.textContent = titulo;
       if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
-      card.dataset.originalTransform = card.style.transform;
     });
-    return;
-  }
-
-  // Si estaba viendo introducción
-  if (shortVisible || longVisible) {
-    if (contenidoActual.includes("pregunta") || contenidoActual.includes("question")) {
-      mostrarPregunta();
-    } else if (contenidoActual.includes("lentes") || contenidoActual.includes("lens")) {
-      mostrarLentes();
-    } else if (contenidoActual.includes("dinámica") || contenidoActual.includes("dinâmica")) {
-      mostrarDinamica();
-    } else {
-      cargarIntro(longVisible);
+    // Actualizar labels de posición (Pasado/Presente/Futuro, etc.) si es tirada múltiple
+    const tirada = TIRADAS[modoTirada];
+    if (tirada && tirada.labels) {
+      const newLabels = tirada.labels[idioma] || tirada.labels.es || [];
+      document.querySelectorAll('.carta-posicion').forEach(el => {
+        const i = parseInt(el.dataset.posIndex || '0', 10);
+        if (newLabels[i]) el.textContent = newLabels[i];
+      });
     }
+    // Refresca el label sutil del naipe con el nuevo idioma
+    if (cartaActual) setNaipeActivo(cartaActual.lente);
     return;
   }
 
-  // Si todo falla, mostrar introducción corta
-  cargarIntro(false);
+  // Re-renderiza la sección activa con el nuevo idioma
+  switch (seccionActiva) {
+    case 'pregunta':   mostrarPregunta(); break;
+    case 'lentes':     mostrarLentes();   break;
+    case 'dinamica':   mostrarDinamica(); break;
+    case 'autor':      mostrarAutor();    break;
+    case 'intro-long': cargarIntro(true); break;
+    case 'intro':
+    default:           cargarIntro(false);
+  }
 }
 
+// Compatibilidad con código antiguo que pueda llamar toggleIdioma
+function toggleIdioma() {
+  const checkbox = document.getElementById("idiomaToggle");
+  setIdioma(checkbox && checkbox.checked ? "pt" : "es");
+}
+
+function mostrarAutor() {
+  const render = (data) => {
+    setNaipeActivo(null);
+    const texto = data.autor?.[idioma] || data.autor['es'];
+    document.getElementById('introShort').style.display = 'none';
+    document.getElementById('introLong').innerHTML = texto;
+    document.getElementById('introLong').dataset.seccion = 'autor';
+    document.getElementById('introLong').style.display = 'block';
+    document.getElementById('carta-container').style.display = 'none';
+    seccionActiva = 'autor';
+  };
+  if (textosCache) {
+    render(textosCache);
+  } else {
+    fetch('textos.json')
+      .then(res => res.json())
+      .then(data => { textosCache = data; render(data); })
+      .catch(err => console.error('Error al cargar el texto de autor:', err));
+  }
+}
+
+// ============================================================
+// COMPARTIR LECTURA · Generación de imagen 4:5 + Web Share API
+// ============================================================
+
+const compartirLabels = {
+  es: 'Compartir',
+  pt: 'Compartilhar',
+  en: 'Share'
+};
+
+// Llena el template oculto #share-canvas con los datos de la(s) carta(s)
+// que se están mostrando. Modo "solo" para 1 carta, "triple" para 3.
+async function llenarShareCanvas() {
+  const canvas = document.getElementById('share-canvas');
+  if (!canvas) return false;
+
+  // CRÍTICO: html-to-image clona el nodo y pierde las CSS variables heredadas
+  // del body. Las copiamos resueltas como inline properties en el canvas para
+  // que el clon (y sus hijos vía var()) las tenga disponibles.
+  const bs = getComputedStyle(document.body);
+  ['--bg', '--ink', '--ink-soft', '--ink-mute', '--hairline', '--primary', '--accent'].forEach(v => {
+    const val = bs.getPropertyValue(v).trim();
+    if (val) canvas.style.setProperty(v, val);
+  });
+
+  const naipeEl = document.getElementById('share-naipe');
+  const cardsEl = document.getElementById('share-cards');
+  const subtitleEl = document.getElementById('share-subtitle');
+  if (!naipeEl || !cardsEl || !subtitleEl) return false;
+
+  cardsEl.innerHTML = '';
+
+  // Determinar qué compartir: en modo 'carta' la cartaActual; en 3-h/3-v las cartasLanzadas
+  const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
+  const esMultiple = tirada.count > 1 && cartasLanzadas.length >= tirada.count;
+
+  if (esMultiple) {
+    const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
+    const seleccion = cartasLanzadas.slice(0, tirada.count);
+    // Pre-resolver las URLs de imagen que realmente cargan (evita imágenes rotas en html-to-image)
+    const urls = await Promise.all(seleccion.map(resolverImagenCarta));
+    seleccion.forEach((carta, i) => {
+      const t = getCartaField(carta, 'titulo');
+      const slot = document.createElement('div');
+      slot.className = 'share-card triple';
+      slot.innerHTML = `
+        <div class="share-card-pos">${labels[i] || ''}</div>
+        <div class="share-card-img"><img src="${urls[i]}" alt=""></div>
+        <div class="share-card-title">${t}</div>
+      `;
+      cardsEl.appendChild(slot);
+    });
+    const lentesPresentes = [...new Set(seleccion.map(c => c.lente))];
+    naipeEl.textContent = lentesPresentes.map(l => (lenteNombres[idioma] || lenteNombres.es)[l]).join(' · ');
+    subtitleEl.textContent = (tirada.subtitle && tirada.subtitle[idioma]) || '';
+  } else {
+    const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
+    if (!carta) return false;
+    const titulo = getCartaField(carta, 'titulo');
+    const texto = getCartaField(carta, 'texto');
+    const url = await resolverImagenCarta(carta);
+    const slot = document.createElement('div');
+    slot.className = 'share-card solo';
+    slot.innerHTML = `
+      <div class="share-card-img"><img src="${url}" alt=""></div>
+      <div class="share-card-text">
+        <h2 class="share-card-title">${titulo}</h2>
+        <p class="share-card-body">${texto.replace(/\n/g, '<br>')}</p>
+      </div>
+    `;
+    cardsEl.appendChild(slot);
+    naipeEl.textContent = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
+    subtitleEl.textContent = '';
+  }
+
+  return true;
+}
+
+// Devuelve una promesa con la URL de imagen que realmente carga para una carta:
+// intenta la del idioma activo; si falla (ej. imagen EN inexistente), cae a la ES.
+function resolverImagenCarta(carta) {
+  const imgIdioma = getCartaField(carta, 'imagen') || carta.imagen || '';
+  const imgES = carta.imagen || '';
+  if (!imgIdioma || imgIdioma === imgES) {
+    return Promise.resolve(imgES || imgIdioma);
+  }
+  return new Promise(resolve => {
+    const test = new Image();
+    test.onload = () => resolve(imgIdioma);
+    test.onerror = () => resolve(imgES);
+    test.src = imgIdioma;
+  });
+}
+
+// Genera la imagen como PNG (dataURL) usando html-to-image.
+async function generarImagenCompartible() {
+  if (typeof htmlToImage === 'undefined') {
+    console.error('html-to-image no cargó (¿CDN bloqueado?)');
+    return null;
+  }
+  // Llenar el template (async: pre-resuelve qué imágenes cargan)
+  const ok = await llenarShareCanvas();
+  if (!ok) return null;
+  const canvas = document.getElementById('share-canvas');
+
+  // CRÍTICO: algunos navegadores no pintan elementos en left:-10000px, así que
+  // html-to-image los captura vacíos. Solución: traer el canvas al viewport
+  // durante la captura, tapado por un loader opaco para no mostrar el flash.
+  const loader = document.createElement('div');
+  loader.style.cssText =
+    'position:fixed;inset:0;background:#FAFAF8;z-index:99999;display:flex;' +
+    'align-items:center;justify-content:center;font-family:"DM Sans",sans-serif;' +
+    'font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#999;';
+  loader.textContent = '…';
+  document.body.appendChild(loader);
+
+  canvas.style.left = '0';
+  canvas.style.top = '0';
+  canvas.style.zIndex = '99998';
+
+  try {
+    // Dos frames + espera de imágenes para garantizar layout y paint completos
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const imgs = canvas.querySelectorAll('img');
+    await Promise.all(Array.from(imgs).map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(resolve => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }));
+
+    const dataUrl = await htmlToImage.toPng(canvas, {
+      pixelRatio: 2,
+      skipFonts: true,
+      backgroundColor: '#FAFAF8'
+    });
+    return dataUrl;
+  } catch (e) {
+    console.error('Error generando imagen:', e);
+    return null;
+  } finally {
+    canvas.style.left = '-10000px';
+    canvas.style.top = '0';
+    canvas.style.zIndex = '-1';
+    loader.remove();
+  }
+}
+
+// Comparte la imagen vía Web Share API (móvil) o descarga (desktop/fallback).
+async function compartirLectura() {
+  if (!cartasLanzadas.length && !cartaActual) return;
+
+  const btn = document.querySelector('.btn-share');
+  if (btn) btn.disabled = true;
+
+  try {
+    const dataUrl = await generarImagenCompartible();
+    if (!dataUrl) return;
+
+    // Convertir dataURL → Blob → File
+    const blob = await (await fetch(dataUrl)).blob();
+    const filename = `ludopoiesis-${Date.now()}.png`;
+    const file = new File([blob], filename, { type: 'image/png' });
+
+    // Intentar Web Share API con archivo (móvil principalmente)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Ludopoiesis',
+          text: 'Ludopoiesis'
+        });
+        return;
+      } catch (e) {
+        // AbortError = usuario canceló, no es error real
+        if (e.name !== 'AbortError') console.error('Share falló, fallback a descarga:', e);
+        else return;
+      }
+    }
+
+    // Fallback: descarga directa
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ============================================================
+// EXPORTS A WINDOW
+// ============================================================
 window.lanzarCartaConEstilo = lanzarCartaConEstilo;
+window.lanzarCartaSuperpuesta = lanzarCartaSuperpuesta;
+window.lanzarTirada = lanzarTirada;
+window.setModoTirada = setModoTirada;
 window.reiniciarCartas = reiniciarCartas;
 window.cargarIntro = cargarIntro;
+window.compartirLectura = compartirLectura;
 window.mostrarPregunta = mostrarPregunta;
 window.mostrarLentes = mostrarLentes;
 window.mostrarDinamica = mostrarDinamica;
+window.mostrarAutor = mostrarAutor;
+window.setIdioma = setIdioma;
+window.toggleLente = toggleLente;
+window.toggleIdioma = toggleIdioma;

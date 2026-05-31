@@ -1,82 +1,127 @@
-<!-- LUDO ACTIVE REPO TEST 2026-01-02 -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ludopoiesis - Oráculo Para Jugar la Vida</title>
+  <meta name="theme-color" content="#FAFAF8" />
+  <title data-i18n="tituloSitio">Ludopoiesis · Oráculo para jugar la vida</title>
+
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-  
+
 <body onload="cargarIntro()">
-<div class="contenedor-principal">
-  <h1 id="titulo-home" onclick="cargarIntro()">Ludopoiesis</h1>
 
+  <!-- ============ HEADER STICKY ============ -->
+  <header class="app-header" role="banner">
+    <h1 id="titulo-home" class="logo" onclick="cargarIntro()">
+      Ludo<b>poiesis</b>
+    </h1>
+    <div class="idioma-switch" role="group" aria-label="Idioma">
+      <span class="bandera" id="flag-es" onclick="setIdioma('es')" title="Español">ES</span>
+      <span class="lang-sep">·</span>
+      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')" title="Português">PT</span>
+      <span class="lang-sep">·</span>
+      <span class="bandera" id="flag-en" onclick="setIdioma('en')" title="English">EN</span>
+    </div>
+  </header>
+
+  <!-- ============ MAIN: INTRO + CARTA ============ -->
+  <main class="app-main" role="main">
+
+    <!-- Etiqueta sutil arriba de la carta con el lente activo (solo aparece con carta tirada) -->
+    <div id="card-meta-label" class="card-meta-label" aria-live="polite"></div>
+
+    <!-- Contenedor de cartas (el JS pinta acá) -->
     <div id="carta-container"></div>
-  <div id="introShort" class="intro-texto" style="display: none;"></div>
-  <div id="introLong" class="intro-texto" style="display: none;"> 
-    <span class="more-button" onclick="mostrarAutor()">➤ Sobre el autor</span>
-  </div>
-  <div id="dinamica" class="intro-texto" style="display: none;"></div>
-</div>
-<div id="overlay-ampliada"></div>
 
-  
-<div class="zona-controles">
-  <div class="botones-controles">
-    <button onclick="lanzarCartaSuperpuesta()">Carta</button>
-    <button onclick="reiniciarCartas()">Nuevo</button>
-  </div>
-  <div id="lentes-toggle">
-      <div class="lente-horizontal" onclick="toggleLente('naturaleza')">
-        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="Naturaleza">
+    <!-- Intros / secciones de texto -->
+    <section id="introShort" class="intro-texto" style="display: none;"></section>
+    <section id="introLong" class="intro-texto" style="display: none;"></section>
+    <section id="dinamica" class="intro-texto" style="display: none;"></section>
+
+  </main>
+
+  <!-- Overlay de carta ampliada (lo maneja el JS) -->
+  <div id="overlay-ampliada" aria-hidden="true"></div>
+
+  <!-- ============ CONTROLES: BOTONES + LENTES + PASOS ============ -->
+  <section class="zona-controles" aria-label="Controles">
+
+    <div class="modo-selector" role="radiogroup" aria-label="Tipo de tirada">
+      <button class="modo-btn active" data-modo="carta" onclick="setModoTirada('carta')" role="radio" aria-checked="true">Carta</button>
+      <button class="modo-btn" data-modo="horizontal" onclick="setModoTirada('horizontal')" role="radio" aria-checked="false">3 horizontal</button>
+      <button class="modo-btn" data-modo="vertical" onclick="setModoTirada('vertical')" role="radio" aria-checked="false">3 vertical</button>
+    </div>
+    <div class="modo-subtitle" id="modo-subtitle" aria-live="polite"></div>
+
+    <div class="botones-controles">
+      <button class="btn btn-primary" onclick="lanzarTirada()" data-i18n="btnCarta">Tirar</button>
+      <button class="btn btn-outline" onclick="reiniciarCartas()" data-i18n="btnNuevo">Nuevo</button>
+      <!-- TODO(share): botón de Compartir desactivado temporalmente.
+           Falla la generación de imagen (html-to-image) en branch en.
+           Re-activar al cerrar el issue del Sprint 3 — solo descomentar este bloque.
+      <button class="btn btn-share" onclick="compartirLectura()" aria-label="Compartir">
+        <span data-i18n-share>Compartir</span>
+      </button>
+      -->
+      <!-- /TODO(share) -->
+    </div>
+
+    <div id="lentes-toggle" class="lentes-row" role="group" aria-label="Lentes">
+      <div class="lente-mini" onclick="toggleLente('naturaleza')">
+        <img id="btn-naturaleza" src="img/iconos/icono_naturaleza.png" alt="">
+        <span class="lente-label">Naturaleza</span>
       </div>
-      <div class="lente-horizontal" onclick="toggleLente('fluir')">
-        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="Fluir">
+      <div class="lente-mini" onclick="toggleLente('fluir')">
+        <img id="btn-fluir" src="img/iconos/icono_fluir.png" alt="">
+        <span class="lente-label">Fluir</span>
       </div>
-      <div class="lente-horizontal" onclick="toggleLente('tecnologia')">
-        <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="Tecnología">
+      <div class="lente-mini" onclick="toggleLente('tecnologia')">
+        <img id="btn-tecnologia" src="img/iconos/icono_tecnologia.png" alt="">
+        <span class="lente-label">Tecnología</span>
       </div>
     </div>
-  
-  <div id="instrucciones">
-    <div class="paso">
-      <h2>
-        1. Haz una pregunta
-        <i class="fa fa-info-circle" onclick="mostrarPregunta()" title="¿Cómo se hace una buena pregunta?"></i>
-      </h2>
+
+    <div id="instrucciones" class="steps-row">
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-label" data-i18n="paso1">Hazte una pregunta</span>
+        <i class="fa fa-info-circle step-info" onclick="mostrarPregunta()" data-i18n-title="tooltipPregunta" title="¿Cómo se hace una buena pregunta?"></i>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-label" data-i18n="paso2">Escoge tus lentes</span>
+        <i class="fa fa-info-circle step-info" onclick="mostrarLentes()" data-i18n-title="tooltipLentes" title="Ver más sobre los lentes"></i>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-label" data-i18n="paso3">Tira una carta</span>
+      </div>
     </div>
 
-    <div class="paso">
-      <h2>
-        2. Escoge tus lentes
-        <i class="fa fa-info-circle" onclick="mostrarLentes()" title="Ver más sobre los lentes"></i>
-      </h2>
+  </section>
+
+  <!-- Template oculto para generar la imagen compartible (no visible al usuario) -->
+  <div id="share-canvas" aria-hidden="true">
+    <div class="share-content">
+      <header class="share-header">
+        <span class="share-logo">Ludo<b>poiesis</b></span>
+        <span class="share-naipe" id="share-naipe"></span>
+      </header>
+      <div class="share-cards" id="share-cards"></div>
+      <footer class="share-footer">
+        <span class="share-subtitle" id="share-subtitle"></span>
+        <span class="share-url">ludopoiesis.app</span>
+      </footer>
     </div>
-
-  
-    <div class="paso">
-      <h2>3. Tira una carta</h2>
-    
-    </div>
-
-
-    <div class="idioma-switch">
-      <span class="bandera" id="flag-es" onclick="setIdioma('es')">🇪🇸</span>
-      <label class="switch">
-        <input type="checkbox" id="idiomaToggle" onchange="toggleIdioma()">
-        <span class="slider"></span>
-      </label>
-      <span class="bandera" id="flag-pt" onclick="setIdioma('pt')">🇧🇷</span>
-    </div>
-
-    
-    
   </div>
 
-<script src="script.js"></script>
+  <!-- Librería para convertir DOM → imagen PNG (usada al Compartir) -->
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
