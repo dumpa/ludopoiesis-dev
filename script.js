@@ -1,13 +1,17 @@
 // Detecta el idioma inicial:
+// 0) Preferencia guardada (elección previa del visitante) → manda sobre todo
 // 1) Por subdominio: en.* → 'en', pt.* → 'pt'
-// 2) Por idioma del navegador si está soportado
-// 3) Fallback: 'es'
+// 2) Default: 'es'. El idioma del navegador NO cambia el default;
+//    el visitante cambia de idioma con las banderas.
 function detectarIdiomaInicial() {
+  try {
+    const guardado = localStorage.getItem('ludo_idioma');
+    if (['es', 'pt', 'en'].includes(guardado)) return guardado;
+  } catch (e) { /* localStorage bloqueado (modo privado): se ignora */ }
+
   const host = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
   if (host.startsWith('en.')) return 'en';
   if (host.startsWith('pt.')) return 'pt';
-  const browserLang = (typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'es').slice(0, 2);
-  if (['es', 'pt', 'en'].includes(browserLang)) return browserLang;
   return 'es';
 }
 
@@ -611,6 +615,9 @@ function setIdioma(nuevoIdioma) {
   if (!['es','pt','en'].includes(nuevoIdioma)) return;
   if (nuevoIdioma === idioma) return;
   idioma = nuevoIdioma;
+
+  // Recordar la elección para próximas visitas.
+  try { localStorage.setItem('ludo_idioma', nuevoIdioma); } catch (e) { /* localStorage bloqueado */ }
 
   // Aplica la UI estática (botones, pasos, banderas activas, título, labels de lentes)
   aplicarIdiomaUI();
