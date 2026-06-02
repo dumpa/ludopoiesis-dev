@@ -765,24 +765,41 @@ async function cargarFuentesCompartir() {
 }
 
 // Pinta texto envuelto respetando saltos \n. Devuelve la y final.
-function pintarTextoEnvuelto(ctx, texto, x, y, maxW, lineH) {
+// Envuelve un texto en líneas respetando saltos \n. Requiere ctx.font ya fijado.
+// Devuelve items: { text } para una línea, { blank:true } para un salto de párrafo.
+function envolverEnLineas(ctx, texto, maxW) {
+  const items = [];
   const parrafos = String(texto).split('\n');
   parrafos.forEach((parr, idx) => {
-    if (parr.trim() === '') { y += lineH * 0.6; return; }
+    if (parr.trim() === '') { items.push({ blank: true }); return; }
     const palabras = parr.split(' ');
     let linea = '';
     for (let i = 0; i < palabras.length; i++) {
       const prueba = linea ? linea + ' ' + palabras[i] : palabras[i];
       if (ctx.measureText(prueba).width > maxW && linea) {
-        ctx.fillText(linea, x, y);
+        items.push({ text: linea });
         linea = palabras[i];
-        y += lineH;
       } else {
         linea = prueba;
       }
     }
-    if (linea) { ctx.fillText(linea, x, y); y += lineH; }
-    if (idx < parrafos.length - 1) y += lineH * 0.35;
+    if (linea) items.push({ text: linea });
+    if (idx < parrafos.length - 1) items.push({ blank: true });
+  });
+  return items;
+}
+
+// Alto total que ocuparían unos items con cierta interlínea.
+function altoLineas(items, lineH) {
+  return items.reduce((h, it) => h + (it.blank ? lineH * 0.55 : lineH), 0);
+}
+
+// Dibuja los items desde (x,y). Devuelve la y final.
+function dibujarLineas(ctx, items, x, y, lineH) {
+  items.forEach(it => {
+    if (it.blank) { y += lineH * 0.55; return; }
+    ctx.fillText(it.text, x, y);
+    y += lineH;
   });
   return y;
 }
@@ -861,6 +878,7 @@ async function renderReversoCanvas(carta, naipe) {
 
   const margin = 110;
   const maxW = SHARE_W - margin * 2;
+  const bottomLimit = SHARE_H - 200; // el texto no debe pasar de aquí (deja sitio al pie)
   let y = 210;
 
   // Etiqueta del naipe
@@ -869,25 +887,42 @@ async function renderReversoCanvas(carta, naipe) {
   ctx.font = '600 26px "DM Sans", sans-serif';
   ctx.fillStyle = p.accent;
   ctx.fillText((naipe || '').toUpperCase(), margin, y);
-  y += 78;
+  y += 72;
 
-  // Título (Fraunces)
-  ctx.font = '500 66px "Fraunces", serif';
+  // Título (Fraunces) — se encoge si es muy largo (máx 3 líneas).
+  let tSize, tItems;
+  for (tSize = 66; tSize >= 44; tSize -= 4) {
+    ctx.font = `500 ${tSize}px "Fraunces", serif`;
+    tItems = envolverEnLineas(ctx, titulo, maxW);
+    if (tItems.length <= 3) break;
+  }
+  if (tSize < 44) { tSize = 44; ctx.font = `500 44px "Fraunces", serif`; tItems = envolverEnLineas(ctx, titulo, maxW); }
+  const tLineH = Math.round(tSize * 1.16);
+  ctx.font = `500 ${tSize}px "Fraunces", serif`;
   ctx.fillStyle = p.primary;
-  y = pintarTextoEnvuelto(ctx, titulo, margin, y, maxW, 78) + 44;
+  y = dibujarLineas(ctx, tItems, margin, y, tLineH) + 38;
 
-  // Texto / camino (DM Sans)
-  ctx.font = '400 36px "DM Sans", sans-serif';
+  // Texto / camino (DM Sans) — se ajusta el cuerpo para que SIEMPRE quepa.
+  const dispo = bottomLimit - y;          // alto disponible
+  let bSize, bItems, bLineH;
+  for (bSize = 38; bSize >= 22; bSize -= 1) {
+    ctx.font = `400 ${bSize}px "DM Sans", sans-serif`;
+    bItems = envolverEnLineas(ctx, texto, maxW);
+    bLineH = Math.round(bSize * 1.5);
+    if (altoLineas(bItems, bLineH) <= dispo) break;
+  }
+  if (bSize < 22) { bSize = 22; bLineH = Math.round(bSize * 1.5); }
+  ctx.font = `400 ${bSize}px "DM Sans", sans-serif`;
   ctx.fillStyle = p.inkSoft;
-  pintarTextoEnvuelto(ctx, texto, margin, y, maxW, 54);
+  dibujarLineas(ctx, bItems, margin, y, bLineH);
 
   pintarPie(ctx, p, naipe);
   return canvasABlob(canvas);
 }
 
-// Genera las dos imágenes (frente + reverso) de la carta activa.
-async function generarImagenesCompartibles() {
-  const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
+// Genera las dos imágenes (frente + reverso) de una carta.
+async function generarImagenesCompartibles(cartaArg) {
+  const carta = cartaArg || cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
   if (!carta) return null;
   await cargarFuentesCompartir();
   const naipe = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
@@ -912,10 +947,46 @@ function descargarArchivo(file) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Comparte las dos imágenes como SET (carrusel en feed / dos frames en Stories).
-// Fallback: descarga ambas.
+// Descripción lista para pegar, con la MENCIÓN real @ludopoiesis.
+// (Una imagen no puede forzar una mención en Instagram; esto se copia al
+//  portapapeles para que al pegarla, el @ se vuelva mención tappable.)
+const SHARE_HANDLE = '@ludopoiesis';
+function captionCompartir(carta, naipe) {
+  const titulo = getCartaField(carta, 'titulo') || '';
+  const plantillas = {
+    es: `“${titulo}” · ${naipe}\n\nMi carta de hoy con ${SHARE_HANDLE}\nTira la tuya en ludopoiesis.app`,
+    pt: `“${titulo}” · ${naipe}\n\nMinha carta de hoje com ${SHARE_HANDLE}\nTire a sua em ludopoiesis.app`,
+    en: `“${titulo}” · ${naipe}\n\nMy card today with ${SHARE_HANDLE}\nDraw yours at ludopoiesis.app`
+  };
+  return plantillas[idioma] || plantillas.es;
+}
+
+// Aviso breve, autocontenido (sin tocar el CSS).
+function mostrarToastCompartir(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText =
+    'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:99999;' +
+    'max-width:86%;background:#1A1A1A;color:#FAFAF8;padding:12px 18px;border-radius:10px;' +
+    'font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.35;text-align:center;' +
+    'box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .25s ease;';
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity = '1'; });
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3800);
+}
+
+const toastCopiado = {
+  es: 'Descripción con @ludopoiesis copiada — pégala al postear y queda como mención.',
+  pt: 'Descrição com @ludopoiesis copiada — cole ao postar e vira menção.',
+  en: 'Caption with @ludopoiesis copied — paste it when posting to tag us.'
+};
+
+// Comparte las dos imágenes como SET (carrusel en feed / dos frames en Stories)
+// y copia una descripción con @ludopoiesis para que la mención sea real al pegar.
 async function compartirLectura() {
   if (!cartasLanzadas.length && !cartaActual) return;
+  const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
+  if (!carta) return;
 
   const btn = document.querySelector('.btn-share');
   const label = btn && btn.querySelector('[data-i18n-share]');
@@ -923,14 +994,30 @@ async function compartirLectura() {
   if (btn) btn.disabled = true;
   if (label) label.textContent = '…';
 
+  const naipe = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
+  const caption = captionCompartir(carta, naipe);
+
+  // Copiar la descripción YA (dentro del gesto, antes de los awaits) para no
+  // perder el permiso de portapapeles en navegadores estrictos.
+  let copiado = false;
   try {
-    const imgs = await generarImagenesCompartibles();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(caption);
+      copiado = true;
+    }
+  } catch (e) { /* sin portapapeles: seguimos igual */ }
+
+  try {
+    const imgs = await generarImagenesCompartibles(carta);
     if (!imgs) return;
     const files = [imgs.frente, imgs.reverso];
 
     if (navigator.canShare && navigator.canShare({ files })) {
       try {
-        await navigator.share({ files, title: 'Ludopoiesis' });
+        // text se respeta en apps como WhatsApp/Telegram; Instagram lo ignora,
+        // por eso además dejamos la descripción en el portapapeles.
+        await navigator.share({ files, text: caption, title: 'Ludopoiesis' });
+        if (copiado) mostrarToastCompartir(toastCopiado[idioma] || toastCopiado.es);
         return;
       } catch (e) {
         if (e.name === 'AbortError') return; // el usuario canceló: no es error
@@ -940,6 +1027,7 @@ async function compartirLectura() {
     // Fallback: descargar ambas (para postear a mano).
     descargarArchivo(imgs.frente);
     setTimeout(() => descargarArchivo(imgs.reverso), 400);
+    if (copiado) mostrarToastCompartir(toastCopiado[idioma] || toastCopiado.es);
   } catch (e) {
     console.error('Error al compartir:', e);
   } finally {
