@@ -705,7 +705,15 @@ function mostrarAutor() {
 }
 
 // ============================================================
-// COMPARTIR LECTURA · Generación de imagen 4:5 + Web Share API
+// COMPARTIR LECTURA · Dos imágenes 4:5 (frente + texto) con Canvas 2D nativo
+// ------------------------------------------------------------
+// Reescrito (jun 2026): se ABANDONA html-to-image. En su lugar:
+//   · Frente  = la ilustración de la carta, encuadrada 4:5 sobre fondo crema.
+//   · Reverso = título + texto pintados con Canvas 2D nativo (sin librerías,
+//               sin hojas de estilo cross-origin, sin hacks de viewport).
+// Las dos salen a 1080×1350 y se comparten como SET (carrusel en feed /
+// dos frames en Stories). Slide 1 = ilustración (gancho); slide 2 = texto.
+// La pregunta nunca viaja.
 // ============================================================
 
 const compartirLabels = {
@@ -714,76 +722,234 @@ const compartirLabels = {
   en: 'Share'
 };
 
-// Llena el template oculto #share-canvas con los datos de la(s) carta(s)
-// que se están mostrando. Modo "solo" para 1 carta, "triple" para 3.
-async function llenarShareCanvas() {
-  const canvas = document.getElementById('share-canvas');
-  if (!canvas) return false;
+const SHARE_W = 1080;
+const SHARE_H = 1350; // 4:5 (proporción recomendada para carrusel)
 
-  // CRÍTICO: html-to-image clona el nodo y pierde las CSS variables heredadas
-  // del body. Las copiamos resueltas como inline properties en el canvas para
-  // que el clon (y sus hijos vía var()) las tenga disponibles.
+// Paleta viva del lente activo, leída del <body> (data-naipe la cambia).
+function paletaCompartir() {
   const bs = getComputedStyle(document.body);
-  ['--bg', '--ink', '--ink-soft', '--ink-mute', '--hairline', '--primary', '--accent'].forEach(v => {
-    const val = bs.getPropertyValue(v).trim();
-    if (val) canvas.style.setProperty(v, val);
-  });
-
-  const naipeEl = document.getElementById('share-naipe');
-  const cardsEl = document.getElementById('share-cards');
-  const subtitleEl = document.getElementById('share-subtitle');
-  if (!naipeEl || !cardsEl || !subtitleEl) return false;
-
-  cardsEl.innerHTML = '';
-
-  // Determinar qué compartir: en modo 'carta' la cartaActual; en 3-h/3-v las cartasLanzadas
-  const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
-  const esMultiple = tirada.count > 1 && cartasLanzadas.length >= tirada.count;
-
-  if (esMultiple) {
-    const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
-    const seleccion = cartasLanzadas.slice(0, tirada.count);
-    // Pre-resolver las URLs de imagen que realmente cargan (evita imágenes rotas en html-to-image)
-    const urls = await Promise.all(seleccion.map(resolverImagenCarta));
-    seleccion.forEach((carta, i) => {
-      const t = getCartaField(carta, 'titulo');
-      const slot = document.createElement('div');
-      slot.className = 'share-card triple';
-      slot.innerHTML = `
-        <div class="share-card-pos">${labels[i] || ''}</div>
-        <div class="share-card-img"><img src="${urls[i]}" alt=""></div>
-        <div class="share-card-title">${t}</div>
-      `;
-      cardsEl.appendChild(slot);
-    });
-    const lentesPresentes = [...new Set(seleccion.map(c => c.lente))];
-    naipeEl.textContent = lentesPresentes.map(l => (lenteNombres[idioma] || lenteNombres.es)[l]).join(' · ');
-    subtitleEl.textContent = (tirada.subtitle && tirada.subtitle[idioma]) || '';
-  } else {
-    const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
-    if (!carta) return false;
-    const titulo = getCartaField(carta, 'titulo');
-    const texto = getCartaField(carta, 'texto');
-    const url = await resolverImagenCarta(carta);
-    const slot = document.createElement('div');
-    slot.className = 'share-card solo';
-    slot.innerHTML = `
-      <div class="share-card-img"><img src="${url}" alt=""></div>
-      <div class="share-card-text">
-        <h2 class="share-card-title">${titulo}</h2>
-        <p class="share-card-body">${texto.replace(/\n/g, '<br>')}</p>
-      </div>
-    `;
-    cardsEl.appendChild(slot);
-    naipeEl.textContent = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
-    subtitleEl.textContent = '';
-  }
-
-  return true;
+  const v = (n, fb) => (bs.getPropertyValue(n).trim() || fb);
+  return {
+    bg:      v('--bg', '#FAFAF8'),
+    ink:     v('--ink', '#1A1A1A'),
+    inkSoft: v('--ink-soft', '#555555'),
+    inkMute: v('--ink-mute', '#999999'),
+    primary: v('--primary', '#1A1A1A'),
+    accent:  v('--accent', '#1A1A1A')
+  };
 }
 
-// Devuelve una promesa con la URL de imagen que realmente carga para una carta:
-// intenta la del idioma activo; si falla (ej. imagen EN inexistente), cae a la ES.
+// Carga una imagen del mismo origen (no ensucia el canvas). Resuelve null si falla.
+function cargarImagen(src) {
+  return new Promise(resolve => {
+    if (!src) return resolve(null);
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+// Asegura que las fuentes de marca estén listas antes de pintar texto.
+async function cargarFuentesCompartir() {
+  if (!document.fonts || !document.fonts.load) return;
+  try {
+    await Promise.all([
+      document.fonts.load('400 66px "Fraunces"'),
+      document.fonts.load('500 66px "Fraunces"'),
+      document.fonts.load('400 36px "DM Sans"'),
+      document.fonts.load('600 26px "DM Sans"')
+    ]);
+    await document.fonts.ready;
+  } catch (e) { /* si falla, se pinta con la fuente de respaldo */ }
+}
+
+// Pinta texto envuelto respetando saltos \n. Devuelve la y final.
+function pintarTextoEnvuelto(ctx, texto, x, y, maxW, lineH) {
+  const parrafos = String(texto).split('\n');
+  parrafos.forEach((parr, idx) => {
+    if (parr.trim() === '') { y += lineH * 0.6; return; }
+    const palabras = parr.split(' ');
+    let linea = '';
+    for (let i = 0; i < palabras.length; i++) {
+      const prueba = linea ? linea + ' ' + palabras[i] : palabras[i];
+      if (ctx.measureText(prueba).width > maxW && linea) {
+        ctx.fillText(linea, x, y);
+        linea = palabras[i];
+        y += lineH;
+      } else {
+        linea = prueba;
+      }
+    }
+    if (linea) { ctx.fillText(linea, x, y); y += lineH; }
+    if (idx < parrafos.length - 1) y += lineH * 0.35;
+  });
+  return y;
+}
+
+// Pie común a las dos imágenes: línea fina + naipe (izq) + url (der).
+function pintarPie(ctx, p, naipe) {
+  ctx.strokeStyle = p.accent;
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(110, SHARE_H - 165);
+  ctx.lineTo(SHARE_W - 110, SHARE_H - 165);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  ctx.textBaseline = 'alphabetic';
+
+  // Naipe (izquierda)
+  ctx.font = '600 26px "DM Sans", sans-serif';
+  ctx.fillStyle = p.accent;
+  ctx.textAlign = 'left';
+  ctx.fillText((naipe || '').toUpperCase(), 110, SHARE_H - 95);
+
+  // Handle de Instagram + sitio (derecha, dos líneas)
+  ctx.textAlign = 'right';
+  ctx.font = '600 26px "DM Sans", sans-serif';
+  ctx.fillStyle = p.ink;
+  ctx.fillText('@ludopoiesis', SHARE_W - 110, SHARE_H - 110);
+  ctx.font = '400 24px "DM Sans", sans-serif';
+  ctx.fillStyle = p.inkMute;
+  ctx.fillText('ludopoiesis.app', SHARE_W - 110, SHARE_H - 72);
+  ctx.textAlign = 'left';
+}
+
+function canvasABlob(canvas) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+// FRENTE: la ilustración encuadrada 4:5 sobre fondo crema (es lectura → va grande).
+async function renderFrenteCanvas(carta, naipe) {
+  const p = paletaCompartir();
+  const canvas = document.createElement('canvas');
+  canvas.width = SHARE_W; canvas.height = SHARE_H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = p.bg;
+  ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+
+  const url = await resolverImagenCarta(carta);
+  const img = await cargarImagen(url);
+
+  // Caja de contenido: deja aire arriba y reserva el pie abajo.
+  const box = { x: 90, y: 110, w: SHARE_W - 180, h: SHARE_H - 110 - 230 };
+  if (img && img.naturalWidth) {
+    const escala = Math.min(box.w / img.naturalWidth, box.h / img.naturalHeight);
+    const w = img.naturalWidth * escala;
+    const h = img.naturalHeight * escala;
+    const dx = box.x + (box.w - w) / 2;
+    const dy = box.y + (box.h - h) / 2;
+    ctx.drawImage(img, dx, dy, w, h);
+  }
+  pintarPie(ctx, p, naipe);
+  return canvasABlob(canvas);
+}
+
+// REVERSO: título + texto (el camino), sin la pregunta.
+async function renderReversoCanvas(carta, naipe) {
+  const p = paletaCompartir();
+  const titulo = getCartaField(carta, 'titulo') || '';
+  const texto  = getCartaField(carta, 'texto') || '';
+
+  const canvas = document.createElement('canvas');
+  canvas.width = SHARE_W; canvas.height = SHARE_H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = p.bg;
+  ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+
+  const margin = 110;
+  const maxW = SHARE_W - margin * 2;
+  let y = 210;
+
+  // Etiqueta del naipe
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  ctx.font = '600 26px "DM Sans", sans-serif';
+  ctx.fillStyle = p.accent;
+  ctx.fillText((naipe || '').toUpperCase(), margin, y);
+  y += 78;
+
+  // Título (Fraunces)
+  ctx.font = '500 66px "Fraunces", serif';
+  ctx.fillStyle = p.primary;
+  y = pintarTextoEnvuelto(ctx, titulo, margin, y, maxW, 78) + 44;
+
+  // Texto / camino (DM Sans)
+  ctx.font = '400 36px "DM Sans", sans-serif';
+  ctx.fillStyle = p.inkSoft;
+  pintarTextoEnvuelto(ctx, texto, margin, y, maxW, 54);
+
+  pintarPie(ctx, p, naipe);
+  return canvasABlob(canvas);
+}
+
+// Genera las dos imágenes (frente + reverso) de la carta activa.
+async function generarImagenesCompartibles() {
+  const carta = cartaActual || cartasLanzadas[cartasLanzadas.length - 1];
+  if (!carta) return null;
+  await cargarFuentesCompartir();
+  const naipe = (lenteNombres[idioma] || lenteNombres.es)[carta.lente] || '';
+  const [frenteBlob, reversoBlob] = await Promise.all([
+    renderFrenteCanvas(carta, naipe),
+    renderReversoCanvas(carta, naipe)
+  ]);
+  if (!frenteBlob || !reversoBlob) return null;
+  const stamp = Date.now();
+  return {
+    frente:  new File([frenteBlob],  `ludopoiesis-${stamp}-1-imagen.png`, { type: 'image/png' }),
+    reverso: new File([reversoBlob], `ludopoiesis-${stamp}-2-texto.png`,  { type: 'image/png' })
+  };
+}
+
+// Descarga un File (fallback desktop / navegadores sin Web Share de archivos).
+function descargarArchivo(file) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url; a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Comparte las dos imágenes como SET (carrusel en feed / dos frames en Stories).
+// Fallback: descarga ambas.
+async function compartirLectura() {
+  if (!cartasLanzadas.length && !cartaActual) return;
+
+  const btn = document.querySelector('.btn-share');
+  const label = btn && btn.querySelector('[data-i18n-share]');
+  const textoOriginal = label ? label.textContent : '';
+  if (btn) btn.disabled = true;
+  if (label) label.textContent = '…';
+
+  try {
+    const imgs = await generarImagenesCompartibles();
+    if (!imgs) return;
+    const files = [imgs.frente, imgs.reverso];
+
+    if (navigator.canShare && navigator.canShare({ files })) {
+      try {
+        await navigator.share({ files, title: 'Ludopoiesis' });
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return; // el usuario canceló: no es error
+        console.error('Share falló, fallback a descarga:', e);
+      }
+    }
+    // Fallback: descargar ambas (para postear a mano).
+    descargarArchivo(imgs.frente);
+    setTimeout(() => descargarArchivo(imgs.reverso), 400);
+  } catch (e) {
+    console.error('Error al compartir:', e);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (label) label.textContent = textoOriginal || (compartirLabels[idioma] || compartirLabels.es);
+  }
+}
+
+// Devuelve la URL de imagen que realmente carga para una carta: intenta la del
+// idioma activo; si falla (ej. imagen EN inexistente), cae a la ES.
 function resolverImagenCarta(carta) {
   const imgIdioma = getCartaField(carta, 'imagen') || carta.imagen || '';
   const imgES = carta.imagen || '';
@@ -796,105 +962,6 @@ function resolverImagenCarta(carta) {
     test.onerror = () => resolve(imgES);
     test.src = imgIdioma;
   });
-}
-
-// Genera la imagen como PNG (dataURL) usando html-to-image.
-async function generarImagenCompartible() {
-  if (typeof htmlToImage === 'undefined') {
-    console.error('html-to-image no cargó (¿CDN bloqueado?)');
-    return null;
-  }
-  // Llenar el template (async: pre-resuelve qué imágenes cargan)
-  const ok = await llenarShareCanvas();
-  if (!ok) return null;
-  const canvas = document.getElementById('share-canvas');
-
-  // CRÍTICO: algunos navegadores no pintan elementos en left:-10000px, así que
-  // html-to-image los captura vacíos. Solución: traer el canvas al viewport
-  // durante la captura, tapado por un loader opaco para no mostrar el flash.
-  const loader = document.createElement('div');
-  loader.style.cssText =
-    'position:fixed;inset:0;background:#FAFAF8;z-index:99999;display:flex;' +
-    'align-items:center;justify-content:center;font-family:"DM Sans",sans-serif;' +
-    'font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#999;';
-  loader.textContent = '…';
-  document.body.appendChild(loader);
-
-  canvas.style.left = '0';
-  canvas.style.top = '0';
-  canvas.style.zIndex = '99998';
-
-  try {
-    // Dos frames + espera de imágenes para garantizar layout y paint completos
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    const imgs = canvas.querySelectorAll('img');
-    await Promise.all(Array.from(imgs).map(img => {
-      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise(resolve => {
-        img.addEventListener('load', resolve, { once: true });
-        img.addEventListener('error', resolve, { once: true });
-      });
-    }));
-
-    const dataUrl = await htmlToImage.toPng(canvas, {
-      pixelRatio: 2,
-      skipFonts: true,
-      backgroundColor: '#FAFAF8'
-    });
-    return dataUrl;
-  } catch (e) {
-    console.error('Error generando imagen:', e);
-    return null;
-  } finally {
-    canvas.style.left = '-10000px';
-    canvas.style.top = '0';
-    canvas.style.zIndex = '-1';
-    loader.remove();
-  }
-}
-
-// Comparte la imagen vía Web Share API (móvil) o descarga (desktop/fallback).
-async function compartirLectura() {
-  if (!cartasLanzadas.length && !cartaActual) return;
-
-  const btn = document.querySelector('.btn-share');
-  if (btn) btn.disabled = true;
-
-  try {
-    const dataUrl = await generarImagenCompartible();
-    if (!dataUrl) return;
-
-    // Convertir dataURL → Blob → File
-    const blob = await (await fetch(dataUrl)).blob();
-    const filename = `ludopoiesis-${Date.now()}.png`;
-    const file = new File([blob], filename, { type: 'image/png' });
-
-    // Intentar Web Share API con archivo (móvil principalmente)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: 'Ludopoiesis',
-          text: 'Ludopoiesis'
-        });
-        return;
-      } catch (e) {
-        // AbortError = usuario canceló, no es error real
-        if (e.name !== 'AbortError') console.error('Share falló, fallback a descarga:', e);
-        else return;
-      }
-    }
-
-    // Fallback: descarga directa
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
 }
 
 // ============================================================

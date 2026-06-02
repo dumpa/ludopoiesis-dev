@@ -67,14 +67,11 @@
     <div class="botones-controles">
       <button class="btn btn-primary" onclick="lanzarTirada()" data-i18n="btnCarta">Tirar</button>
       <button class="btn btn-outline" onclick="reiniciarCartas()" data-i18n="btnNuevo">Nuevo</button>
-      <!-- TODO(share): botón de Compartir desactivado temporalmente.
-           Falla la generación de imagen (html-to-image) en branch en.
-           Re-activar al cerrar el issue del Sprint 3 — solo descomentar este bloque.
+      <!-- Compartir reactivado (Sprint 3): genera 2 imágenes 4:5 (frente + texto)
+           con Canvas 2D nativo y las comparte como set (carrusel / Stories). -->
       <button class="btn btn-share" onclick="compartirLectura()" aria-label="Compartir">
         <span data-i18n-share>Compartir</span>
       </button>
-      -->
-      <!-- /TODO(share) -->
     </div>
 
     <div id="lentes-toggle" class="lentes-row" role="group" aria-label="Lentes">
@@ -111,23 +108,10 @@
 
   </section>
 
-  <!-- Template oculto para generar la imagen compartible (no visible al usuario) -->
-  <div id="share-canvas" aria-hidden="true">
-    <div class="share-content">
-      <header class="share-header">
-        <span class="share-logo">Ludo<b>poiesis</b></span>
-        <span class="share-naipe" id="share-naipe"></span>
-      </header>
-      <div class="share-cards" id="share-cards"></div>
-      <footer class="share-footer">
-        <span class="share-subtitle" id="share-subtitle"></span>
-        <span class="share-url">ludopoiesis.app</span>
-      </footer>
-    </div>
-  </div>
+  <!-- (El template #share-canvas se eliminó: las imágenes para compartir ahora
+       se dibujan en un <canvas> nativo desde script.js, sin DOM oculto.) -->
 
-  <!-- Librería para convertir DOM → imagen PNG (usada al Compartir) -->
-  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js" defer></script>
+  <!-- (Se quitó la librería html-to-image: Compartir ya no la necesita.) -->
   <script src="script.js"></script>
 </body>
 </html>
