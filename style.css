@@ -466,6 +466,7 @@ body {
 
 .modo-subtitle {
   text-align: center;
+  white-space: nowrap;
   font-family: 'Fraunces', serif;
   font-style: italic;
   font-weight: 300;
@@ -477,6 +478,11 @@ body {
   transition: opacity 0.3s ease;
 }
 .modo-subtitle:empty { opacity: 0; }
+/* El subtítulo se alinea bajo el botón activo (los 3 botones son tercios iguales):
+   carta → izquierda, 3 horizontal → centro, 3 vertical → derecha. */
+.modo-subtitle[data-modo="carta"] { text-align: left; }
+.modo-subtitle[data-modo="horizontal"] { text-align: center; }
+.modo-subtitle[data-modo="vertical"] { text-align: right; }
 
 /* ----- Botones primarios ----- */
 .botones-controles {

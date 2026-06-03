@@ -443,6 +443,8 @@ function setModoTirada(modo) {
   const sub = document.getElementById('modo-subtitle');
   if (sub) {
     sub.textContent = (TIRADAS[modo].subtitle && TIRADAS[modo].subtitle[idioma]) || '';
+    // data-modo permite alinear el subtítulo bajo el botón activo (CSS).
+    sub.dataset.modo = modo;
   }
 
   // Limpiar cartas y volver a intro (cada cambio de modo es un nuevo intento)
