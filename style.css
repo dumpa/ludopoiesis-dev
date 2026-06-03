@@ -934,12 +934,14 @@ body[data-naipe] .btn-share {
   }
   .step-num { font-size: 44px; }
   .intro-texto { font-size: 20px; max-width: 42ch; }
-  /* En desktop no hay scroll: si las 3 caben, se centran; si no, se cortan
-     parejas (Presente al centro, Pasado y Futuro recortados por igual). */
+  /* Desktop: el scroll se mantiene. Se centra cuando caben; cuando no, arranca
+     centrado (lo posiciona el JS) y se puede desplazar a ambos lados.
+     margin-inline negativo recupera el margen lateral → más ancho para las cartas. */
   #carta-container[data-layout="horizontal"] {
-    justify-content: center;
+    justify-content: safe center;
     gap: 28px;
-    overflow-x: hidden;
+    margin-inline: -40px;
+    padding-inline: 8px;
     scroll-snap-type: none;
   }
 }

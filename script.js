@@ -515,6 +515,19 @@ function lanzarTirada() {
     }, i * 220);
   });
 
+  // Posición inicial del scroll en horizontal: móvil arranca en la 1ª carta
+  // (Pasado, a la izquierda); desktop arranca centrado. Siempre con scroll.
+  if (tirada.layout === 'horizontal') {
+    setTimeout(() => {
+      const esDesktop = window.matchMedia('(min-width: 768px)').matches;
+      if (esDesktop) {
+        container.scrollLeft = Math.max(0, (container.scrollWidth - container.clientWidth) / 2);
+      } else {
+        container.scrollLeft = 0;
+      }
+    }, tirada.count * 220 + 80);
+  }
+
   // Tras varias lecturas y algo de tiempo, quizá ofrecer "añadir a inicio" (una vez).
   _tiradasHechas++;
   tal_vez_avisar_home();
