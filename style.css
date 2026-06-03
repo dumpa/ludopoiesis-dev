@@ -934,9 +934,12 @@ body[data-naipe] .btn-share {
   }
   .step-num { font-size: 44px; }
   .intro-texto { font-size: 20px; max-width: 42ch; }
-  /* En desktop, 3 cartas horizontales caben holgadas — no necesita scroll */
+  /* En desktop no hay scroll: si las 3 caben, se centran; si no, se cortan
+     parejas (Presente al centro, Pasado y Futuro recortados por igual). */
   #carta-container[data-layout="horizontal"] {
     justify-content: center;
     gap: 28px;
+    overflow-x: hidden;
+    scroll-snap-type: none;
   }
 }

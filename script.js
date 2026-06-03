@@ -1154,19 +1154,19 @@ function marcarHintMostrado() {
 
 const homeHintTextos = {
   titulo: {
-    es: '¿Te gustó? Tenla siempre a mano',
-    pt: 'Gostou? Deixe sempre à mão',
-    en: 'Liked it? Keep it close'
+    es: 'Ten Ludopoiesis a la mano',
+    pt: 'Tenha o Ludopoiesis à mão',
+    en: 'Keep Ludopoiesis close'
   },
   ios: {
-    es: 'Toca <b>Compartir {share}</b> y elige <b>“Añadir a pantalla de inicio”</b>.',
-    pt: 'Toque em <b>Compartilhar {share}</b> e escolha <b>“Adicionar à Tela de Início”</b>.',
-    en: 'Tap <b>Share {share}</b> and choose <b>“Add to Home Screen”</b>.'
+    es: 'Toca <b>Compartir {share}</b> → <b>“Añadir a pantalla de inicio”</b>, y el oráculo queda a un toque.',
+    pt: 'Toque em <b>Compartilhar {share}</b> → <b>“Adicionar à Tela de Início”</b>, e o oráculo fica a um toque.',
+    en: 'Tap <b>Share {share}</b> → <b>“Add to Home Screen”</b>, and the oracle stays one tap away.'
   },
   android: {
-    es: 'Instálala como app para abrirla de un toque.',
-    pt: 'Instale como app para abrir num toque.',
-    en: 'Install it as an app to open in one tap.'
+    es: 'Déjalo en tu inicio: el oráculo, a un toque.',
+    pt: 'Deixe na sua tela inicial: o oráculo, a um toque.',
+    en: 'Put it on your home screen: the oracle, one tap away.'
   },
   instalar: { es: 'Instalar', pt: 'Instalar', en: 'Install' },
   cerrar: { es: 'Cerrar', pt: 'Fechar', en: 'Close' }
