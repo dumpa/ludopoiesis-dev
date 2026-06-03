@@ -96,7 +96,10 @@ function setNaipeActivo(lente) {
     if (metaLabel) {
       const nombre = (lenteNombres[idioma] && lenteNombres[idioma][lente]) || lente;
       metaLabel.textContent = nombre;
-      metaLabel.classList.add('show');
+      // En tiradas de 3 cada carta ya muestra su posición (Pasado/Pensar…);
+      // ocultamos el nombre del naipe para que no tape ese label al subir la carta.
+      if (enTirada) metaLabel.classList.remove('show');
+      else metaLabel.classList.add('show');
     }
   } else {
     document.body.removeAttribute('data-naipe');
@@ -110,6 +113,7 @@ let cartas = [];
 let idioma = detectarIdiomaInicial();
 let cartaActual = null;
 let cartasLanzadas = [];
+let enTirada = false; // true en tiradas de 3 (horizontal/vertical): oculta el label del naipe
 let textosCache = null;
 // Source of truth de qué sección está visible en pantalla.
 // Valores posibles: 'intro', 'intro-long', 'pregunta', 'lentes', 'dinamica', 'autor', 'cartas', null
@@ -459,6 +463,7 @@ function lanzarTirada() {
   const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
   const container = document.getElementById('carta-container');
   const esAcumulativo = modoTirada === 'carta';
+  enTirada = !esAcumulativo; // tiradas de 3 → ocultar label del naipe
 
   if (esAcumulativo) {
     // Modo Carta: NO limpia cartas anteriores, solo agrega una más al pool
@@ -515,7 +520,8 @@ function lanzarTirada() {
     }, i * 220);
   });
 
-  // Tras vivir una lectura, quizá ofrecer "añadir a pantalla de inicio" (una vez).
+  // Tras varias lecturas y algo de tiempo, quizá ofrecer "añadir a inicio" (una vez).
+  _tiradasHechas++;
   tal_vez_avisar_home();
 }
 
@@ -608,6 +614,7 @@ function mostrarObraDeArteOTexto() {
 function reiniciarCartas() {
   cartasLanzadas = [];
   cartaActual = null;
+  enTirada = false;
   setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   container.innerHTML = "";
@@ -1123,6 +1130,10 @@ function resolverImagenCarta(carta) {
 const HOME_HINT_KEY = 'ludo_homehint';
 let _homeHintArmado = false;
 let _deferredInstallPrompt = null;
+let _tiradasHechas = 0;                 // cuántas lecturas lleva el visitante
+const _homeHintInicio = Date.now();     // marca de tiempo de carga
+const HOME_HINT_MIN_TIRADAS = 2;        // necesita al menos 2 lecturas
+const HOME_HINT_MIN_MS = 30000;         // y ~30s de uso real antes de ofrecerlo
 
 // Captura el prompt nativo de instalación (Android / Chrome) para ofrecer un
 // botón "Instalar" de verdad cuando el navegador lo permite.
@@ -1200,12 +1211,15 @@ function tal_vez_avisar_home() {
   // Solo en móvil: es donde el ícono al inicio cambia la experiencia.
   const esMovil = window.matchMedia('(max-width: 820px)').matches || ('ontouchstart' in window);
   if (!esMovil) return;
+  // Necesita tiempo y uso real: varias lecturas y un rato en la app.
+  if (_tiradasHechas < HOME_HINT_MIN_TIRADAS) return;
+  if (Date.now() - _homeHintInicio < HOME_HINT_MIN_MS) return;
   _homeHintArmado = true;
   // Pequeña espera para no pisar el momento de la carta recién tirada.
   setTimeout(() => {
     if (estaInstalada() || yaSeMostroHint()) return;
     mostrarHomeHint();
-  }, 2200);
+  }, 2000);
 }
 
 function mostrarHomeHint() {
