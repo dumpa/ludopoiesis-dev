@@ -259,6 +259,18 @@ body {
   transform: translateY(-24px) scale(1.04) rotate(0deg);
 }
 
+/* En columna (vertical), el lift hacia arriba hace que la carta roce el label
+   de su posición. Ahí mantenemos solo el realce por escala, sin desplazamiento. */
+#carta-container[data-layout="vertical"] .carta-wrapper.al-frente {
+  transform: scale(1.04) rotate(0deg);
+}
+
+/* En horizontal pasa lo mismo: al subir, la carta se trepa sobre los labels
+   (naipe + Pasado/Presente/Futuro). Realce por escala, sin subir. */
+#carta-container[data-layout="horizontal"] .carta-wrapper.al-frente {
+  transform: scale(1.04) rotate(0deg);
+}
+
 /* Label de posición arriba de cada carta en tiradas múltiples
    ("Pasado", "Presente", "Futuro" / "Pensar", "Sentir", "Hacer") */
 .carta-posicion {
@@ -271,6 +283,17 @@ body {
   text-align: center;
   min-height: 13px;
   transition: color 0.4s ease;
+}
+
+/* Micro-línea bajo el label que ayuda a situar la carta en su posición. */
+.carta-posicion-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #8f8f8a;
+  text-align: center;
+  max-width: min(280px, calc(85vw - 32px));
+  margin-top: -4px;
 }
 
 /* ===== CARTA · FLIP 3D ====================================== */
@@ -449,6 +472,7 @@ body {
 
 .modo-subtitle {
   text-align: center;
+  white-space: nowrap;
   font-family: 'Fraunces', serif;
   font-style: italic;
   font-weight: 300;
@@ -460,6 +484,11 @@ body {
   transition: opacity 0.3s ease;
 }
 .modo-subtitle:empty { opacity: 0; }
+/* El subtítulo se alinea bajo el botón activo (los 3 botones son tercios iguales):
+   carta → izquierda, 3 horizontal → centro, 3 vertical → derecha. */
+.modo-subtitle[data-modo="carta"] { text-align: left; }
+.modo-subtitle[data-modo="horizontal"] { text-align: center; }
+.modo-subtitle[data-modo="vertical"] { text-align: right; }
 
 /* ----- Botones primarios ----- */
 .botones-controles {
@@ -905,9 +934,20 @@ body[data-naipe] .btn-share {
   }
   .step-num { font-size: 44px; }
   .intro-texto { font-size: 20px; max-width: 42ch; }
-  /* En desktop, 3 cartas horizontales caben holgadas — no necesita scroll */
+  /* Desktop: el scroll se mantiene. Se centra cuando caben; cuando no, arranca
+     centrado (lo posiciona el JS) y se puede desplazar a ambos lados.
+     margin-inline negativo recupera el margen lateral → más ancho para las cartas. */
   #carta-container[data-layout="horizontal"] {
-    justify-content: center;
+    justify-content: safe center;
     gap: 28px;
+    margin-inline: -40px;
+    padding-inline: 8px;
+    scroll-snap-type: none;
   }
+
+  /* En desktop los botones son anchos (~1/3 de 1100px). El subtítulo se centra
+     DENTRO del tercio del botón activo (padding %), no pegado al borde. */
+  .modo-subtitle[data-modo="carta"]      { text-align: center; padding: 0 66.666% 0 0; }
+  .modo-subtitle[data-modo="horizontal"] { text-align: center; padding: 0; }
+  .modo-subtitle[data-modo="vertical"]   { text-align: center; padding: 0 0 0 66.666%; }
 }
