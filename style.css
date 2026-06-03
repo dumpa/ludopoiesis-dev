@@ -944,4 +944,10 @@ body[data-naipe] .btn-share {
     padding-inline: 8px;
     scroll-snap-type: none;
   }
+
+  /* En desktop los botones son anchos (~1/3 de 1100px). El subtítulo se centra
+     DENTRO del tercio del botón activo (padding %), no pegado al borde. */
+  .modo-subtitle[data-modo="carta"]      { text-align: center; padding: 0 66.666% 0 0; }
+  .modo-subtitle[data-modo="horizontal"] { text-align: center; padding: 0; }
+  .modo-subtitle[data-modo="vertical"]   { text-align: center; padding: 0 0 0 66.666%; }
 }
