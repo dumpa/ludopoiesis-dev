@@ -770,8 +770,13 @@ async function cargarFuentesCompartir() {
 function envolverEnLineas(ctx, texto, maxW) {
   const items = [];
   const parrafos = String(texto).split('\n');
-  parrafos.forEach((parr, idx) => {
-    if (parr.trim() === '') { items.push({ blank: true }); return; }
+  parrafos.forEach((parr) => {
+    if (parr.trim() === '') {
+      // Línea vacía del texto = separación de estrofa: un solo hueco, sin duplicar.
+      if (items.length && items[items.length - 1].blank) return;
+      items.push({ blank: true });
+      return;
+    }
     const palabras = parr.split(' ');
     let linea = '';
     for (let i = 0; i < palabras.length; i++) {
@@ -784,8 +789,12 @@ function envolverEnLineas(ctx, texto, maxW) {
       }
     }
     if (linea) items.push({ text: linea });
-    if (idx < parrafos.length - 1) items.push({ blank: true });
+    // Un \n simple es salto de verso (línea normal), NO un hueco de estrofa.
+    // El hueco solo lo crea una línea vacía real (\n\n) en el bloque de arriba.
   });
+  // Quita huecos sobrantes al principio y al final.
+  while (items.length && items[0].blank) items.shift();
+  while (items.length && items[items.length - 1].blank) items.pop();
   return items;
 }
 
@@ -905,13 +914,26 @@ async function renderReversoCanvas(carta, naipe) {
   // Texto / camino (DM Sans) — se ajusta el cuerpo para que SIEMPRE quepa.
   const dispo = bottomLimit - y;          // alto disponible
   let bSize, bItems, bLineH;
-  for (bSize = 38; bSize >= 22; bSize -= 1) {
+  let bMult = 1.42;                        // interlínea del cuerpo (más ajustada que 1.5)
+  for (bSize = 38; bSize >= 18; bSize -= 1) {
     ctx.font = `400 ${bSize}px "DM Sans", sans-serif`;
     bItems = envolverEnLineas(ctx, texto, maxW);
-    bLineH = Math.round(bSize * 1.5);
+    bLineH = Math.round(bSize * bMult);
     if (altoLineas(bItems, bLineH) <= dispo) break;
   }
-  if (bSize < 22) { bSize = 22; bLineH = Math.round(bSize * 1.5); }
+  // Garantía anti-desborde: si ni a 18px cabe (carta extrema), aprieta la
+  // interlínea hasta que entre antes de tocar el pie.
+  if (bSize < 18) {
+    bSize = 18;
+    ctx.font = `400 ${bSize}px "DM Sans", sans-serif`;
+    bItems = envolverEnLineas(ctx, texto, maxW);
+    while (bMult > 1.05) {
+      bLineH = Math.round(bSize * bMult);
+      if (altoLineas(bItems, bLineH) <= dispo) break;
+      bMult -= 0.03;
+    }
+    bLineH = Math.round(bSize * bMult);
+  }
   ctx.font = `400 ${bSize}px "DM Sans", sans-serif`;
   ctx.fillStyle = p.inkSoft;
   dibujarLineas(ctx, bItems, margin, y, bLineH);
