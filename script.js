@@ -41,14 +41,14 @@ const TIRADAS = {
     },
     // Micro-línea bajo cada label: ayuda a situar la carta en esa posición.
     hints: {
-      es: ['Lo que te trajo', 'Lo que está vivo', 'Lo que emerge'],
-      pt: ['O que te trouxe', 'O que está vivo', 'O que emerge'],
-      en: ['What brought you here', 'What is alive', 'What emerges']
+      es: ['El mundo hasta hoy', 'Hoy', 'El mundo en creación'],
+      pt: ['O mundo até hoje', 'Hoje', 'O mundo em criação'],
+      en: ['The world until today', 'Today', 'The world in creation']
     },
     subtitle: {
-      es: 'lo que te trajo · lo que está vivo · lo que emerge',
-      pt: 'o que te trouxe · o que está vivo · o que emerge',
-      en: 'what brought you · what is alive · what emerges'
+      es: 'pasado · presente · futuro',
+      pt: 'passado · presente · futuro',
+      en: 'past · present · future'
     }
   },
   vertical: {
@@ -78,9 +78,9 @@ const TIRADAS = {
       ]
     },
     subtitle: {
-      es: 'cabeza · pecho · manos',
-      pt: 'cabeça · peito · mãos',
-      en: 'head · chest · hands'
+      es: 'pensar · sentir · hacer',
+      pt: 'pensar · sentir · fazer',
+      en: 'think · feel · do'
     }
   }
 };
