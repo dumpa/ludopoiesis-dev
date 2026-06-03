@@ -259,6 +259,12 @@ body {
   transform: translateY(-24px) scale(1.04) rotate(0deg);
 }
 
+/* En columna (vertical), el lift hacia arriba hace que la carta roce el label
+   de su posición. Ahí mantenemos solo el realce por escala, sin desplazamiento. */
+#carta-container[data-layout="vertical"] .carta-wrapper.al-frente {
+  transform: scale(1.04) rotate(0deg);
+}
+
 /* Label de posición arriba de cada carta en tiradas múltiples
    ("Pasado", "Presente", "Futuro" / "Pensar", "Sentir", "Hacer") */
 .carta-posicion {
@@ -271,6 +277,17 @@ body {
   text-align: center;
   min-height: 13px;
   transition: color 0.4s ease;
+}
+
+/* Micro-línea bajo el label que ayuda a situar la carta en su posición. */
+.carta-posicion-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #8f8f8a;
+  text-align: center;
+  max-width: min(280px, calc(85vw - 32px));
+  margin-top: -4px;
 }
 
 /* ===== CARTA · FLIP 3D ====================================== */

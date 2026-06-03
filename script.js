@@ -39,10 +39,16 @@ const TIRADAS = {
       pt: ['Passado', 'Presente', 'Futuro'],
       en: ['Past', 'Present', 'Future']
     },
+    // Micro-línea bajo cada label: ayuda a situar la carta en esa posición.
+    hints: {
+      es: ['Lo que te trajo', 'Lo que está vivo', 'Lo que emerge'],
+      pt: ['O que te trouxe', 'O que está vivo', 'O que emerge'],
+      en: ['What brought you here', 'What is alive', 'What emerges']
+    },
     subtitle: {
-      es: 'pasado · presente · futuro',
-      pt: 'passado · presente · futuro',
-      en: 'past · present · future'
+      es: 'lo que te trajo · lo que está vivo · lo que emerge',
+      pt: 'o que te trouxe · o que está vivo · o que emerge',
+      en: 'what brought you · what is alive · what emerges'
     }
   },
   vertical: {
@@ -53,10 +59,28 @@ const TIRADAS = {
       pt: ['Pensar', 'Sentir', 'Fazer'],
       en: ['Think', 'Feel', 'Do']
     },
+    // Versión corta (cabe bajo la carta). La larga vive en la apertura/Notion.
+    hints: {
+      es: [
+        'Compone el mundo. Piensa bonito.',
+        '¿Qué mueve en ti? Resuena o incomoda.',
+        'Acciones concretas, pasando o por pasar.'
+      ],
+      pt: [
+        'Compõe o mundo. Pensa bonito.',
+        'O que move em você? Ressoa ou incomoda.',
+        'Ações concretas, acontecendo ou por acontecer.'
+      ],
+      en: [
+        'It composes the world. Think beautifully.',
+        'What moves in you? It resonates or unsettles.',
+        'Concrete actions, happening or to come.'
+      ]
+    },
     subtitle: {
-      es: 'pensar · sentir · hacer',
-      pt: 'pensar · sentir · fazer',
-      en: 'think · feel · do'
+      es: 'cabeza · pecho · manos',
+      pt: 'cabeça · peito · mãos',
+      en: 'head · chest · hands'
     }
   }
 };
@@ -488,6 +512,9 @@ function lanzarTirada() {
       cartasLanzadas.push(carta);
     }, i * 220);
   });
+
+  // Tras vivir una lectura, quizá ofrecer "añadir a pantalla de inicio" (una vez).
+  tal_vez_avisar_home();
 }
 
 // Renderiza UNA carta dentro de un wrapper con su label de posición (si aplica).
@@ -497,6 +524,8 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
   const texto  = getCartaField(carta, 'texto');
   const labels = (tirada.labels && tirada.labels[idioma]) || (tirada.labels && tirada.labels.es) || [];
   const posLabel = labels[posIndex] || '';
+  const hints = (tirada.hints && tirada.hints[idioma]) || (tirada.hints && tirada.hints.es) || [];
+  const posHint = hints[posIndex] || '';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'carta-wrapper';
@@ -513,6 +542,14 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
     labelEl.dataset.posIndex = String(posIndex);
     labelEl.textContent = posLabel;
     wrapper.appendChild(labelEl);
+  }
+
+  // Micro-línea que ayuda a leer la carta en esa posición (Pasado / Pensar…).
+  if (posHint) {
+    const hintEl = document.createElement('div');
+    hintEl.className = 'carta-posicion-hint';
+    hintEl.textContent = posHint;
+    wrapper.appendChild(hintEl);
   }
 
   const card = document.createElement('div');
@@ -1072,6 +1109,161 @@ function resolverImagenCarta(carta) {
     test.onerror = () => resolve(imgES);
     test.src = imgIdioma;
   });
+}
+
+// ============================================================
+// AVISO "AÑADIR A PANTALLA DE INICIO" (una sola vez, tras la primera tirada)
+// ============================================================
+// Filosofía: ofrecerlo UNA vez, en el mejor momento (después de vivir una
+// lectura), fácil de ignorar y que no vuelva a aparecer. iOS no permite
+// instalar por código → se enseña el gesto. Android/Chrome → botón real.
+
+const HOME_HINT_KEY = 'ludo_homehint';
+let _homeHintArmado = false;
+let _deferredInstallPrompt = null;
+
+// Captura el prompt nativo de instalación (Android / Chrome) para ofrecer un
+// botón "Instalar" de verdad cuando el navegador lo permite.
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+});
+
+function estaInstalada() {
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+  } catch (e) { return false; }
+}
+function esIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent || '') && !window.MSStream;
+}
+function yaSeMostroHint() {
+  try { return localStorage.getItem(HOME_HINT_KEY) === '1'; } catch (e) { return false; }
+}
+function marcarHintMostrado() {
+  try { localStorage.setItem(HOME_HINT_KEY, '1'); } catch (e) { /* ignorar */ }
+}
+
+const homeHintTextos = {
+  titulo: {
+    es: '¿Te gustó? Tenla siempre a mano',
+    pt: 'Gostou? Deixe sempre à mão',
+    en: 'Liked it? Keep it close'
+  },
+  ios: {
+    es: 'Toca <b>Compartir {share}</b> y elige <b>“Añadir a pantalla de inicio”</b>.',
+    pt: 'Toque em <b>Compartilhar {share}</b> e escolha <b>“Adicionar à Tela de Início”</b>.',
+    en: 'Tap <b>Share {share}</b> and choose <b>“Add to Home Screen”</b>.'
+  },
+  android: {
+    es: 'Instálala como app para abrirla de un toque.',
+    pt: 'Instale como app para abrir num toque.',
+    en: 'Install it as an app to open in one tap.'
+  },
+  instalar: { es: 'Instalar', pt: 'Instalar', en: 'Install' },
+  cerrar: { es: 'Cerrar', pt: 'Fechar', en: 'Close' }
+};
+
+function inyectarEstilosHint() {
+  if (document.getElementById('lph-styles')) return;
+  const st = document.createElement('style');
+  st.id = 'lph-styles';
+  st.textContent =
+    '.lph{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:460px;' +
+    'margin:0 auto;background:#FAFAF8;border:1px solid rgba(0,0,0,.10);border-radius:16px;' +
+    'box-shadow:0 10px 30px rgba(0,0,0,.14);padding:16px 16px 14px;' +
+    'font-family:"DM Sans",system-ui,sans-serif;color:#2A2A28;' +
+    'transform:translateY(150%);transition:transform .45s cubic-bezier(.2,.8,.2,1);}' +
+    '.lph.show{transform:translateY(0);}' +
+    '.lph-row{display:flex;align-items:flex-start;gap:11px;}' +
+    '.lph-ic{flex:0 0 auto;width:26px;height:26px;margin-top:3px;}' +
+    '.lph-body{flex:1 1 auto;}' +
+    '.lph-title{font-weight:600;font-size:16px;margin:0 0 3px;}' +
+    '.lph-text{font-size:14px;line-height:1.45;color:#555;margin:0;}' +
+    '.lph-text b{color:#2A2A28;font-weight:600;}' +
+    '.lph-share-glyph{display:inline-block;vertical-align:-3px;width:15px;height:15px;}' +
+    '.lph-actions{margin-top:12px;}' +
+    '.lph-install{border:none;background:#176B53;color:#fff;font:600 14px/1 "DM Sans",sans-serif;' +
+    'padding:11px 18px;border-radius:10px;cursor:pointer;}' +
+    '.lph-close{position:absolute;top:6px;right:10px;border:none;background:none;font-size:22px;' +
+    'line-height:1;color:#aaa;cursor:pointer;padding:4px;}';
+  document.head.appendChild(st);
+}
+
+// Llamar tras una tirada. Decide si corresponde mostrar el aviso (una vez).
+function tal_vez_avisar_home() {
+  if (_homeHintArmado) return;
+  if (estaInstalada() || yaSeMostroHint()) return;
+  // Solo en móvil: es donde el ícono al inicio cambia la experiencia.
+  const esMovil = window.matchMedia('(max-width: 820px)').matches || ('ontouchstart' in window);
+  if (!esMovil) return;
+  _homeHintArmado = true;
+  // Pequeña espera para no pisar el momento de la carta recién tirada.
+  setTimeout(() => {
+    if (estaInstalada() || yaSeMostroHint()) return;
+    mostrarHomeHint();
+  }, 2200);
+}
+
+function mostrarHomeHint() {
+  inyectarEstilosHint();
+  marcarHintMostrado(); // aparece una sola vez en la vida del visitante
+
+  const t = (o) => o[idioma] || o.es;
+  const hayPromptNativo = !!_deferredInstallPrompt;
+  const usarIOS = esIOS() || !hayPromptNativo; // sin prompt nativo → enseñar el gesto
+
+  const shareGlyph =
+    '<svg class="lph-share-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M12 16V4"/><path d="M8 8l4-4 4 4"/>' +
+    '<path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>';
+  const homeGlyph =
+    '<svg class="lph-ic" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+
+  const cuerpo = usarIOS
+    ? t(homeHintTextos.ios).replace('{share}', shareGlyph)
+    : t(homeHintTextos.android);
+
+  const banner = document.createElement('div');
+  banner.className = 'lph';
+  banner.setAttribute('role', 'dialog');
+  banner.setAttribute('aria-live', 'polite');
+  banner.innerHTML =
+    '<button class="lph-close" aria-label="' + t(homeHintTextos.cerrar) + '">×</button>' +
+    '<div class="lph-row">' + homeGlyph +
+    '<div class="lph-body">' +
+    '<p class="lph-title">' + t(homeHintTextos.titulo) + '</p>' +
+    '<p class="lph-text">' + cuerpo + '</p>' +
+    (hayPromptNativo && !usarIOS
+      ? '<div class="lph-actions"><button class="lph-install">' + t(homeHintTextos.instalar) + '</button></div>'
+      : '') +
+    '</div></div>';
+
+  document.body.appendChild(banner);
+  requestAnimationFrame(() => banner.classList.add('show'));
+
+  const cerrar = () => {
+    banner.classList.remove('show');
+    setTimeout(() => { if (banner.parentNode) banner.remove(); }, 460);
+  };
+  banner.querySelector('.lph-close').addEventListener('click', cerrar);
+
+  const btnInstall = banner.querySelector('.lph-install');
+  if (btnInstall && _deferredInstallPrompt) {
+    btnInstall.addEventListener('click', async () => {
+      const ev = _deferredInstallPrompt;
+      _deferredInstallPrompt = null;
+      cerrar();
+      try { ev.prompt(); await ev.userChoice; } catch (e) { /* el usuario decidió */ }
+    });
+  }
+
+  // No es modal: si lo ignora, se retira solo a los 13s.
+  setTimeout(() => { if (document.body.contains(banner)) cerrar(); }, 13000);
 }
 
 // ============================================================
