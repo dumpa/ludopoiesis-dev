@@ -96,10 +96,7 @@ function setNaipeActivo(lente) {
     if (metaLabel) {
       const nombre = (lenteNombres[idioma] && lenteNombres[idioma][lente]) || lente;
       metaLabel.textContent = nombre;
-      // En tiradas de 3 cada carta ya muestra su posición (Pasado/Pensar…);
-      // ocultamos el nombre del naipe para que no tape ese label al subir la carta.
-      if (enTirada) metaLabel.classList.remove('show');
-      else metaLabel.classList.add('show');
+      metaLabel.classList.add('show');
     }
   } else {
     document.body.removeAttribute('data-naipe');
@@ -113,7 +110,6 @@ let cartas = [];
 let idioma = detectarIdiomaInicial();
 let cartaActual = null;
 let cartasLanzadas = [];
-let enTirada = false; // true en tiradas de 3 (horizontal/vertical): oculta el label del naipe
 let textosCache = null;
 // Source of truth de qué sección está visible en pantalla.
 // Valores posibles: 'intro', 'intro-long', 'pregunta', 'lentes', 'dinamica', 'autor', 'cartas', null
@@ -463,7 +459,6 @@ function lanzarTirada() {
   const tirada = TIRADAS[modoTirada] || TIRADAS.carta;
   const container = document.getElementById('carta-container');
   const esAcumulativo = modoTirada === 'carta';
-  enTirada = !esAcumulativo; // tiradas de 3 → ocultar label del naipe
 
   if (esAcumulativo) {
     // Modo Carta: NO limpia cartas anteriores, solo agrega una más al pool
@@ -614,7 +609,6 @@ function mostrarObraDeArteOTexto() {
 function reiniciarCartas() {
   cartasLanzadas = [];
   cartaActual = null;
-  enTirada = false;
   setNaipeActivo(null);
   const container = document.getElementById("carta-container");
   container.innerHTML = "";

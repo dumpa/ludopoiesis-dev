@@ -265,6 +265,12 @@ body {
   transform: scale(1.04) rotate(0deg);
 }
 
+/* En horizontal pasa lo mismo: al subir, la carta se trepa sobre los labels
+   (naipe + Pasado/Presente/Futuro). Realce por escala, sin subir. */
+#carta-container[data-layout="horizontal"] .carta-wrapper.al-frente {
+  transform: scale(1.04) rotate(0deg);
+}
+
 /* Label de posición arriba de cada carta en tiradas múltiples
    ("Pasado", "Presente", "Futuro" / "Pensar", "Sentir", "Hacer") */
 .carta-posicion {
