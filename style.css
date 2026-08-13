@@ -358,6 +358,7 @@ body {
   justify-content: flex-start;
   text-align: left;
   border-top: 3px solid var(--accent);
+container-type: inline-size;   /* la carta se vuelve su propia unidad de medida */
 }
 .card-back h2 {
   font-family: 'Fraunces', serif;
@@ -370,13 +371,15 @@ body {
 }
 .card-back p {
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.65;
+  //font-size: 13px;
+  font-size: clamp(11px, 5.7cqw, 14px);   /* 13px a ancho de diseño; escala con la carta */
+   line-height: 1.65;
   color: var(--ink-soft);
   margin: 0;
   white-space: pre-line;
   flex: 1;
   overflow-y: auto;
+  
 }
 
 /* Carta ampliada en overlay (mantenido del original, refinado) */
@@ -927,8 +930,7 @@ body[data-naipe] .btn-share {
     width: min(340px, calc(85vw - 32px));
   }
   .card-back h2 { font-size: 28px; }
-  .card-back p { font-size: 14px; }
-  .zona-controles {
+    .zona-controles {
     max-width: 1100px;
     padding: 8px 40px 80px;
   }
