@@ -17,7 +17,11 @@
   --primary:     #1A1A1A;
   --accent:      #1A1A1A;
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
-  --accent-glow: color-mix(in srgb, var(--accent) 24%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 24%, transparent); 
+  --medida:    26.4;
+  --carta-pad: 16px;
+  --carta-w:   min(340px, calc(100vw - 46px));
+  --verso:     calc((var(--carta-w) - 2 * var(--carta-pad)) / var(--medida));
 }
 
 /* Paletas activas según naipe (las setea el JS al tirar carta) */
@@ -205,7 +209,8 @@ body {
   overflow-y: visible;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 30px 22px;
+  padding: 30px 10px;
+  margin-inline: -12px;      
   --cards-scale: 1;
 }
 #carta-container:not([data-layout])::-webkit-scrollbar { display: none; }
@@ -220,8 +225,9 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-padding: 22px;
-  padding: 8px 22px 24px;
+  scroll-padding: 10px;
+  padding: 8px 10px 24px;
+   margin-inline: -12px;
   gap: 18px;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -236,6 +242,7 @@ body {
   flex-wrap: nowrap;
   align-items: center;
   gap: 24px;
+  margin-inline: -12px;
 }
 
 .carta-wrapper {
@@ -292,13 +299,13 @@ body {
   line-height: 1.35;
   color: #8f8f8a;
   text-align: center;
-  max-width: min(280px, calc(85vw - 32px));
+  max-width: var(--carta-w);
   margin-top: -4px;
 }
 
 /* ===== CARTA · FLIP 3D ====================================== */
 .card {
-  width: min(280px, calc(85vw - 32px));
+  width: var(--carta-w);     /* antes: min(280px, calc(85vw - 32px)) */
   aspect-ratio: 280 / 428;
   height: auto;
   flex-shrink: 0;
@@ -351,32 +358,49 @@ body {
   background: #fff;
   color: var(--ink);
   transform: rotateY(180deg);
-  padding: 30px 26px 26px;
+  padding: 24px var(--carta-pad) 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: stretch;
   text-align: left;
   border-top: 3px solid var(--accent);
 }
 .card-back h2 {
   font-family: 'Fraunces', serif;
   font-weight: 300;
-  font-size: 24px;
+  font-size: calc(var(--verso) * 1.85);
   letter-spacing: -0.5px;
-  line-height: 1.05;
-  margin: 0 0 18px;
+  line-height: 1.1;
+  margin: 0 0 calc(var(--verso) * 1.2);
   color: var(--primary);
 }
-.card-back p {
+
+/* El texto es verso: cada línea del JSON es una decisión de autor.
+   Se pinta línea por línea para que el salto sea estructura, no un <br>. */
+.card-back .texto-carta {
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: var(--verso);
+  line-height: 1.45;
   color: var(--ink-soft);
-  margin: 0;
-  white-space: pre-line;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+.card-back .texto-carta::-webkit-scrollbar { display: none; }
+
+.card-back .verso {
+  display: block;
+  white-space: pre-wrap;
+  /* Red de seguridad: si una línea no cabe, envuelve con sangría
+     francesa — se lee como continuación del verso, no como verso
+     nuevo. La mancha se dobla, no se rompe. */
+  padding-left: 1.15em;
+  text-indent: -1.15em;
+}
+.card-back .verso-hueco {
+  display: block;
+  height: 0.55em;   /* salto de estrofa, sin gastar una línea entera */
 }
 
 /* Carta ampliada en overlay (mantenido del original, refinado) */
@@ -923,11 +947,7 @@ body[data-naipe] .btn-share {
     padding: 56px 40px 32px;
     max-width: 1100px;
   }
-  .card {
-    width: min(340px, calc(85vw - 32px));
-  }
-  .card-back h2 { font-size: 28px; }
-  .card-back p { font-size: 14px; }
+  :root { --carta-w: 380px; }
   .zona-controles {
     max-width: 1100px;
     padding: 8px 40px 80px;
