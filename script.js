@@ -128,10 +128,13 @@ let lentesActivos = {
 //     si no existe o está vacío, devuelve carta.titulo (español).
 function getCartaField(carta, baseField) {
   if (!carta) return '';
-  if (idioma === 'es') return carta[baseField] || '';
+  // Los títulos del JSON usan \r para el salto de dos líneas. Se normaliza
+  // aquí, una sola vez, para que todo lo de abajo vea solo \n.
+  const norm = s => String(s || '').replace(/\r\n?/g, '\n');
+  if (idioma === 'es') return norm(carta[baseField]);
   const suffixed = carta[baseField + '_' + idioma];
-  if (suffixed && suffixed.toString().trim() !== '') return suffixed;
-  return carta[baseField] || '';
+  if (suffixed && suffixed.toString().trim() !== '') return norm(suffixed);
+  return norm(carta[baseField]);
 }
 
 // Genera el HTML del <img> de la carta con fallback automático.
@@ -144,7 +147,25 @@ function imgCartaHTML(carta, titulo) {
     : '';
   return `<img src="${imagenIdioma}" alt="${titulo}" onerror="${onerror}">`;
 }
+function escaparHTML(s) {
+  return String(s).replace(/[&<>"]/g,
+    m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+}
 
+// Cada línea del JSON se vuelve su propio bloque. El salto deja de ser
+// un <br> suelto y pasa a ser estructura, con lo que se le puede dar
+// sangría francesa al verso que no cabe y aire propio a la estrofa.
+function versosHTML(texto) {
+  return String(texto).split('\n').map(l =>
+    l.trim() === ''
+      ? '<span class="verso-hueco"></span>'
+      : '<span class="verso">' + escaparHTML(l) + '</span>'
+  ).join('');
+}
+
+function tituloHTML(t) {
+  return escaparHTML(t).replace(/\n/g, '<br>');
+}
 // Aplica los nombres de los lentes (Naturaleza/Fluir/Tecnología) en el idioma activo
 // a los .lente-label dentro de #lentes-toggle. Se llama desde aplicarIdiomaUI.
 function aplicarLenteLabels() {
@@ -576,8 +597,8 @@ function renderCartaTirada(carta, posIndex, tirada, container, esAcumulativo) {
     <div class="card-inner">
       <div class="card-front">${imgCartaHTML(carta, titulo)}</div>
       <div class="card-back">
-        <h2>${titulo}</h2>
-        <p>${texto.replace(/\n/g, '<br>')}</p>
+        <h2>${tituloHTML(titulo)}</h2>
+        <div class="texto-carta">${versosHTML(texto)}</div>
       </div>
     </div>
   `;
@@ -690,7 +711,8 @@ function setIdioma(nuevoIdioma) {
 
       const front = card.querySelector(".card-front img");
       const backH2 = card.querySelector(".card-back h2");
-      const backP = card.querySelector(".card-back p");
+      
+      const backTexto = card.querySelector(".card-back .texto-carta");
 
       if (front) {
         front.src = imagenIdioma;
@@ -701,8 +723,8 @@ function setIdioma(nuevoIdioma) {
           front.onerror = null;
         }
       }
-      if (backH2) backH2.textContent = titulo;
-      if (backP) backP.innerHTML = texto.replace(/\n/g, "<br>");
+     if (backH2) backH2.innerHTML = tituloHTML(titulo);
+      if (backTexto) backTexto.innerHTML = versosHTML(texto);
     });
     // Actualizar labels de posición (Pasado/Presente/Futuro, etc.) si es tirada múltiple
     const tirada = TIRADAS[modoTirada];
